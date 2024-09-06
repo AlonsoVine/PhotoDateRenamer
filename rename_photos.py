@@ -41,5 +41,5 @@ def renombrar_fotos_en_directorio(directorio):
                 print(f"No se encontró la fecha para {archivo}")
 
 # Cambia 'directorio_de_fotos' al directorio donde están tus fotos
-directorio_de_fotos = './'  # O la ruta que prefieras
+directorio_de_fotos = './mi_directorio_con_fotos'  # O la ruta que prefieras
 renombrar_fotos_en_directorio(directorio_de_fotos)

@@ -47,8 +47,9 @@ Cada imagen que tenga metadatos EXIF con la fecha original será renombrada en e
 ```bash
 PhotoDateRenamer/
 │
-├── rename_photos.py     # El script principal de renombrado de fotos
-├── README.md            # Documentación del proyecto
+├── rename_photos.py        # El script principal de renombrado de fotos
+├── README.md               # Documentación del proyecto
+├── mi_directorio_con_fotos # El directorio donde están las fotos 
 ```
 ✍️ Personalización
 Si deseas cambiar el directorio de las fotos, simplemente edita la variable directorio_de_fotos en el script rename_photos.py:(línea 44)
