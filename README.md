@@ -51,8 +51,9 @@ PhotoDateRenamer/
 ├── README.md               # Documentación del proyecto
 ├── mi_directorio_con_fotos # El directorio donde están las fotos 
 ```
-✍️ Personalización
-Si deseas cambiar el directorio de las fotos, simplemente edita la variable directorio_de_fotos en el script rename_photos.py:(línea 44)
+✍️ Personalización:
+
+Si deseas cambiar el directorio de las fotos, simplemente edita la variable directorio_de_fotos en el script rename_photos.py: (línea 44)
 ```bash
 directorio_de_fotos = './mi_directorio_con_fotos'
 ```
