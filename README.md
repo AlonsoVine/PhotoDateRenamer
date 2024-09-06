@@ -33,6 +33,15 @@ cd PhotoDateRenamer
 2. Coloca tus fotos en el directorio
 Mueve las fotos que deseas renombrar al directorio donde está ubicado el script. También puedes especificar un directorio diferente en el código.
 
+📂 Estructura del Proyecto:
+```bash
+PhotoDateRenamer/
+│
+├── rename_photos.py        # El script principal de renombrado de fotos
+├── README.md               # Documentación del proyecto
+├── mi_directorio_con_fotos # El directorio donde están las fotos 
+```
+
 3. Ejecuta el script
 Para ejecutar el script, usa el siguiente comando:
 ```bash
@@ -43,14 +52,7 @@ El script recorrerá todas las fotos en el directorio actual (o en el directorio
 4. Resultado
 Cada imagen que tenga metadatos EXIF con la fecha original será renombrada en el formato `YYYY_MM_DD_nombreOriginal.ext`. Si una imagen no tiene la fecha en sus metadatos, el script la omitirá.
 
-📂 Estructura del Proyecto:
-```bash
-PhotoDateRenamer/
-│
-├── rename_photos.py        # El script principal de renombrado de fotos
-├── README.md               # Documentación del proyecto
-├── mi_directorio_con_fotos # El directorio donde están las fotos 
-```
+
 ✍️ Personalización:
 
 Si deseas cambiar el directorio de las fotos, simplemente edita la variable directorio_de_fotos en el script rename_photos.py: (línea 44)
