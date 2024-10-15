@@ -1,7 +1,7 @@
 # 📸 PhotoDateRenamer
 
 **PhotoDateRenamer** es una herramienta en Python que renombra automáticamente tus fotos utilizando los metadatos EXIF, concretamente la fecha en que fueron tomadas. El nuevo nombre de la foto seguirá el formato `YYYY_MM_DD_nombreOriginal.jpg`, facilitando la organización cronológica de tus imágenes.
-
+![IMG](fotografia-movil-versus-camara2.jpg "imagen cámara")
 ## ✨ Características
 
 - Renombra fotos utilizando la fecha en la que fueron tomadas.
