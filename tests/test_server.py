@@ -1,0 +1,110 @@
+import json
+from pathlib import Path
+from subprocess import CompletedProcess
+import re
+import tempfile
+import threading
+import unittest
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
+from unittest.mock import patch
+
+from PIL import Image
+
+from photodaterenamer.server import AppServer
+
+
+class LocalServerTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temporary_directory = tempfile.TemporaryDirectory()
+        self.folder = Path(self.temporary_directory.name)
+        self.server = AppServer()
+        self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
+        self.thread.start()
+        self.base_url = f"http://127.0.0.1:{self.server.server_port}"
+        with urlopen(f"{self.base_url}/") as response:
+            page = response.read().decode("utf-8")
+        self.token = re.search(r'window\.PDR_TOKEN = "([^"]+)"', page).group(1)
+
+    def tearDown(self) -> None:
+        self.server.shutdown()
+        self.server.server_close()
+        self.thread.join(timeout=3)
+        self.temporary_directory.cleanup()
+
+    def post(self, path: str, payload: dict[str, object], token: str | None = None) -> dict:
+        request = Request(
+            f"{self.base_url}{path}",
+            data=json.dumps(payload).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "Origin": self.base_url,
+                "X-PhotoDateRenamer-Token": token if token is not None else self.token,
+            },
+        )
+        with urlopen(request) as response:
+            return json.loads(response.read())
+
+    def test_serves_browser_assets_and_limits_api_to_authorized_origin(self) -> None:
+        with urlopen(f"{self.base_url}/styles.css") as response:
+            stylesheet = response.read().decode("utf-8")
+        self.assertIn("--paper:", stylesheet)
+
+        with urlopen(f"{self.base_url}/") as response:
+            page = response.read().decode("utf-8")
+        self.assertIn('href="/images/app-icon.png"', page)
+        self.assertIn('src="/images/hero-illustration.png"', page)
+        self.assertIn("Creado por Alonso Viñé", page)
+        for image_path in ("/images/app-icon.png", "/images/hero-illustration.png"):
+            with urlopen(f"{self.base_url}{image_path}") as response:
+                self.assertEqual(response.headers.get_content_type(), "image/png")
+                self.assertTrue(response.read().startswith(b"\x89PNG\r\n\x1a\n"))
+
+        with self.assertRaises(HTTPError) as error:
+            self.post("/api/preview", {"folder": str(self.folder)}, token="incorrect")
+        self.assertEqual(error.exception.code, 403)
+        error.exception.close()
+
+    def test_preview_confirm_and_undo_over_http(self) -> None:
+        image_path = self.folder / "IMG_001.jpg"
+        image = Image.new("RGB", (4, 4), color="olive")
+        exif = Image.Exif()
+        exif[36867] = "2024:05:06 07:08:09"
+        image.save(image_path, exif=exif)
+
+        preview = self.post("/api/preview", {"folder": str(self.folder)})
+        self.assertEqual(preview["rename_count"], 1)
+        self.assertEqual(preview["items"][0]["new_name"], "2024_05_06_IMG_001.jpg")
+
+        result = self.post("/api/confirm", {"plan_id": preview["plan_id"]})
+        renamed_path = self.folder / "2024_05_06_IMG_001.jpg"
+        self.assertTrue(renamed_path.exists())
+        self.assertEqual(result["renamed_count"], 1)
+
+        undo = self.post("/api/undo", {"run_id": result["run_id"]})
+        self.assertTrue(image_path.exists())
+        self.assertEqual(undo["restored_count"], 1)
+
+    def test_folder_picker_runs_in_a_separate_main_thread_process(self) -> None:
+        with patch("photodaterenamer.server.platform.system", return_value="Linux"), patch(
+            "subprocess.run",
+            return_value=CompletedProcess([], 0, stdout="C:\\Photos\r\n", stderr=""),
+        ) as run_process:
+            result = self.post("/api/select-folder", {})
+
+        self.assertEqual(result["folder"], "C:\\Photos")
+        self.assertIn("photodaterenamer.folder_picker", run_process.call_args.args[0])
+
+    def test_windows_api_uses_native_foreground_folder_picker(self) -> None:
+        with patch("photodaterenamer.server.platform.system", return_value="Windows"), patch(
+            "photodaterenamer.server.select_windows_folder",
+            return_value="C:\\Photos",
+        ) as native_picker:
+            result = self.post("/api/select-folder", {})
+
+        self.assertEqual(result["folder"], "C:\\Photos")
+        native_picker.assert_called_once_with()
+
+
+if __name__ == "__main__":
+    unittest.main()

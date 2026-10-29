@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "photo-date-renamer"
+version = "0.3.0"
+description = "A local, preview-first photo renaming application."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "Pillow>=13.0",
+    "defusedxml>=0.7.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pyinstaller>=6.11",
+]
+
+[project.scripts]
+photo-date-renamer = "photodaterenamer.app:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+photodaterenamer = ["web/*", "web/images/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
