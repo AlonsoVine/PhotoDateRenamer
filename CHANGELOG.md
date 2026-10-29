@@ -12,6 +12,7 @@ Notable changes to PhotoDateRenamer are documented here.
 
 ### Added
 - Cancellable scan progress and paginated previews for large photo libraries.
+- Add Node integration tests for preview pagination, scan cancellation, rename confirmation, and undo.
 
 ### Changed
 - The browser reads EXIF/XMP metadata in bounded file ranges instead of loading each complete photo into memory.

@@ -82,10 +82,10 @@ PhotoDateRenamer se distribuye bajo una licencia propietaria de uso personal y n
 ```powershell
 python -m pip install -e ".[dev]"
 python -m unittest discover -s tests -v
-node --test tests/browser_metadata.test.cjs
+node --test
 ```
 
-Los tests construyen imágenes temporales con metadatos de prueba y no modifican fotografías del repositorio. También prueban el lector de metadatos JavaScript de la web. La integración continua prueba el motor en Windows, Linux y macOS; el trabajo de compilación produce el `.exe` de Windows.
+Los tests construyen imágenes temporales con metadatos de prueba y no modifican fotografías del repositorio. Node ejecuta las pruebas del lector incremental de metadatos y de la interfaz web con APIs de carpeta simuladas, incluyendo paginación, cancelación, renombrado y deshacer. La integración continua prueba el motor en Windows, Linux y macOS; el trabajo de compilación produce el `.exe` de Windows.
 
 ## Estructura
 
