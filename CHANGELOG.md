@@ -6,6 +6,7 @@ Notable changes to PhotoDateRenamer are documented here.
 
 ### Security
 - Reject rename plans when a source photo changes after preview.
+- Add a nonce-based Content Security Policy, `X-Content-Type-Options`, and `Referrer-Policy` to the local interface.
 
 ### Added
 - Cancellable scan progress and paginated previews for large photo libraries.

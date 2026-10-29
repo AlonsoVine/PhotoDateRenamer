@@ -50,6 +50,11 @@ class AppRequestHandler(BaseHTTPRequestHandler):
     def log_message(self, format: str, *args: Any) -> None:
         print(f"[PhotoDateRenamer] {self.address_string()} - {format % args}")
 
+    def end_headers(self) -> None:
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Referrer-Policy", "no-referrer")
+        super().end_headers()
+
     def _host_is_local(self) -> bool:
         expected = f"127.0.0.1:{self.server.server_port}"
         return self.headers.get("Host", "").lower() in {
@@ -66,12 +71,26 @@ class AppRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(payload)
 
-    def _send_text(self, status: int, payload: str, content_type: str) -> None:
+    def _send_text(
+        self,
+        status: int,
+        payload: str,
+        content_type: str,
+        csp_nonce: str | None = None,
+    ) -> None:
         body = payload.encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
+        if csp_nonce is not None:
+            self.send_header(
+                "Content-Security-Policy",
+                "default-src 'none'; "
+                f"script-src 'self' 'nonce-{csp_nonce}'; "
+                "style-src 'self'; img-src 'self'; connect-src 'self'; "
+                "form-action 'self'; base-uri 'none'; frame-ancestors 'none'; object-src 'none'",
+            )
         self.end_headers()
         self.wfile.write(body)
 
@@ -108,7 +127,12 @@ class AppRequestHandler(BaseHTTPRequestHandler):
         if path == "/":
             html = (WEB_ROOT / "index.html").read_text(encoding="utf-8")
             html = html.replace("__APP_TOKEN__", self.server.state["token"])
-            self._send_text(200, html, "text/html; charset=utf-8")
+            self._send_text(
+                200,
+                html,
+                "text/html; charset=utf-8",
+                csp_nonce=self.server.state["token"],
+            )
             return
         if path in {"/app.js", "/styles.css"}:
             content_type = "text/javascript; charset=utf-8" if path.endswith(".js") else "text/css; charset=utf-8"
