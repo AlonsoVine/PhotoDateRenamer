@@ -7,6 +7,8 @@ Notable changes to PhotoDateRenamer are documented here.
 ### Security
 - Reject rename plans when a source photo changes after preview.
 - Add a nonce-based Content Security Policy, `X-Content-Type-Options`, and `Referrer-Policy` to the local interface.
+- Restrict GitHub Actions token permissions, pin third-party actions to verified commit SHAs, and add Dependabot update checks.
+- Publish a SHA-256 checksum and build-provenance attestation for Windows releases.
 
 ### Added
 - Cancellable scan progress and paginated previews for large photo libraries.
