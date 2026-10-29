@@ -1,8 +1,20 @@
-# PhotoDateRenamer
+<p align="center">
+  <img src="site/images/app-icon.png" alt="Icono de PhotoDateRenamer" width="120">
+</p>
+
+<h1 align="center">PhotoDateRenamer</h1>
 
 PhotoDateRenamer organiza fotografías anteponiendo a sus nombres una fecha encontrada en los metadatos de la imagen o, como último recurso, en las fechas del archivo. La aplicación funciona localmente: las imágenes no se suben ni se envían a servicios externos.
 
 PhotoDateRenamer está disponible como aplicación portable para Windows y como una página estática que puede servirse con GitHub Pages. En ambos casos las fotografías permanecen en el equipo de la persona usuaria.
+
+<p align="center">
+  <a href="https://alonsovine.github.io/PhotoDateRenamer/">Abrir PhotoDateRenamer en la web ↗</a>
+</p>
+
+<p align="center">
+  <img src="site/images/hero-illustration.png" alt="Paisaje cálido de colinas al atardecer, ilustración de PhotoDateRenamer" width="800">
+</p>
 
 ## Funcionalidades
 
