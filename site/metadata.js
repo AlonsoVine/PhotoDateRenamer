@@ -8,6 +8,8 @@
     "DateTimeDigitized",
     "ModifyDate"
   ];
+  const MAX_METADATA_CHUNK_SIZE = 16 * 1024 * 1024;
+  const PNG_SIGNATURE = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
 
   function parseDate(value) {
     if (typeof value !== "string") return null;
@@ -23,7 +25,18 @@
       Number(match[5] || 0),
       Number(match[6] || 0)
     );
-    return Number.isNaN(date.getTime()) ? null : date;
+    if (
+      Number.isNaN(date.getTime()) ||
+      date.getFullYear() !== Number(match[1]) ||
+      date.getMonth() !== Number(match[2]) - 1 ||
+      date.getDate() !== Number(match[3]) ||
+      date.getHours() !== Number(match[4] || 0) ||
+      date.getMinutes() !== Number(match[5] || 0) ||
+      date.getSeconds() !== Number(match[6] || 0)
+    ) {
+      return null;
+    }
+    return date;
   }
 
   function tiffDates(bytes, start = 0) {
@@ -191,9 +204,164 @@
     return null;
   }
 
+  async function readRange(blob, start, end) {
+    return new Uint8Array(await blob.slice(start, end).arrayBuffer());
+  }
+
+  async function readTiffDatesFromBlob(blob) {
+    if (blob.size < 8) return {};
+    const header = await readRange(blob, 0, 8);
+    if (header.length < 8) return {};
+    const order = String.fromCharCode(header[0], header[1]);
+    if (order !== "II" && order !== "MM") return {};
+    const littleEndian = order === "II";
+    const headerView = new DataView(header.buffer, header.byteOffset, header.byteLength);
+    if (headerView.getUint16(2, littleEndian) !== 42) return {};
+    const firstIfdOffset = headerView.getUint32(4, littleEndian);
+
+    async function readIfd(relativeOffset) {
+      if (relativeOffset + 2 > blob.size) return [];
+      const countBytes = await readRange(blob, relativeOffset, relativeOffset + 2);
+      if (countBytes.length < 2) return [];
+      const count = new DataView(countBytes.buffer, countBytes.byteOffset, 2).getUint16(0, littleEndian);
+      const entriesStart = relativeOffset + 2;
+      const entriesEnd = entriesStart + count * 12;
+      if (count > 4096 || entriesEnd > blob.size) return [];
+      const bytes = await readRange(blob, entriesStart, entriesEnd);
+      if (bytes.length < count * 12) return [];
+      const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+      const entries = [];
+      for (let index = 0; index < count; index += 1) {
+        const entry = index * 12;
+        const tag = view.getUint16(entry, littleEndian);
+        const type = view.getUint16(entry + 2, littleEndian);
+        const length = view.getUint32(entry + 4, littleEndian);
+        const valueOffset = view.getUint32(entry + 8, littleEndian);
+        let value;
+        if (type === 2 && length > 0 && length <= 128) {
+          const valueStart = length <= 4 ? entriesStart + entry + 8 : valueOffset;
+          if (valueStart + length <= blob.size) {
+            const valueBytes = await readRange(blob, valueStart, valueStart + length);
+            if (valueBytes.length === length) {
+              value = new TextDecoder().decode(valueBytes).replace(/\0.*$/s, "");
+            }
+          }
+        }
+        entries.push({ tag, type, length, valueOffset, value });
+      }
+      return entries;
+    }
+
+    const firstEntries = await readIfd(firstIfdOffset);
+    const exifPointer = firstEntries.find((entry) => entry.tag === 0x8769 && entry.type === 4);
+    const exifEntries = exifPointer ? await readIfd(exifPointer.valueOffset) : [];
+    const dates = new Map();
+    for (const entry of [...exifEntries, ...firstEntries]) {
+      if (entry.value && [0x9003, 0x9004, 0x0132].includes(entry.tag)) {
+        dates.set(entry.tag, entry.value);
+      }
+    }
+    return {
+      original: dates.get(0x9003),
+      digitized: dates.get(0x9004),
+      general: dates.get(0x0132)
+    };
+  }
+
+  async function jpegMetadataFromFile(file) {
+    const signature = await readRange(file, 0, Math.min(2, file.size));
+    if (signature.length < 2 || signature[0] !== 0xff || signature[1] !== 0xd8) return null;
+    let offset = 2;
+    while (offset + 4 <= file.size) {
+      const header = await readRange(file, offset, offset + 4);
+      if (header[0] !== 0xff) return null;
+      const marker = header[1];
+      if (marker === 0xda || marker === 0xd9) break;
+      const segmentLength = (header[2] << 8) | header[3];
+      const segmentEnd = offset + 2 + segmentLength;
+      if (segmentLength < 2 || segmentEnd > file.size) return null;
+      if (marker === 0xe1) {
+        const payload = await readRange(file, offset + 4, segmentEnd);
+        const segment = new Uint8Array(6 + payload.length);
+        segment.set([0xff, 0xd8, 0xff, marker, header[2], header[3]]);
+        segment.set(payload, 6);
+        const metadata = imageMetadata(segment, file.name);
+        if (metadata) return metadata;
+      }
+      offset = segmentEnd;
+    }
+    return null;
+  }
+
+  async function pngMetadataFromFile(file) {
+    const signature = await readRange(file, 0, Math.min(8, file.size));
+    if (!PNG_SIGNATURE.every((byte, index) => signature[index] === byte)) return null;
+    let offset = 8;
+    while (offset + 12 <= file.size) {
+      const header = await readRange(file, offset, offset + 8);
+      const length = new DataView(header.buffer, header.byteOffset, 4).getUint32(0);
+      const type = new TextDecoder().decode(header.subarray(4, 8));
+      const dataStart = offset + 8;
+      const dataEnd = dataStart + length;
+      if (dataEnd + 4 > file.size) return null;
+      if (type === "eXIf") {
+        if (length > MAX_METADATA_CHUNK_SIZE) {
+          throw new RangeError("El bloque EXIF supera el límite seguro de lectura de 16 MiB.");
+        }
+        const dates = await readTiffDatesFromBlob(file.slice(dataStart, dataEnd));
+        for (const [field, source] of [
+          ["original", "EXIF · DateTimeOriginal"],
+          ["digitized", "EXIF · DateTimeDigitized"],
+          ["general", "EXIF · DateTime"]
+        ]) {
+          const date = parseDate(dates[field]);
+          if (date) return { date, source };
+        }
+      } else if (type === "iTXt" && length > MAX_METADATA_CHUNK_SIZE) {
+        throw new RangeError("El bloque XMP supera el límite seguro de lectura de 16 MiB.");
+      } else if (type === "iTXt") {
+        const data = await readRange(file, dataStart, dataEnd);
+        const chunk = new Uint8Array(20 + data.length);
+        chunk.set(PNG_SIGNATURE);
+        new DataView(chunk.buffer).setUint32(8, data.length);
+        chunk.set([0x69, 0x54, 0x58, 0x74], 12);
+        chunk.set(data, 16);
+        const metadata = imageMetadata(chunk, file.name);
+        if (metadata) return metadata;
+      }
+      offset = dataEnd + 4;
+      if (type === "IEND") break;
+    }
+    return null;
+  }
+
+  async function tiffMetadataFromFile(file) {
+    const dates = await readTiffDatesFromBlob(file);
+    for (const [field, source] of [
+      ["original", "EXIF · DateTimeOriginal"],
+      ["digitized", "EXIF · DateTimeDigitized"],
+      ["general", "EXIF · DateTime"]
+    ]) {
+      const date = parseDate(dates[field]);
+      if (date) return { date, source };
+    }
+    return null;
+  }
+
   async function readCaptureDate(file) {
-    const bytes = new Uint8Array(await file.arrayBuffer());
-    const metadataDate = imageMetadata(bytes, file.name);
+    const lowerName = file.name.toLowerCase();
+    let metadataDate = null;
+    if (typeof file.slice === "function") {
+      if (lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg")) {
+        metadataDate = await jpegMetadataFromFile(file);
+      } else if (lowerName.endsWith(".png")) {
+        metadataDate = await pngMetadataFromFile(file);
+      } else if (lowerName.endsWith(".tif") || lowerName.endsWith(".tiff")) {
+        metadataDate = await tiffMetadataFromFile(file);
+      }
+    } else if (typeof file.arrayBuffer === "function") {
+      metadataDate = imageMetadata(new Uint8Array(await file.arrayBuffer()), file.name);
+    }
     if (metadataDate) return metadataDate;
     if (file.lastModified > 0) {
       return { date: new Date(file.lastModified), source: "Archivo · última modificación" };

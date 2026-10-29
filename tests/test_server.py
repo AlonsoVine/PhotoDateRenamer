@@ -8,9 +8,11 @@ import unittest
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 from unittest.mock import patch
+from typing import Any
 
 from PIL import Image
 
+from photodaterenamer.renamer import create_preview as run_create_preview
 from photodaterenamer.server import AppServer
 
 
@@ -55,6 +57,8 @@ class LocalServerTests(unittest.TestCase):
         self.assertIn('href="/images/app-icon.png"', page)
         self.assertIn('src="/images/hero-illustration.png"', page)
         self.assertIn("Creado por Alonso Viñé", page)
+        self.assertIn('id="operation-progress"', page)
+        self.assertIn('id="preview-pagination"', page)
         for image_path in ("/images/app-icon.png", "/images/hero-illustration.png"):
             with urlopen(f"{self.base_url}{image_path}") as response:
                 self.assertEqual(response.headers.get_content_type(), "image/png")
@@ -110,6 +114,55 @@ class LocalServerTests(unittest.TestCase):
             self.post("/api/preview", {"folder": str(self.folder), "recursive": "yes"})
         self.assertEqual(error.exception.code, 400)
         error.exception.close()
+
+    def test_preview_progress_is_available_and_does_not_expose_fingerprints(self) -> None:
+        image_path = self.folder / "IMG_001.jpg"
+        image = Image.new("RGB", (4, 4), color="olive")
+        exif = Image.Exif()
+        exif[36867] = "2024:05:06 07:08:09"
+        image.save(image_path, exif=exif)
+
+        preview = self.post(
+            "/api/preview",
+            {"folder": str(self.folder), "scan_id": "test-scan"},
+        )
+        progress = self.post("/api/progress", {"scan_id": "test-scan"})
+
+        self.assertTrue(progress["completed"])
+        self.assertEqual(progress["phase"], "scanning")
+        self.assertEqual(progress["scanned"], 1)
+        self.assertEqual(progress["total"], 1)
+        self.assertNotIn("source_fingerprint", preview["items"][0])
+
+    def test_scan_can_be_cancelled_over_http(self) -> None:
+        started = threading.Event()
+        errors: list[int] = []
+
+        def wait_until_cancelled(*args: Any, **kwargs: Any) -> Any:
+            started.set()
+            kwargs["cancellation_event"].wait(timeout=3)
+            return run_create_preview(*args, **kwargs)
+
+        def request_preview() -> None:
+            try:
+                self.post(
+                    "/api/preview",
+                    {"folder": str(self.folder), "scan_id": "cancel-scan"},
+                )
+            except HTTPError as error:
+                errors.append(error.code)
+                error.close()
+
+        with patch("photodaterenamer.server.create_preview", side_effect=wait_until_cancelled):
+            preview_thread = threading.Thread(target=request_preview)
+            preview_thread.start()
+            self.assertTrue(started.wait(timeout=2))
+            result = self.post("/api/cancel", {"scan_id": "cancel-scan"})
+            preview_thread.join(timeout=3)
+
+        self.assertFalse(preview_thread.is_alive())
+        self.assertEqual(result["cancelled"], True)
+        self.assertEqual(errors, [409])
 
     def test_folder_picker_runs_in_a_separate_main_thread_process(self) -> None:
         with patch("photodaterenamer.server.platform.system", return_value="Linux"), patch(

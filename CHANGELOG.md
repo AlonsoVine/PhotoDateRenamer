@@ -7,6 +7,13 @@ Notable changes to PhotoDateRenamer are documented here.
 ### Security
 - Reject rename plans when a source photo changes after preview.
 
+### Added
+- Cancellable scan progress and paginated previews for large photo libraries.
+
+### Changed
+- The browser reads EXIF/XMP metadata in bounded file ranges instead of loading each complete photo into memory.
+- Browser metadata chunks larger than 16 MiB are reported as skipped rather than loaded into memory all at once.
+
 ## [0.4.0] - 2026-10-29
 
 ### Added

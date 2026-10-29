@@ -84,6 +84,11 @@
           <button id="preview-button" class="button button-dark" type="button">Preparar vista previa <span aria-hidden="true">↗</span></button>
         </div>
         <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+        <div id="operation-progress" class="operation-progress" role="status" aria-live="polite" hidden>
+          <progress id="operation-progress-bar" max="100"></progress>
+          <span id="operation-progress-label"></span>
+          <button id="cancel-operation" class="button button-outline" type="button">Cancelar</button>
+        </div>
         <div id="undo-control" class="undo-control" hidden>
           <span>El último lote se puede restaurar mientras esta página siga abierta.</span>
           <button id="undo-button" class="button button-outline" type="button">Deshacer</button>
@@ -96,6 +101,11 @@
               <tbody id="preview-rows"></tbody>
             </table>
           </div>
+          <nav id="preview-pagination" class="preview-pagination" aria-label="Páginas de la vista previa" hidden>
+            <span id="preview-page-label"></span>
+            <button id="previous-page" class="button button-outline" type="button">Anterior</button>
+            <button id="next-page" class="button button-outline" type="button">Siguiente</button>
+          </nav>
           <div class="confirm-row">
             <p>Solo se cambiarán los nombres tras tu confirmación. No se sobrescribirán archivos.</p>
             <button id="confirm-button" class="button button-accent" type="button">Confirmar renombrado</button>

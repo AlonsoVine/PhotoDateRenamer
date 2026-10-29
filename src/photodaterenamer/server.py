@@ -8,6 +8,7 @@ import platform
 import secrets
 import subprocess
 import sys
+from threading import Event, Lock
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
 from urllib.parse import urlparse
@@ -33,10 +34,12 @@ STATIC_IMAGES = {
 
 class AppServer(ThreadingHTTPServer):
     def __init__(self) -> None:
+        self.state_lock = Lock()
         self.state: dict[str, Any] = {
             "token": secrets.token_urlsafe(32),
             "plans": {},
             "runs": {},
+            "scan": None,
         }
         super().__init__(("127.0.0.1", 0), AppRequestHandler)
 
@@ -136,16 +139,20 @@ class AppRequestHandler(BaseHTTPRequestHandler):
                 self._send_json(200, self._select_folder())
             elif path == "/api/preview":
                 self._preview(payload)
+            elif path == "/api/progress":
+                self._progress(payload)
+            elif path == "/api/cancel":
+                self._cancel(payload)
             elif path == "/api/confirm":
                 self._confirm(payload)
             elif path == "/api/undo":
                 self._undo(payload)
             else:
                 self.send_error(404)
-        except ValueError as error:
-            self._send_json(400, {"error": str(error)})
         except RenamePlanError as error:
             self._send_json(409, {"error": str(error)})
+        except ValueError as error:
+            self._send_json(400, {"error": str(error)})
         except RenameExecutionError as error:
             self._send_json(500, {"error": str(error)})
 
@@ -188,7 +195,48 @@ class AppRequestHandler(BaseHTTPRequestHandler):
         if not isinstance(recursive, bool):
             raise ValueError("La opción de incluir subcarpetas no es válida.")
 
-        plan = create_preview(folder, components, date_format, recursive)
+        scan_id = payload.get("scan_id")
+        if scan_id is None:
+            scan_id = secrets.token_urlsafe(18)
+        if not isinstance(scan_id, str) or not scan_id or len(scan_id) > 128:
+            raise ValueError("El identificador del análisis no es válido.")
+        cancellation_event = Event()
+        with self.server.state_lock:
+            current_scan = self.server.state["scan"]
+            if current_scan is not None and not current_scan["completed"]:
+                raise ValueError("Ya hay un análisis en curso.")
+            self.server.state["scan"] = {
+                "scan_id": scan_id,
+                "event": cancellation_event,
+                "phase": "starting",
+                "completed": False,
+                "scanned": 0,
+                "total": None,
+                "cancelled": False,
+            }
+
+        def update_progress(phase: str, scanned: int, total: int | None) -> None:
+            with self.server.state_lock:
+                active_scan = self.server.state["scan"]
+                if active_scan is not None and active_scan["scan_id"] == scan_id:
+                    active_scan.update(phase=phase, scanned=scanned, total=total)
+
+        try:
+            plan = create_preview(
+                folder,
+                components,
+                date_format,
+                recursive,
+                progress_callback=update_progress,
+                cancellation_event=cancellation_event,
+            )
+        finally:
+            with self.server.state_lock:
+                active_scan = self.server.state["scan"]
+                if active_scan is not None and active_scan["scan_id"] == scan_id:
+                    active_scan["completed"] = True
+                    active_scan["cancelled"] = cancellation_event.is_set()
+
         self.server.state["plans"].clear()
         self.server.state["plans"][plan.plan_id] = plan
         self._send_json(
@@ -196,6 +244,7 @@ class AppRequestHandler(BaseHTTPRequestHandler):
             {
                 "plan_id": plan.plan_id,
                 "folder": str(plan.directory),
+                "scan_id": scan_id,
                 "rename_count": plan.rename_count,
                 "items": [
                     {
@@ -209,6 +258,40 @@ class AppRequestHandler(BaseHTTPRequestHandler):
                 ],
             },
         )
+
+    def _progress(self, payload: dict[str, Any]) -> None:
+        scan_id = payload.get("scan_id")
+        with self.server.state_lock:
+            scan = self.server.state["scan"]
+            if scan is None or scan["scan_id"] != scan_id:
+                progress = {
+                    "scan_id": scan_id,
+                    "phase": "pending",
+                    "completed": False,
+                    "scanned": 0,
+                    "total": None,
+                    "cancelled": False,
+                }
+            else:
+                progress = {
+                    key: scan[key]
+                    for key in ("scan_id", "phase", "completed", "scanned", "total", "cancelled")
+                }
+        self._send_json(200, progress)
+
+    def _cancel(self, payload: dict[str, Any]) -> None:
+        scan_id = payload.get("scan_id")
+        with self.server.state_lock:
+            scan = self.server.state["scan"]
+            if scan is None or scan["scan_id"] != scan_id or scan["completed"]:
+                cancelled = False
+            else:
+                scan["event"].set()
+                cancelled = True
+        if cancelled:
+            self._send_json(200, {"cancelled": True})
+        else:
+            self._send_json(409, {"error": "El análisis ya terminó o no existe."})
 
     def _confirm(self, payload: dict[str, Any]) -> None:
         plan_id = payload.get("plan_id")

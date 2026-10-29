@@ -25,6 +25,7 @@ PhotoDateRenamer está disponible como aplicación portable para Windows y como 
 - Ofrece recetas de nombre y un editor para concatenar fecha, nombre original, título sin extensión, extensión y texto fijo.
 - Requiere confirmación explícita para renombrar y permite deshacer el último lote mientras la aplicación siga abierta.
 - Permite incluir opcionalmente las fotografías de las subcarpetas, manteniendo cada archivo en su carpeta.
+- Muestra el progreso de análisis y permite cancelarlo; las vistas previas largas se paginan para mantener la interfaz ágil.
 - El servicio HTTP escucha únicamente en `127.0.0.1`.
 
 La fecha se busca en este orden: EXIF de captura, EXIF de digitalización, EXIF general, XMP, última modificación del archivo y, al final, creación del archivo. Las fechas del sistema de archivos pueden corresponder a una copia o edición y no a la captura; por eso la tabla muestra la fuente empleada para cada fotografía. Los destinos existentes, nombres duplicados y nombres inválidos se señalan como conflictos; esos elementos no se renombran.
@@ -43,7 +44,7 @@ La versión estática está en `site/` y se publica en GitHub Pages mediante `.g
 
 La web solo puede seleccionar y modificar carpetas en navegadores compatibles con la File System Access API, actualmente Chrome y Edge actualizados en un contexto HTTPS. El navegador solicita permiso para la carpeta elegida. En Firefox, Safari u otros navegadores incompatibles, usa el `.exe` portable de Windows.
 
-Las imágenes se leen en el navegador, sin subirlas al sitio. La web consulta EXIF en JPEG, PNG y TIFF y XMP en JPEG y PNG; usa la última modificación disponible en el navegador como último recurso. Para aplicar cada cambio crea el archivo nuevo con el mismo contenido y después elimina el original, ya que el navegador no ofrece una operación de renombrado de archivos ampliamente compatible. La vista previa detecta conflictos y no reemplaza destinos existentes; conserva la estructura de subcarpetas si está activada la opción recursiva. El deshacer está disponible mientras la página permanezca abierta. La aplicación portable mantiene el motor Python y el selector nativo de Windows.
+Las imágenes se leen en el navegador, sin subirlas al sitio. La web consulta EXIF en JPEG, PNG y TIFF y XMP en JPEG y PNG mediante lecturas parciales de metadatos: no carga el contenido completo de cada fotografía en memoria. Los bloques individuales de metadatos mayores de 16 MiB se marcan como omitidos por seguridad; no hay un límite al tamaño total de las fotos. Usa la última modificación disponible en el navegador como último recurso. Para aplicar cada cambio crea el archivo nuevo con el mismo contenido y después elimina el original, ya que el navegador no ofrece una operación de renombrado de archivos ampliamente compatible. La vista previa detecta conflictos y no reemplaza destinos existentes; conserva la estructura de subcarpetas si está activada la opción recursiva. El deshacer está disponible mientras la página permanezca abierta. La aplicación portable mantiene el motor Python y el selector nativo de Windows.
 
 ## Ejecución desde el código
 

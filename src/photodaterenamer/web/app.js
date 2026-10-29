@@ -23,6 +23,7 @@ const PRESETS = {
     { kind: "field", value: "extension" }
   ]
 };
+const PREVIEW_PAGE_SIZE = 100;
 
 const folderInput = document.querySelector("#folder-path");
 const notice = document.querySelector("#notice");
@@ -33,14 +34,64 @@ const previewRows = document.querySelector("#preview-rows");
 const previewSummary = document.querySelector("#preview-summary");
 const previewButton = document.querySelector("#preview-button");
 const confirmButton = document.querySelector("#confirm-button");
+const operationProgress = document.querySelector("#operation-progress");
+const operationProgressBar = document.querySelector("#operation-progress-bar");
+const operationProgressLabel = document.querySelector("#operation-progress-label");
+const cancelOperationButton = document.querySelector("#cancel-operation");
+const previewPagination = document.querySelector("#preview-pagination");
+const previewPageLabel = document.querySelector("#preview-page-label");
+const previousPageButton = document.querySelector("#previous-page");
+const nextPageButton = document.querySelector("#next-page");
 let components = PRESETS.date_original.map((part) => ({ ...part }));
 let currentPlanId = null;
 let currentRunId = null;
+let activeScanId = null;
+let scanCancelled = false;
+let previewItems = [];
+let previewPage = 0;
 
 function invalidatePreview() {
   currentPlanId = null;
+  previewItems = [];
   previewWrap.hidden = true;
   notice.hidden = true;
+}
+
+function updateProgress(progress) {
+  operationProgress.hidden = false;
+  if (progress.phase === "indexing") {
+    operationProgressLabel.textContent = `Indexando ${progress.scanned} elementos…`;
+    operationProgressBar.removeAttribute("value");
+  } else if (progress.phase === "scanning" && progress.total !== null) {
+    operationProgressLabel.textContent =
+      `Leyendo fotografía ${progress.scanned} de ${progress.total}…`;
+    operationProgressBar.max = Math.max(progress.total, 1);
+    operationProgressBar.value = progress.scanned;
+  } else {
+    operationProgressLabel.textContent = "Preparando el análisis…";
+    operationProgressBar.removeAttribute("value");
+  }
+  cancelOperationButton.disabled = progress.phase === "pending" || progress.completed;
+}
+
+function finishProgress() {
+  operationProgress.hidden = true;
+  cancelOperationButton.disabled = true;
+  operationProgressBar.removeAttribute("value");
+}
+
+function wait(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+async function monitorScan(scanId, isPreviewRequestSettled) {
+  let progress;
+  do {
+    progress = await request("/api/progress", { scan_id: scanId });
+    updateProgress(progress);
+    if (progress.phase === "pending" && isPreviewRequestSettled()) return;
+    if (!progress.completed) await wait(300);
+  } while (!progress.completed);
 }
 
 async function request(path, data = {}) {
@@ -64,6 +115,39 @@ function showNotice(message, isError = false) {
   const text = document.createElement("span");
   text.textContent = message;
   notice.append(text);
+}
+
+function renderPreview(items) {
+  previewRows.replaceChildren();
+  const pageCount = Math.max(1, Math.ceil(items.length / PREVIEW_PAGE_SIZE));
+  previewPage = Math.min(previewPage, pageCount - 1);
+  const start = previewPage * PREVIEW_PAGE_SIZE;
+  for (const item of items.slice(start, start + PREVIEW_PAGE_SIZE)) {
+    const row = document.createElement("tr");
+    row.className = `is-${item.status}`;
+    const oldName = document.createElement("td");
+    oldName.textContent = item.original_name;
+    const dateSource = document.createElement("td");
+    dateSource.textContent = item.date_source || "—";
+    const status = document.createElement("td");
+    status.className = "status";
+    status.textContent = {
+      ready: "Lista",
+      unchanged: "Sin cambio",
+      skipped: "Omitida",
+      conflict: "Conflicto"
+    }[item.status] || item.status;
+    status.title = item.reason || "";
+    const newName = document.createElement("td");
+    newName.textContent = item.new_name || item.reason || "—";
+    row.append(oldName, dateSource, status, newName);
+    previewRows.append(row);
+  }
+  previewPagination.hidden = items.length <= PREVIEW_PAGE_SIZE;
+  previewPageLabel.textContent =
+    `Mostrando ${start + 1}–${Math.min(start + PREVIEW_PAGE_SIZE, items.length)} de ${items.length}`;
+  previousPageButton.disabled = previewPage === 0;
+  nextPageButton.disabled = previewPage >= pageCount - 1;
 }
 
 function updateTokens() {
@@ -163,15 +247,36 @@ document.querySelector("#recursive").addEventListener("change", invalidatePrevie
 
 previewButton.addEventListener("click", async () => {
   invalidatePreview();
+  scanCancelled = false;
+  activeScanId = crypto.randomUUID();
+  const scanSettings = {
+    folder: folderInput.value,
+    components: components.map((part) => ({ ...part })),
+    date_format: document.querySelector("#date-format").value,
+    recursive: document.querySelector("#recursive").checked
+  };
   previewButton.disabled = true;
   previewButton.textContent = "Preparando…";
+  updateProgress({ phase: "pending", scanned: 0, total: null, completed: false });
   try {
-    const result = await request("/api/preview", {
-      folder: folderInput.value,
-      components,
-      date_format: document.querySelector("#date-format").value,
-      recursive: document.querySelector("#recursive").checked
+    let previewRequestSettled = false;
+    const previewRequest = request("/api/preview", {
+      ...scanSettings,
+      scan_id: activeScanId
+    }).finally(() => {
+      previewRequestSettled = true;
     });
+    const progressRequest = monitorScan(activeScanId, () => previewRequestSettled);
+    const result = await previewRequest;
+    await progressRequest;
+    if (
+      folderInput.value !== scanSettings.folder ||
+      document.querySelector("#date-format").value !== scanSettings.date_format ||
+      document.querySelector("#recursive").checked !== scanSettings.recursive ||
+      JSON.stringify(components) !== JSON.stringify(scanSettings.components)
+    ) {
+      throw new Error("La configuración cambió durante el análisis. Prepara una vista previa nueva.");
+    }
     currentPlanId = result.plan_id;
     const counts = result.items.reduce((summary, item) => {
       summary[item.status] = (summary[item.status] || 0) + 1;
@@ -181,36 +286,50 @@ previewButton.addEventListener("click", async () => {
       `${result.items.length} fotografías revisadas · ${result.rename_count} listas para renombrar` +
       `${counts.conflict ? ` · ${counts.conflict} conflictos` : ""}` +
       `${counts.skipped ? ` · ${counts.skipped} sin fecha válida` : ""}`;
-    previewRows.replaceChildren();
-    result.items.forEach((item) => {
-      const row = document.createElement("tr");
-      row.className = `is-${item.status}`;
-      const oldName = document.createElement("td");
-      oldName.textContent = item.original_name;
-      const dateSource = document.createElement("td");
-      dateSource.textContent = item.date_source || "—";
-      const status = document.createElement("td");
-      status.className = "status";
-      status.textContent = {
-        ready: "Lista",
-        unchanged: "Sin cambio",
-        skipped: "Omitida",
-        conflict: "Conflicto"
-      }[item.status] || item.status;
-      status.title = item.reason || "";
-      const newName = document.createElement("td");
-      newName.textContent = item.new_name || item.reason || "—";
-      row.append(oldName, dateSource, status, newName);
-      previewRows.append(row);
-    });
+    previewItems = result.items;
+    previewPage = 0;
+    renderPreview(previewItems);
     confirmButton.disabled = result.rename_count === 0;
     previewWrap.hidden = false;
     showNotice("Vista previa lista. Comprueba los nombres y los avisos antes de confirmar.");
   } catch (error) {
-    showNotice(error.message, true);
+    if (scanCancelled) {
+      showNotice("Análisis cancelado. No se modificó ningún archivo.");
+    } else {
+      showNotice(error.message, true);
+    }
   } finally {
+    activeScanId = null;
+    finishProgress();
     previewButton.disabled = false;
-    previewButton.innerHTML = 'Preparar vista previa <span aria-hidden="true">↗</span>';
+    previewButton.textContent = "Preparar vista previa ↗";
+  }
+});
+
+cancelOperationButton.addEventListener("click", async () => {
+  if (!activeScanId) return;
+  scanCancelled = true;
+  cancelOperationButton.disabled = true;
+  try {
+    await request("/api/cancel", { scan_id: activeScanId });
+  } catch (error) {
+    scanCancelled = false;
+    cancelOperationButton.disabled = false;
+    showNotice(`No se pudo cancelar el análisis: ${error.message}`, true);
+  }
+});
+
+previousPageButton.addEventListener("click", () => {
+  if (previewPage > 0) {
+    previewPage -= 1;
+    renderPreview(previewItems);
+  }
+});
+
+nextPageButton.addEventListener("click", () => {
+  if ((previewPage + 1) * PREVIEW_PAGE_SIZE < previewItems.length) {
+    previewPage += 1;
+    renderPreview(previewItems);
   }
 });
 

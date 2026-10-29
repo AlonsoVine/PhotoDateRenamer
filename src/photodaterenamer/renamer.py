@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from dataclasses import dataclass
 from datetime import datetime
 import os
 from pathlib import Path
 import re
-from typing import Any
+from threading import Event
+from typing import Any, Callable
 import uuid
 
 from defusedxml.common import DefusedXmlException
@@ -59,6 +61,9 @@ class RenameExecutionError(RuntimeError):
     """Raised when applying or undoing a plan fails."""
 
 
+ProgressCallback = Callable[[str, int, int | None], None]
+
+
 def _is_windows() -> bool:
     return os.name == "nt"
 
@@ -91,6 +96,26 @@ def _file_fingerprint(path: Path) -> tuple[int, int, int, int, int]:
         stats.st_mtime_ns,
         stats.st_ctime_ns,
     )
+
+
+def _walk_entries(directory: Path, recursive: bool) -> Iterator[Path]:
+    pending = [directory]
+    while pending:
+        current = pending.pop()
+        with os.scandir(current) as iterator:
+            entries = sorted(iterator, key=lambda entry: entry.name.casefold())
+        child_directories: list[Path] = []
+        for entry in entries:
+            path = Path(entry.path)
+            yield path
+            if recursive and entry.is_dir(follow_symlinks=False):
+                child_directories.append(path)
+        pending.extend(reversed(child_directories))
+
+
+def _check_cancelled(cancellation_event: Event | None) -> None:
+    if cancellation_event is not None and cancellation_event.is_set():
+        raise RenamePlanError("El análisis se canceló. No se modificó ningún archivo.")
 
 
 def _validate_components(components: list[dict[str, str]]) -> tuple[dict[str, str], ...]:
@@ -214,6 +239,8 @@ def create_preview(
     components: list[dict[str, str]] | None = None,
     date_format: str = "yyyy_mm_dd",
     recursive: bool = False,
+    progress_callback: ProgressCallback | None = None,
+    cancellation_event: Event | None = None,
 ) -> RenamePlan:
     folder = Path(directory).expanduser().resolve()
     if not folder.exists() or not folder.is_dir():
@@ -234,19 +261,26 @@ def create_preview(
     )
     entries: list[RenameItem] = []
     destinations: dict[str, list[int]] = {}
-    paths = list(folder.rglob("*") if recursive else folder.iterdir())
-    sources = sorted(
-        (path for path in paths if path.is_file()),
-        key=lambda path: path.relative_to(folder).as_posix().casefold(),
-    )
-    existing_names = {
-        path.relative_to(folder).as_posix().casefold()
-        for path in paths
-    }
+    existing_names: set[str] = set()
+    photo_count = 0
+    for path_count, path in enumerate(_walk_entries(folder, recursive), start=1):
+        _check_cancelled(cancellation_event)
+        existing_names.add(path.relative_to(folder).as_posix().casefold())
+        if path.is_file() and path.suffix.lower() in SUPPORTED_EXTENSIONS:
+            photo_count += 1
+        if progress_callback is not None and path_count % 100 == 0:
+            progress_callback("indexing", path_count, None)
 
-    for source in sources:
-        if source.suffix.lower() not in SUPPORTED_EXTENSIONS:
+    if progress_callback is not None:
+        progress_callback("scanning", 0, photo_count)
+    scanned_photos = 0
+    for source in _walk_entries(folder, recursive):
+        _check_cancelled(cancellation_event)
+        if not source.is_file() or source.suffix.lower() not in SUPPORTED_EXTENSIONS:
             continue
+        scanned_photos += 1
+        if progress_callback is not None:
+            progress_callback("scanning", scanned_photos, photo_count)
 
         relative_name = source.relative_to(folder).as_posix()
         try:
@@ -304,6 +338,7 @@ def create_preview(
         destinations.setdefault(destination, []).append(entry_index)
 
     for destination_key, indexes in destinations.items():
+        _check_cancelled(cancellation_event)
         if destination_key in existing_names or len(indexes) > 1:
             for index in indexes:
                 item = entries[index]
@@ -316,6 +351,8 @@ def create_preview(
                     item.source_fingerprint,
                 )
 
+    _check_cancelled(cancellation_event)
+    entries.sort(key=lambda item: item.original_name.casefold())
     return RenamePlan(
         plan_id=uuid.uuid4().hex,
         directory=folder,

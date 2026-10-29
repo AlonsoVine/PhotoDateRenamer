@@ -2,6 +2,7 @@ from pathlib import Path
 from datetime import datetime
 import os
 import tempfile
+from threading import Event
 import unittest
 
 from PIL import Image
@@ -182,6 +183,26 @@ class RenamePreviewTests(unittest.TestCase):
 
         self.assertTrue(source.exists())
         self.assertFalse((self.folder / "2024_05_06_IMG_1234.jpg").exists())
+
+    def test_preview_reports_progress_and_can_be_cancelled(self) -> None:
+        create_photo(self.folder / "IMG_1234.jpg")
+        cancellation_event = Event()
+        progress: list[tuple[str, int, int | None]] = []
+
+        def cancel_after_inventory(phase: str, completed: int, total: int | None) -> None:
+            progress.append((phase, completed, total))
+            if phase == "scanning":
+                cancellation_event.set()
+
+        with self.assertRaisesRegex(RenamePlanError, "se canceló"):
+            create_preview(
+                self.folder,
+                progress_callback=cancel_after_inventory,
+                cancellation_event=cancellation_event,
+            )
+
+        self.assertIn(("scanning", 0, 1), progress)
+        self.assertTrue((self.folder / "IMG_1234.jpg").exists())
 
     def test_invalid_component_and_date_format_are_rejected(self) -> None:
         with self.assertRaises(ValueError):

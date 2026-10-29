@@ -25,6 +25,7 @@
       { kind: "field", value: "extension" }
     ]
   };
+  const PREVIEW_PAGE_SIZE = 100;
   const SUPPORTED_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".tif", ".tiff"]);
   const INVALID_NAME = /[<>:"/\\|?*\u0000-\u001f]/;
   const RESERVED_NAME = /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\..*)?$/i;
@@ -38,15 +39,52 @@
   const previewButton = document.querySelector("#preview-button");
   const confirmButton = document.querySelector("#confirm-button");
   const recursiveInput = document.querySelector("#recursive");
+  const operationProgress = document.querySelector("#operation-progress");
+  const operationProgressBar = document.querySelector("#operation-progress-bar");
+  const operationProgressLabel = document.querySelector("#operation-progress-label");
+  const cancelOperationButton = document.querySelector("#cancel-operation");
+  const previewPagination = document.querySelector("#preview-pagination");
+  const previewPageLabel = document.querySelector("#preview-page-label");
+  const previousPageButton = document.querySelector("#previous-page");
+  const nextPageButton = document.querySelector("#next-page");
   let rootHandle = null;
   let components = PRESETS.date_original.map((part) => ({ ...part }));
   let previewPlan = null;
   let lastRun = null;
+  let operationCancelled = false;
+  let previewPage = 0;
+  let previewItems = [];
 
   function invalidatePreview() {
     previewPlan = null;
+    previewItems = [];
     previewWrap.hidden = true;
     notice.hidden = true;
+  }
+
+  function updateProgress(label, value, max = 100) {
+    operationProgressLabel.textContent = label;
+    operationProgress.hidden = false;
+    if (value === null) {
+      operationProgressBar.removeAttribute("value");
+    } else {
+      operationProgressBar.max = max;
+      operationProgressBar.value = value;
+    }
+  }
+
+  function finishProgress() {
+    operationProgress.hidden = true;
+    cancelOperationButton.disabled = false;
+    operationProgressBar.removeAttribute("value");
+  }
+
+  function yieldToBrowser() {
+    return new Promise((resolve) => setTimeout(resolve, 0));
+  }
+
+  function throwIfCancelled() {
+    if (operationCancelled) throw new Error("Operación cancelada.");
   }
 
   function showNotice(message, isError = false) {
@@ -105,7 +143,7 @@
     return dot > 0 ? name.slice(dot) : "";
   }
 
-  function dateText(date) {
+  function dateText(date, format) {
     const year = String(date.getFullYear()).padStart(4, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
@@ -113,20 +151,20 @@
       yyyy_mm_dd: "_",
       "yyyy-mm-dd": "-",
       yyyymmdd: ""
-    }[document.querySelector("#date-format").value];
+    }[format];
     return separator ? `${year}${separator}${month}${separator}${day}` : `${year}${month}${day}`;
   }
 
-  function buildName(name, date) {
+  function buildName(name, date, selectedComponents, dateFormat) {
     const extension = extensionOf(name);
     const stem = extension ? name.slice(0, -extension.length) : name;
     const values = {
-      date: dateText(date),
+      date: dateText(date, dateFormat),
       original_name: name,
       original_stem: stem,
       extension
     };
-    const result = components.map((part) =>
+    const result = selectedComponents.map((part) =>
       part.kind === "field" ? values[part.value] : part.value
     ).join("");
     if (
@@ -143,19 +181,23 @@
     return result;
   }
 
-  async function collectFiles(directoryHandle, relativeDirectory, recursive, entries) {
+  async function* walkEntries(directoryHandle, relativeDirectory, recursive) {
     for await (const entry of directoryHandle.values()) {
       const relativePath = relativeDirectory ? `${relativeDirectory}/${entry.name}` : entry.name;
-      entries.push({ handle: entry, parent: directoryHandle, relativePath });
+      yield { handle: entry, parent: directoryHandle, relativePath };
       if (recursive && entry.kind === "directory") {
-        await collectFiles(entry, relativePath, true, entries);
+        yield* walkEntries(entry, relativePath, true);
       }
     }
   }
 
   function renderPreview(items) {
     previewRows.replaceChildren();
-    for (const item of items) {
+    const pageCount = Math.max(1, Math.ceil(items.length / PREVIEW_PAGE_SIZE));
+    previewPage = Math.min(previewPage, pageCount - 1);
+    const start = previewPage * PREVIEW_PAGE_SIZE;
+    const visibleItems = items.slice(start, start + PREVIEW_PAGE_SIZE);
+    for (const item of visibleItems) {
       const row = document.createElement("tr");
       row.className = `is-${item.status}`;
       const oldName = document.createElement("td");
@@ -176,6 +218,11 @@
       row.append(oldName, source, status, newName);
       previewRows.append(row);
     }
+    previewPagination.hidden = items.length <= PREVIEW_PAGE_SIZE;
+    previewPageLabel.textContent =
+      `Mostrando ${start + 1}–${Math.min(start + PREVIEW_PAGE_SIZE, items.length)} de ${items.length}`;
+    previousPageButton.disabled = previewPage === 0;
+    nextPageButton.disabled = previewPage >= pageCount - 1;
   }
 
   async function createPreview() {
@@ -187,26 +234,59 @@
       showNotice("Añade al menos una pieza al formato del nombre.", true);
       return;
     }
+    const selectedComponents = components.map((part) => ({ ...part }));
+    const selectedDateFormat = document.querySelector("#date-format").value;
+    const selectedRecursive = recursiveInput.checked;
+    const selectedRoot = rootHandle;
     invalidatePreview();
+    operationCancelled = false;
     previewButton.disabled = true;
+    confirmButton.disabled = true;
     previewButton.textContent = "Leyendo fotografías…";
+    updateProgress("Indexando archivos…", null);
     try {
-      const entries = [];
-      await collectFiles(rootHandle, "", recursiveInput.checked, entries);
-      const photoEntries = entries.filter((entry) =>
-        entry.handle.kind === "file" &&
-        SUPPORTED_EXTENSIONS.has(extensionOf(entry.handle.name).toLowerCase())
-      );
-      const existingPaths = new Set(entries.map((entry) => entry.relativePath.toLowerCase()));
+      const existingPaths = new Set();
+      let entryCount = 0;
+      let photoCount = 0;
+      for await (const entry of walkEntries(selectedRoot, "", selectedRecursive)) {
+        throwIfCancelled();
+        existingPaths.add(entry.relativePath.toLowerCase());
+        entryCount += 1;
+        if (
+          entry.handle.kind === "file" &&
+          SUPPORTED_EXTENSIONS.has(extensionOf(entry.handle.name).toLowerCase())
+        ) {
+          photoCount += 1;
+        }
+        if (entryCount % 100 === 0) {
+          updateProgress(`Indexando ${entryCount} elementos…`, null);
+          await yieldToBrowser();
+        }
+      }
+
       const items = [];
       const destinations = new Map();
-      for (const entry of photoEntries) {
+      let processedCount = 0;
+      for await (const entry of walkEntries(selectedRoot, "", selectedRecursive)) {
+        throwIfCancelled();
+        if (
+          entry.handle.kind !== "file" ||
+          !SUPPORTED_EXTENSIONS.has(extensionOf(entry.handle.name).toLowerCase())
+        ) {
+          continue;
+        }
+        processedCount += 1;
+        if (processedCount % 10 === 1 || processedCount === photoCount) {
+          updateProgress(`Leyendo fotografía ${processedCount} de ${photoCount}…`, processedCount, photoCount || 1);
+          await yieldToBrowser();
+        }
         let file;
         let capture;
         try {
           file = await entry.handle.getFile();
           capture = await PhotoDateMetadata.readCaptureDate(file);
         } catch (error) {
+          throwIfCancelled();
           items.push({
             originalPath: entry.relativePath,
             newPath: null,
@@ -226,7 +306,7 @@
         }
         let newName;
         try {
-          newName = buildName(entry.handle.name, capture.date);
+          newName = buildName(entry.handle.name, capture.date, selectedComponents, selectedDateFormat);
         } catch (error) {
           items.push({
             originalPath: entry.relativePath,
@@ -261,6 +341,16 @@
         const destinationKey = newPath.toLowerCase();
         if (!destinations.has(destinationKey)) destinations.set(destinationKey, []);
         destinations.get(destinationKey).push(item);
+        if (processedCount % 10 === 0) await yieldToBrowser();
+      }
+      throwIfCancelled();
+      if (
+        rootHandle !== selectedRoot ||
+        recursiveInput.checked !== selectedRecursive ||
+        document.querySelector("#date-format").value !== selectedDateFormat ||
+        JSON.stringify(components) !== JSON.stringify(selectedComponents)
+      ) {
+        throw new Error("La configuración cambió durante el análisis. Prepara una vista previa nueva.");
       }
       for (const [destination, collisions] of destinations) {
         if (existingPaths.has(destination) || collisions.length > 1) {
@@ -280,16 +370,25 @@
         `${items.length} fotografías revisadas · ${renameCount} listas para renombrar` +
         `${counts.conflict ? ` · ${counts.conflict} conflictos` : ""}` +
         `${counts.skipped ? ` · ${counts.skipped} sin fecha válida` : ""}`;
-      renderPreview(items);
+      previewItems = items;
+      previewPage = 0;
+      renderPreview(previewItems);
       previewPlan = items;
       confirmButton.disabled = renameCount === 0;
       previewWrap.hidden = false;
       showNotice("Vista previa lista. Comprueba los nombres y los avisos antes de confirmar.");
     } catch (error) {
-      showNotice(`No se pudo leer la carpeta: ${error.message}`, true);
+      previewPlan = null;
+      previewWrap.hidden = true;
+      if (operationCancelled) {
+        showNotice("Análisis cancelado. No se modificó ningún archivo.");
+      } else {
+        showNotice(`No se pudo leer la carpeta: ${error.message}`, true);
+      }
     } finally {
+      finishProgress();
       previewButton.disabled = false;
-      previewButton.innerHTML = 'Preparar vista previa <span aria-hidden="true">↗</span>';
+      previewButton.textContent = "Preparar vista previa ↗";
     }
   }
 
@@ -372,12 +471,18 @@
     if (!ready.length) return;
     const scope = recursiveInput.checked ? "en la carpeta y sus subcarpetas" : "en la carpeta seleccionada";
     if (!window.confirm(`Se cambiarán ${ready.length} nombres ${scope}. No se sobrescribirán archivos. ¿Continuar?`)) return;
+    operationCancelled = false;
     confirmButton.disabled = true;
     const renamed = [];
+    updateProgress("Preparando cambios…", 0, ready.length);
     try {
-      for (const item of ready) {
+      for (let index = 0; index < ready.length; index += 1) {
+        throwIfCancelled();
+        const item = ready[index];
         await renameItem(item);
         renamed.push(item);
+        updateProgress(`Renombrando ${renamed.length} de ${ready.length}…`, renamed.length, ready.length);
+        if (renamed.length % 10 === 0) await yieldToBrowser();
       }
       lastRun = renamed;
       undoControl.hidden = false;
@@ -387,19 +492,26 @@
     } catch (error) {
       previewPlan = null;
       previewWrap.hidden = true;
-      let detail = `El renombrado se detuvo: ${error.message}`;
+      const renamedCount = renamed.length;
+      let rollbackFailed = false;
+      let detail = operationCancelled
+        ? `Operación cancelada después de ${renamedCount} cambios.`
+        : `El renombrado se detuvo: ${error.message}`;
       if (renamed.length) {
         try {
+          updateProgress(`Restaurando ${renamed.length} cambios…`, null);
           await undoRun(renamed);
-          detail += ` Se revirtieron los ${renamed.length} cambios anteriores.`;
+          detail += ` Se revirtieron los ${renamedCount} cambios anteriores.`;
         } catch (rollbackError) {
-          detail += ` Se habían completado ${renamed.length} cambios y no se pudieron revertir todos: ${rollbackError.message}`;
+          rollbackFailed = true;
+          detail += ` Se habían completado ${renamedCount} cambios y no se pudieron revertir todos: ${rollbackError.message}`;
           lastRun = renamed;
           undoControl.hidden = false;
         }
       }
-      showNotice(detail, true);
+      showNotice(detail, !operationCancelled || rollbackFailed);
     } finally {
+      finishProgress();
       confirmButton.disabled = false;
     }
   }
@@ -452,6 +564,22 @@
   document.querySelector("#browse-button").addEventListener("click", selectFolder);
   document.querySelector("#preview-button").addEventListener("click", createPreview);
   document.querySelector("#confirm-button").addEventListener("click", confirmRenames);
+  cancelOperationButton.addEventListener("click", () => {
+    operationCancelled = true;
+    cancelOperationButton.disabled = true;
+  });
+  previousPageButton.addEventListener("click", () => {
+    if (previewPage > 0) {
+      previewPage -= 1;
+      renderPreview(previewItems);
+    }
+  });
+  nextPageButton.addEventListener("click", () => {
+    if ((previewPage + 1) * PREVIEW_PAGE_SIZE < previewItems.length) {
+      previewPage += 1;
+      renderPreview(previewItems);
+    }
+  });
   document.querySelector("#recursive").addEventListener("change", invalidatePreview);
   document.querySelector("#date-format").addEventListener("change", invalidatePreview);
   document.querySelector("#undo-button").addEventListener("click", async () => {

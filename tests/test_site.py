@@ -30,6 +30,9 @@ class StaticSiteTests(unittest.TestCase):
 
         self.assertIn("las fotografías no se envían", page)
         self.assertIn('id="recursive"', page)
+        self.assertIn('id="operation-progress"', page)
+        self.assertIn('id="cancel-operation"', page)
+        self.assertIn('id="preview-pagination"', page)
         self.assertIn('class="header-author"', page)
         self.assertIn('href="https://alonsovine.github.io/portfolioR/" target="_blank"', page)
         self.assertIn("¿Prefieres una aplicación para Windows? ↓", page)
