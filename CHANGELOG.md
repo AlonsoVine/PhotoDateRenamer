@@ -2,6 +2,11 @@
 
 Notable changes to PhotoDateRenamer are documented here.
 
+## [0.3.1] - 2026-10-29
+
+### Changed
+- Raised the minimum supported Python version to 3.11 to match Pillow 13 and retain XMP support.
+
 ## [0.3.0] - 2026-10-29
 
 ### Added

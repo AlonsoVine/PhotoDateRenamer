@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "photo-date-renamer"
-version = "0.3.0"
+version = "0.3.1"
 description = "A local, preview-first photo renaming application."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "Pillow>=13.0",
     "defusedxml>=0.7.1",
@@ -35,4 +35,4 @@ testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py310"
+target-version = "py311"

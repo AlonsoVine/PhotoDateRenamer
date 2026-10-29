@@ -26,7 +26,7 @@ Selecciona una carpeta con **Explorar** o escribe su ruta. Elige un formato, rev
 
 ## Ejecución desde el código
 
-Requiere Python 3.10 o posterior.
+Requiere Python 3.11 o posterior.
 
 ```powershell
 py -m venv .venv
@@ -43,7 +43,7 @@ photo-date-renamer
 
 ## Compilar el `.exe` para Windows
 
-En Windows, con Python 3.10 o posterior:
+En Windows, con Python 3.11 o posterior:
 
 ```powershell
 .\scripts\build_windows.cmd
@@ -88,6 +88,7 @@ El motor de nombres y el formato de componentes no dependen de la interfaz ni de
 - [ADR 0002: Vista previa antes de renombrar](docs/adr/0002-preview-before-rename.md)
 - [ADR 0003: Nombres personalizados por componentes](docs/adr/0003-custom-name-components.md)
 - [ADR 0004: Prioridad de fuentes para la fecha de las fotos](docs/adr/0004-photo-date-source-priority.md)
+- [ADR 0005: Versión mínima de Python](docs/adr/0005-python-version-support.md)
 
 Consulta [AGENTS.md](AGENTS.md) para las convenciones del proyecto y las actualizaciones requeridas en cada iteración.
 Las instrucciones para contribuir y el formato de commits están en [CONTRIBUTING.md](CONTRIBUTING.md).
