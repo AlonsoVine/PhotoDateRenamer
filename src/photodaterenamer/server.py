@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict
 import json
 from pathlib import Path
 import platform
@@ -198,7 +197,16 @@ class AppRequestHandler(BaseHTTPRequestHandler):
                 "plan_id": plan.plan_id,
                 "folder": str(plan.directory),
                 "rename_count": plan.rename_count,
-                "items": [asdict(item) for item in plan.items],
+                "items": [
+                    {
+                        "original_name": item.original_name,
+                        "new_name": item.new_name,
+                        "status": item.status,
+                        "reason": item.reason,
+                        "date_source": item.date_source,
+                    }
+                    for item in plan.items
+                ],
             },
         )
 

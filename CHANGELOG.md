@@ -2,6 +2,11 @@
 
 Notable changes to PhotoDateRenamer are documented here.
 
+## Unreleased
+
+### Security
+- Reject rename plans when a source photo changes after preview.
+
 ## [0.4.0] - 2026-10-29
 
 ### Added

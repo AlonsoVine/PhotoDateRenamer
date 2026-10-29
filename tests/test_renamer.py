@@ -171,6 +171,18 @@ class RenamePreviewTests(unittest.TestCase):
             (self.folder / "2024_05_06_IMG_1234.jpg").read_text(encoding="utf-8"), "keep"
         )
 
+    def test_source_changed_after_preview_is_not_renamed(self) -> None:
+        source = self.folder / "IMG_1234.jpg"
+        create_photo(source)
+        plan = create_preview(self.folder)
+        create_photo(source, capture_date="2025:06:07 08:09:10")
+
+        with self.assertRaisesRegex(RenamePlanError, "cambió desde la vista previa"):
+            execute_plan(plan)
+
+        self.assertTrue(source.exists())
+        self.assertFalse((self.folder / "2024_05_06_IMG_1234.jpg").exists())
+
     def test_invalid_component_and_date_format_are_rejected(self) -> None:
         with self.assertRaises(ValueError):
             create_preview(self.folder, [{"kind": "field", "value": "not-a-field"}])

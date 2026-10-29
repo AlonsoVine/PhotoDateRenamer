@@ -35,6 +35,7 @@ class RenameItem:
     status: str
     reason: str | None = None
     date_source: str | None = None
+    source_fingerprint: tuple[int, int, int, int, int] | None = None
 
 
 @dataclass(frozen=True)
@@ -79,6 +80,17 @@ def _move_without_overwrite(source: Path, destination: Path) -> None:
                 f"{destination.name}: {cleanup_error}"
             ) from error
         raise
+
+
+def _file_fingerprint(path: Path) -> tuple[int, int, int, int, int]:
+    stats = path.stat()
+    return (
+        stats.st_dev,
+        stats.st_ino,
+        stats.st_size,
+        stats.st_mtime_ns,
+        stats.st_ctime_ns,
+    )
 
 
 def _validate_components(components: list[dict[str, str]]) -> tuple[dict[str, str], ...]:
@@ -238,7 +250,11 @@ def create_preview(
 
         relative_name = source.relative_to(folder).as_posix()
         try:
+            fingerprint_before = _file_fingerprint(source)
             capture_date_result = _read_capture_date(source)
+            fingerprint_after = _file_fingerprint(source)
+            if fingerprint_before != fingerprint_after:
+                raise OSError("El archivo cambió mientras se analizaba.")
         except (OSError, UnidentifiedImageError, ValueError, Image.DecompressionBombError) as error:
             entries.append(
                 RenameItem(
@@ -277,7 +293,13 @@ def create_preview(
         destination = relative_destination.casefold()
         entry_index = len(entries)
         entries.append(
-            RenameItem(relative_name, relative_destination, "ready", date_source=date_source)
+            RenameItem(
+                relative_name,
+                relative_destination,
+                "ready",
+                date_source=date_source,
+                source_fingerprint=fingerprint_after,
+            )
         )
         destinations.setdefault(destination, []).append(entry_index)
 
@@ -290,6 +312,8 @@ def create_preview(
                     item.new_name,
                     "conflict",
                     "El nombre de destino ya existe o se repite en la vista previa.",
+                    item.date_source,
+                    item.source_fingerprint,
                 )
 
     return RenamePlan(
@@ -310,6 +334,15 @@ def execute_plan(plan: RenamePlan) -> list[tuple[Path, Path]]:
         destination = plan.directory / Path(str(item.new_name))
         if not source.is_file():
             raise RenamePlanError(f"El archivo ya no existe: {item.original_name}")
+        if item.source_fingerprint is not None:
+            try:
+                source_matches_preview = _file_fingerprint(source) == item.source_fingerprint
+            except OSError:
+                source_matches_preview = False
+            if not source_matches_preview:
+                raise RenamePlanError(
+                    f"El archivo cambió desde la vista previa: {item.original_name}"
+                )
         if destination.exists():
             raise RenamePlanError(
                 f"El destino ya existe: {destination.relative_to(plan.directory).as_posix()}"

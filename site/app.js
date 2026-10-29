@@ -253,7 +253,9 @@
           sourceHandle: entry.handle,
           parentHandle: entry.parent,
           oldName: entry.handle.name,
-          newName
+          newName,
+          sourceSize: file.size,
+          sourceLastModified: file.lastModified
         };
         items.push(item);
         const destinationKey = newPath.toLowerCase();
@@ -319,6 +321,12 @@
 
   async function renameItem(item) {
     const originalFile = await item.sourceHandle.getFile();
+    if (
+      originalFile.size !== item.sourceSize ||
+      originalFile.lastModified !== item.sourceLastModified
+    ) {
+      throw new Error(`El archivo cambió desde la vista previa: ${item.originalPath}`);
+    }
     await writeCopy(item.parentHandle, item.newName, originalFile);
     try {
       await item.parentHandle.removeEntry(item.oldName);
