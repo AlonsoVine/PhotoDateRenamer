@@ -2,6 +2,18 @@
 
 Notable changes to PhotoDateRenamer are documented here.
 
+## [0.4.0] - 2026-10-29
+
+### Added
+- Static, browser-only version prepared for GitHub Pages; photo data is processed locally and never sent to a server.
+- Recursive preview and renaming for photos in subfolders, preserving their directory structure.
+- A download section linking to the latest Windows portable release.
+- GitHub Pages deployment workflow and browser metadata parser tests.
+
+### Changed
+- The Windows interface now offers an opt-in subfolder scan.
+- The browser version uses the File System Access API and requires a current Chromium browser on HTTPS.
+
 ## [0.3.1] - 2026-10-29
 
 ### Changed

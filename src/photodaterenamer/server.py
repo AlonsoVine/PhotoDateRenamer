@@ -176,6 +176,7 @@ class AppRequestHandler(BaseHTTPRequestHandler):
         folder = payload.get("folder")
         components = payload.get("components")
         date_format = payload.get("date_format", "yyyy_mm_dd")
+        recursive = payload.get("recursive", False)
         if not isinstance(folder, str) or not folder.strip():
             raise ValueError("Selecciona una carpeta antes de crear la vista previa.")
         if components is not None and (
@@ -185,8 +186,10 @@ class AppRequestHandler(BaseHTTPRequestHandler):
             raise ValueError("El formato personalizado no es válido.")
         if not isinstance(date_format, str):
             raise ValueError("El formato de fecha no es válido.")
+        if not isinstance(recursive, bool):
+            raise ValueError("La opción de incluir subcarpetas no es válida.")
 
-        plan = create_preview(folder, components, date_format)
+        plan = create_preview(folder, components, date_format, recursive)
         self.server.state["plans"].clear()
         self.server.state["plans"][plan.plan_id] = plan
         self._send_json(

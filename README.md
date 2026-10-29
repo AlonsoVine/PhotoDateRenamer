@@ -2,7 +2,7 @@
 
 PhotoDateRenamer organiza fotografías anteponiendo a sus nombres una fecha encontrada en los metadatos de la imagen o, como último recurso, en las fechas del archivo. La aplicación funciona localmente: las imágenes no se suben ni se envían a servicios externos.
 
-La versión actual incluye una interfaz web servida por una aplicación local de Python. El navegador permite elegir una carpeta, preparar una vista previa, personalizar el nombre y confirmar o deshacer el cambio.
+PhotoDateRenamer está disponible como aplicación portable para Windows y como una página estática que puede servirse con GitHub Pages. En ambos casos las fotografías permanecen en el equipo de la persona usuaria.
 
 ## Funcionalidades
 
@@ -12,6 +12,7 @@ La versión actual incluye una interfaz web servida por una aplicación local de
 - Incluye los formatos `YYYY_MM_DD`, `YYYY-MM-DD` y `YYYYMMDD`.
 - Ofrece recetas de nombre y un editor para concatenar fecha, nombre original, título sin extensión, extensión y texto fijo.
 - Requiere confirmación explícita para renombrar y permite deshacer el último lote mientras la aplicación siga abierta.
+- Permite incluir opcionalmente las fotografías de las subcarpetas, manteniendo cada archivo en su carpeta.
 - El servicio HTTP escucha únicamente en `127.0.0.1`.
 
 La fecha se busca en este orden: EXIF de captura, EXIF de digitalización, EXIF general, XMP, última modificación del archivo y, al final, creación del archivo. Las fechas del sistema de archivos pueden corresponder a una copia o edición y no a la captura; por eso la tabla muestra la fuente empleada para cada fotografía. Los destinos existentes, nombres duplicados y nombres inválidos se señalan como conflictos; esos elementos no se renombran.
@@ -20,9 +21,17 @@ La fecha se busca en este orden: EXIF de captura, EXIF de digitalización, EXIF 
 
 Para probar una compilación reciente, abre una ejecución completada del workflow **CI** en GitHub Actions y descarga el artefacto `PhotoDateRenamer-windows`. Ese artefacto de CI es temporal y no equivale a una publicación de GitHub Releases.
 
-Las versiones se distribuyen en [GitHub Releases](https://github.com/AlonsoVine/PhotoDateRenamer/releases). Al publicar una etiqueta `v*` (por ejemplo, `v0.3.0`), el workflow **Release** ejecuta las pruebas, construye el `.exe` para Windows y publica el ejecutable junto con `LICENSE`. Para ejecutar la aplicación, abre `PhotoDateRenamer.exe`; se iniciará la interfaz en el navegador predeterminado. Si no se abre automáticamente, usa la URL que aparece en la consola.
+Las versiones se distribuyen en [GitHub Releases](https://github.com/AlonsoVine/PhotoDateRenamer/releases). Al publicar una etiqueta `v*`, el workflow **Release** ejecuta las pruebas, construye el `.exe` para Windows y publica el ejecutable junto con `LICENSE`. La página estática ofrece un enlace a la última versión. Para ejecutar la aplicación, abre `PhotoDateRenamer.exe`; se iniciará la interfaz en el navegador predeterminado. Si no se abre automáticamente, usa la URL que aparece en la consola.
 
-Selecciona una carpeta con **Explorar** o escribe su ruta. Elige un formato, revisa la vista previa y pulsa **Confirmar renombrado** solo cuando los cambios sean correctos. La opción **Deshacer** restaura el último lote mientras la ventana del programa continúe abierta.
+Selecciona una carpeta con **Explorar** o escribe su ruta. Activa **Incluir también las fotografías de las subcarpetas** si quieres procesar el árbol completo. Elige un formato, revisa la vista previa y pulsa **Confirmar renombrado** solo cuando los cambios sean correctos. La opción **Deshacer** restaura el último lote mientras la ventana del programa continúe abierta.
+
+## Usar la versión web
+
+La versión estática está en `site/` y se publica en GitHub Pages mediante `.github/workflows/pages.yml`. Para habilitar la publicación en el repositorio, abre **Settings → Pages**, elige **GitHub Actions** como fuente y ejecuta el workflow **Deploy static website** o publica cambios en `site/` sobre `main`. La dirección del proyecto será `https://alonsovine.github.io/PhotoDateRenamer/`.
+
+La web solo puede seleccionar y modificar carpetas en navegadores compatibles con la File System Access API, actualmente Chrome y Edge actualizados en un contexto HTTPS. El navegador solicita permiso para la carpeta elegida. En Firefox, Safari u otros navegadores incompatibles, usa el `.exe` portable de Windows.
+
+Las imágenes se leen en el navegador, sin subirlas al sitio. La web consulta EXIF en JPEG, PNG y TIFF y XMP en JPEG y PNG; usa la última modificación disponible en el navegador como último recurso. Para aplicar cada cambio crea el archivo nuevo con el mismo contenido y después elimina el original, ya que el navegador no ofrece una operación de renombrado de archivos ampliamente compatible. La vista previa detecta conflictos y no reemplaza destinos existentes; conserva la estructura de subcarpetas si está activada la opción recursiva. El deshacer está disponible mientras la página permanezca abierta. La aplicación portable mantiene el motor Python y el selector nativo de Windows.
 
 ## Ejecución desde el código
 
@@ -60,9 +69,10 @@ PhotoDateRenamer se distribuye bajo una licencia propietaria de uso personal y n
 ```powershell
 python -m pip install -e ".[dev]"
 python -m unittest discover -s tests -v
+node --test tests/browser_metadata.test.cjs
 ```
 
-Los tests construyen imágenes temporales con metadatos de prueba y no modifican fotografías del repositorio. La integración continua prueba el motor en Windows, Linux y macOS; el trabajo de compilación produce el `.exe` de Windows.
+Los tests construyen imágenes temporales con metadatos de prueba y no modifican fotografías del repositorio. También prueban el lector de metadatos JavaScript de la web. La integración continua prueba el motor en Windows, Linux y macOS; el trabajo de compilación produce el `.exe` de Windows.
 
 ## Estructura
 
@@ -72,6 +82,7 @@ src/photodaterenamer/
   renamer.py             Lectura EXIF/XMP/archivo, vista previa, renombrado y deshacer
   server.py              HTTP local y operaciones de la interfaz
   web/                   Interfaz y recursos estáticos (ilustración e icono)
+site/                    Aplicación web estática y recursos publicados con Pages
 tests/                   Pruebas del motor de nombres
 docs/adr/                Decisiones arquitectónicas
 AGENTS.md                Reglas para agentes y contribuidores
@@ -89,6 +100,7 @@ El motor de nombres y el formato de componentes no dependen de la interfaz ni de
 - [ADR 0003: Nombres personalizados por componentes](docs/adr/0003-custom-name-components.md)
 - [ADR 0004: Prioridad de fuentes para la fecha de las fotos](docs/adr/0004-photo-date-source-priority.md)
 - [ADR 0005: Versión mínima de Python](docs/adr/0005-python-version-support.md)
+- [ADR 0006: Versión estática para navegador](docs/adr/0006-static-browser-app.md)
 
 Consulta [AGENTS.md](AGENTS.md) para las convenciones del proyecto y las actualizaciones requeridas en cada iteración.
 Las instrucciones para contribuir y el formato de commits están en [CONTRIBUTING.md](CONTRIBUTING.md).

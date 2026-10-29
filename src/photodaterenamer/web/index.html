@@ -40,6 +40,7 @@
           <input id="folder-path" type="text" placeholder="Selecciona o escribe la ruta de una carpeta" autocomplete="off">
           <button id="browse-button" class="button button-outline" type="button">Explorar</button>
         </div>
+        <label class="recursive-option"><input id="recursive" type="checkbox"> Incluir también las fotografías de las subcarpetas</label>
 
         <div class="step-heading format-heading">
           <span class="step-number">02</span>
@@ -90,12 +91,12 @@
           <div id="preview-summary" class="preview-summary"></div>
           <div class="table-scroll">
             <table>
-              <thead><tr><th>Nombre actual</th><th>Fecha usada</th><th aria-label="Estado"></th><th>Nombre propuesto</th></tr></thead>
+              <thead><tr><th>Ubicación y nombre actual</th><th>Fecha usada</th><th aria-label="Estado"></th><th>Nombre propuesto</th></tr></thead>
               <tbody id="preview-rows"></tbody>
             </table>
           </div>
           <div class="confirm-row">
-            <p>Los cambios se aplicarán a los archivos de esta carpeta.</p>
+            <p>Los cambios se aplicarán a los archivos de la carpeta seleccionada y, si lo activas, sus subcarpetas.</p>
             <button id="confirm-button" class="button button-accent" type="button">Confirmar renombrado</button>
           </div>
         </div>
@@ -110,7 +111,7 @@
         <a href="https://github.com/AlonsoVine" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a href="https://www.linkedin.com/in/alonso-vi%C3%B1%C3%A9-barrancos/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
       </nav>
-      <span>PhotoDateRenamer <b>·</b> 0.3</span>
+      <span>PhotoDateRenamer <b>·</b> 0.4</span>
     </footer>
   </div>
   <dialog id="text-dialog" class="text-dialog">

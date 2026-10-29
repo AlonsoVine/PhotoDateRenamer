@@ -40,6 +40,8 @@ h2 { margin: 0; font: 500 25px/1.2 var(--serif); }
 .step-heading .eyebrow { margin-bottom: 6px; }
 .folder-row { display: flex; gap: 10px; margin: 20px 0 34px 32px; }
 .folder-row input, .text-dialog input { flex: 1; min-width: 0; padding: 13px 14px; border: 1px solid var(--line); background: white; color: var(--ink); outline: none; }
+.recursive-option { display: flex; align-items: center; gap: 8px; margin: -22px 0 34px 32px; color: var(--muted); font-size: 11px; }
+.recursive-option input { accent-color: var(--olive); }
 input:focus, select:focus { border-color: var(--olive); box-shadow: 0 0 0 2px rgba(101, 112, 79, .12); }
 .button { display: inline-flex; min-height: 43px; align-items: center; justify-content: center; gap: 10px; padding: 0 16px; border: 1px solid transparent; font-size: 12px; font-weight: 600; transition: background .2s, transform .2s; }
 .button:hover { transform: translateY(-1px); }

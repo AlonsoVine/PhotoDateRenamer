@@ -54,6 +54,46 @@ class RenamePreviewTests(unittest.TestCase):
 
         self.assertTrue((self.folder / "IMG_1234.jpg").exists())
 
+    def test_subfolders_are_ignored_by_default(self) -> None:
+        nested_folder = self.folder / "vacaciones"
+        nested_folder.mkdir()
+        create_photo(nested_folder / "IMG_5678.jpg")
+
+        plan = create_preview(self.folder)
+
+        self.assertEqual(plan.items, ())
+
+    def test_recursive_preview_renames_nested_photos_and_can_undo(self) -> None:
+        nested_folder = self.folder / "vacaciones"
+        nested_folder.mkdir()
+        create_photo(nested_folder / "IMG_5678.jpg")
+
+        plan = create_preview(self.folder, recursive=True)
+
+        self.assertEqual(plan.rename_count, 1)
+        self.assertEqual(plan.items[0].original_name, "vacaciones/IMG_5678.jpg")
+        self.assertEqual(plan.items[0].new_name, "vacaciones/2024_05_06_IMG_5678.jpg")
+        renamed = execute_plan(plan)
+        self.assertTrue((nested_folder / "2024_05_06_IMG_5678.jpg").exists())
+
+        undo_renames(renamed)
+
+        self.assertTrue((nested_folder / "IMG_5678.jpg").exists())
+
+    def test_recursive_preview_detects_existing_destinations_in_subfolders(self) -> None:
+        nested_folder = self.folder / "vacaciones"
+        nested_folder.mkdir()
+        create_photo(nested_folder / "IMG_5678.jpg")
+        (nested_folder / "2024_05_06_IMG_5678.jpg").write_text("keep", encoding="utf-8")
+
+        plan = create_preview(self.folder, recursive=True)
+
+        photo_item = next(
+            item for item in plan.items if item.original_name == "vacaciones/IMG_5678.jpg"
+        )
+        self.assertEqual(photo_item.status, "conflict")
+        self.assertEqual(plan.rename_count, 0)
+
     def test_missing_or_invalid_exif_uses_filesystem_date_as_last_resort(self) -> None:
         create_photo(self.folder / "no-date.jpg", None)
         create_photo(self.folder / "bad-date.jpg", "not a date")

@@ -159,6 +159,7 @@ document.querySelector("#browse-button").addEventListener("click", async () => {
 
 folderInput.addEventListener("input", invalidatePreview);
 document.querySelector("#date-format").addEventListener("change", invalidatePreview);
+document.querySelector("#recursive").addEventListener("change", invalidatePreview);
 
 previewButton.addEventListener("click", async () => {
   invalidatePreview();
@@ -168,7 +169,8 @@ previewButton.addEventListener("click", async () => {
     const result = await request("/api/preview", {
       folder: folderInput.value,
       components,
-      date_format: document.querySelector("#date-format").value
+      date_format: document.querySelector("#date-format").value,
+      recursive: document.querySelector("#recursive").checked
     });
     currentPlanId = result.plan_id;
     const counts = result.items.reduce((summary, item) => {
@@ -213,7 +215,10 @@ previewButton.addEventListener("click", async () => {
 });
 
 confirmButton.addEventListener("click", async () => {
-  if (!currentPlanId || !window.confirm("Se cambiarán los nombres de los archivos de esta carpeta. ¿Continuar?")) return;
+  const scope = document.querySelector("#recursive").checked
+    ? "la carpeta seleccionada y sus subcarpetas"
+    : "la carpeta seleccionada";
+  if (!currentPlanId || !window.confirm(`Se cambiarán los nombres de los archivos de ${scope}. ¿Continuar?`)) return;
   confirmButton.disabled = true;
   try {
     const result = await request("/api/confirm", { plan_id: currentPlanId });

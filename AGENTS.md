@@ -17,10 +17,11 @@ PhotoDateRenamer is a local-first desktop utility for organizing photo filenames
 1. Read the relevant source, tests, and current ADRs.
 2. Add or update tests for behavior changes.
 3. Run `python -m unittest discover -s tests -v`.
-4. Update `CHANGELOG.md` for user-visible changes.
-5. Add or update an ADR in `docs/adr/` when an architectural decision changes.
-6. Update this file when project-wide agent or contributor rules change.
-7. Follow the Conventional Commits format documented in `CONTRIBUTING.md`.
+4. When changing the browser-only version, run `node --test tests/browser_metadata.test.cjs`.
+5. Update `CHANGELOG.md` for user-visible changes.
+6. Add or update an ADR in `docs/adr/` when an architectural decision changes.
+7. Update this file when project-wide agent or contributor rules change.
+8. Follow the Conventional Commits format documented in `CONTRIBUTING.md`.
 
 ## Quality and scope
 

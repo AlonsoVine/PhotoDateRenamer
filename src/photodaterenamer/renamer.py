@@ -201,10 +201,13 @@ def create_preview(
     directory: str | Path,
     components: list[dict[str, str]] | None = None,
     date_format: str = "yyyy_mm_dd",
+    recursive: bool = False,
 ) -> RenamePlan:
     folder = Path(directory).expanduser().resolve()
     if not folder.exists() or not folder.is_dir():
         raise ValueError("La carpeta seleccionada no existe o no es una carpeta.")
+    if not isinstance(recursive, bool):
+        raise ValueError("La opción de incluir subcarpetas no es válida.")
     if date_format not in DATE_FORMATS:
         raise ValueError("El formato de fecha seleccionado no es válido.")
 
@@ -219,23 +222,37 @@ def create_preview(
     )
     entries: list[RenameItem] = []
     destinations: dict[str, list[int]] = {}
-    existing_names = {path.name.casefold() for path in folder.iterdir()}
+    paths = list(folder.rglob("*") if recursive else folder.iterdir())
+    sources = sorted(
+        (path for path in paths if path.is_file()),
+        key=lambda path: path.relative_to(folder).as_posix().casefold(),
+    )
+    existing_names = {
+        path.relative_to(folder).as_posix().casefold()
+        for path in paths
+    }
 
-    for source in sorted(folder.iterdir(), key=lambda path: path.name.casefold()):
-        if not source.is_file() or source.suffix.lower() not in SUPPORTED_EXTENSIONS:
+    for source in sources:
+        if source.suffix.lower() not in SUPPORTED_EXTENSIONS:
             continue
 
+        relative_name = source.relative_to(folder).as_posix()
         try:
             capture_date_result = _read_capture_date(source)
         except (OSError, UnidentifiedImageError, ValueError, Image.DecompressionBombError) as error:
             entries.append(
-                RenameItem(source.name, None, "skipped", f"No se pudieron leer los metadatos: {error}")
+                RenameItem(
+                    relative_name,
+                    None,
+                    "skipped",
+                    f"No se pudieron leer los metadatos: {error}",
+                )
             )
             continue
         if capture_date_result is None:
             entries.append(
                 RenameItem(
-                    source.name,
+                    relative_name,
                     None,
                     "skipped",
                     "No se encontró una fecha válida en los metadatos ni en el archivo.",
@@ -247,16 +264,21 @@ def create_preview(
         try:
             new_name = _build_name(source, capture_date, date_format, selected_components)
         except ValueError as error:
-            entries.append(RenameItem(source.name, None, "conflict", str(error), date_source))
+            entries.append(RenameItem(relative_name, None, "conflict", str(error), date_source))
             continue
 
         if new_name == source.name:
-            entries.append(RenameItem(source.name, new_name, "unchanged", date_source=date_source))
+            entries.append(
+                RenameItem(relative_name, relative_name, "unchanged", date_source=date_source)
+            )
             continue
 
-        destination = new_name.casefold()
+        relative_destination = (source.parent / new_name).relative_to(folder).as_posix()
+        destination = relative_destination.casefold()
         entry_index = len(entries)
-        entries.append(RenameItem(source.name, new_name, "ready", date_source=date_source))
+        entries.append(
+            RenameItem(relative_name, relative_destination, "ready", date_source=date_source)
+        )
         destinations.setdefault(destination, []).append(entry_index)
 
     for destination_key, indexes in destinations.items():
@@ -284,12 +306,14 @@ def execute_plan(plan: RenamePlan) -> list[tuple[Path, Path]]:
     ready_items = [item for item in plan.items if item.status == "ready"]
     sources: list[tuple[Path, Path]] = []
     for item in ready_items:
-        source = plan.directory / item.original_name
-        destination = plan.directory / str(item.new_name)
+        source = plan.directory / Path(item.original_name)
+        destination = plan.directory / Path(str(item.new_name))
         if not source.is_file():
             raise RenamePlanError(f"El archivo ya no existe: {item.original_name}")
         if destination.exists():
-            raise RenamePlanError(f"El destino ya existe: {destination.name}")
+            raise RenamePlanError(
+                f"El destino ya existe: {destination.relative_to(plan.directory).as_posix()}"
+            )
         sources.append((source, destination))
 
     renamed: list[tuple[Path, Path]] = []

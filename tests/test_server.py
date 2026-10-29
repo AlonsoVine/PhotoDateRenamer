@@ -85,6 +85,32 @@ class LocalServerTests(unittest.TestCase):
         self.assertTrue(image_path.exists())
         self.assertEqual(undo["restored_count"], 1)
 
+    def test_preview_can_include_subfolders(self) -> None:
+        nested_folder = self.folder / "vacaciones"
+        nested_folder.mkdir()
+        image_path = nested_folder / "IMG_001.jpg"
+        image = Image.new("RGB", (4, 4), color="olive")
+        exif = Image.Exif()
+        exif[36867] = "2024:05:06 07:08:09"
+        image.save(image_path, exif=exif)
+
+        preview = self.post(
+            "/api/preview",
+            {"folder": str(self.folder), "recursive": True},
+        )
+
+        self.assertEqual(preview["rename_count"], 1)
+        self.assertEqual(
+            preview["items"][0]["new_name"],
+            "vacaciones/2024_05_06_IMG_001.jpg",
+        )
+
+    def test_preview_rejects_non_boolean_recursive_option(self) -> None:
+        with self.assertRaises(HTTPError) as error:
+            self.post("/api/preview", {"folder": str(self.folder), "recursive": "yes"})
+        self.assertEqual(error.exception.code, 400)
+        error.exception.close()
+
     def test_folder_picker_runs_in_a_separate_main_thread_process(self) -> None:
         with patch("photodaterenamer.server.platform.system", return_value="Linux"), patch(
             "subprocess.run",
