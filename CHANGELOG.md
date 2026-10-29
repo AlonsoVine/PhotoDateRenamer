@@ -4,6 +4,8 @@ Notable changes to PhotoDateRenamer are documented here.
 
 ## Unreleased
 
+## [0.5.0] - 2026-10-29
+
 ### Security
 - Reject rename plans when a source photo changes after preview.
 - Add a nonce-based Content Security Policy, `X-Content-Type-Options`, and `Referrer-Policy` to the local interface.
