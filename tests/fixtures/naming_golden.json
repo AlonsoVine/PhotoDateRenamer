@@ -1,0 +1,5282 @@
+{
+ "date_original|yyyy_mm_dd|flat": [
+  [
+   ".oculta.jpg",
+   "2016_08_09_.oculta.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024_05_06_2024_05_06_IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "2017_06_15_café_ñandú-çà.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "2020_03_04_fecha rota.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "2022_01_02_foto con espacios.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "2015_05_05_gemela_a.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "2015_05_05_gemela_b.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "2024_05_06_IMG_0001.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "2024_05_06_IMG_0002.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "2024_05_06_IMG_0003.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "2012_12_12_llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "2019_10_11_MAYÚSCULAS.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "2018_02_28_mezcla.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "2020_03_04_sin-exif.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "2021_07_08_símbolos #&@!(1)+[2]{3}~'.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "2023_12_31_Árbol niño.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "date_original|yyyy_mm_dd|recursive": [
+  [
+   ".oculta.jpg",
+   "2016_08_09_.oculta.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024_05_06_2024_05_06_IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "2017_06_15_café_ñandú-çà.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "2020_03_04_fecha rota.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "2022_01_02_foto con espacios.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "2015_05_05_gemela_a.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "2015_05_05_gemela_b.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "2024_05_06_IMG_0001.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "2024_05_06_IMG_0002.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "2024_05_06_IMG_0003.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "2012_12_12_llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "2019_10_11_MAYÚSCULAS.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "2018_02_28_mezcla.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "2020_03_04_sin-exif.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "subcarpeta con tilde á/anidada/2013_03_03_Ñ.PNG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "subcarpeta con tilde á/2014_04_04_IMG_9000.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "2021_07_08_símbolos #&@!(1)+[2]{3}~'.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "2023_12_31_Árbol niño.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "date_original|yyyy-mm-dd|flat": [
+  [
+   ".oculta.jpg",
+   "2016-08-09_.oculta.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024-05-06_2024_05_06_IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "2017-06-15_café_ñandú-çà.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "2020-03-04_fecha rota.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "2022-01-02_foto con espacios.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "2015-05-05_gemela_a.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "2015-05-05_gemela_b.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "2024-05-06_IMG_0001.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "2024-05-06_IMG_0002.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "2024-05-06_IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "2012-12-12_llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "2019-10-11_MAYÚSCULAS.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "2018-02-28_mezcla.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "2020-03-04_sin-exif.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "2021-07-08_símbolos #&@!(1)+[2]{3}~'.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "2023-12-31_Árbol niño.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "date_original|yyyy-mm-dd|recursive": [
+  [
+   ".oculta.jpg",
+   "2016-08-09_.oculta.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024-05-06_2024_05_06_IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "2017-06-15_café_ñandú-çà.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "2020-03-04_fecha rota.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "2022-01-02_foto con espacios.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "2015-05-05_gemela_a.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "2015-05-05_gemela_b.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "2024-05-06_IMG_0001.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "2024-05-06_IMG_0002.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "2024-05-06_IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "2012-12-12_llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "2019-10-11_MAYÚSCULAS.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "2018-02-28_mezcla.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "2020-03-04_sin-exif.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "subcarpeta con tilde á/anidada/2013-03-03_Ñ.PNG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "subcarpeta con tilde á/2014-04-04_IMG_9000.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "2021-07-08_símbolos #&@!(1)+[2]{3}~'.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "2023-12-31_Árbol niño.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "date_original|yyyymmdd|flat": [
+  [
+   ".oculta.jpg",
+   "20160809_.oculta.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "20240506_2024_05_06_IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "20170615_café_ñandú-çà.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "20200304_fecha rota.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "20220102_foto con espacios.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "20150505_gemela_a.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "20150505_gemela_b.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "20240506_IMG_0001.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "20240506_IMG_0002.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "20240506_IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "20121212_llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "20191011_MAYÚSCULAS.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "20180228_mezcla.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "20200304_sin-exif.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "20210708_símbolos #&@!(1)+[2]{3}~'.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "20231231_Árbol niño.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "date_original|yyyymmdd|recursive": [
+  [
+   ".oculta.jpg",
+   "20160809_.oculta.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "20240506_2024_05_06_IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "20170615_café_ñandú-çà.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "20200304_fecha rota.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "20220102_foto con espacios.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "20150505_gemela_a.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "20150505_gemela_b.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "20240506_IMG_0001.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "20240506_IMG_0002.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "20240506_IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "20121212_llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "20191011_MAYÚSCULAS.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "20180228_mezcla.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "20200304_sin-exif.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "subcarpeta con tilde á/anidada/20130303_Ñ.PNG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "subcarpeta con tilde á/20140404_IMG_9000.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "20210708_símbolos #&@!(1)+[2]{3}~'.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "20231231_Árbol niño.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "date_stem|yyyy_mm_dd|flat": [
+  [
+   ".oculta.jpg",
+   "2016_08_09_.oculta",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024_05_06_2024_05_06_IMG_0003",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "2017_06_15_café_ñandú-çà",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "2020_03_04_fecha rota",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "2022_01_02_foto con espacios",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "2015_05_05_gemela_a",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "2015_05_05_gemela_b",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "2024_05_06_IMG_0001",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "2024_05_06_IMG_0002",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "2024_05_06_IMG_0003",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "2012_12_12_llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "2019_10_11_MAYÚSCULAS",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "2018_02_28_mezcla",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "2020_03_04_sin-exif",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "2021_07_08_símbolos #&@!(1)+[2]{3}~'",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "2023_12_31_Árbol niño",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "date_stem|yyyy_mm_dd|recursive": [
+  [
+   ".oculta.jpg",
+   "2016_08_09_.oculta",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024_05_06_2024_05_06_IMG_0003",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "2017_06_15_café_ñandú-çà",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "2020_03_04_fecha rota",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "2022_01_02_foto con espacios",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "2015_05_05_gemela_a",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "2015_05_05_gemela_b",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "2024_05_06_IMG_0001",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "2024_05_06_IMG_0002",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "2024_05_06_IMG_0003",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "2012_12_12_llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "2019_10_11_MAYÚSCULAS",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "2018_02_28_mezcla",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "2020_03_04_sin-exif",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "subcarpeta con tilde á/anidada/2013_03_03_Ñ",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "subcarpeta con tilde á/2014_04_04_IMG_9000",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "2021_07_08_símbolos #&@!(1)+[2]{3}~'",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "2023_12_31_Árbol niño",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "date_stem|yyyy-mm-dd|flat": [
+  [
+   ".oculta.jpg",
+   "2016-08-09_.oculta",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024-05-06_2024_05_06_IMG_0003",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "2017-06-15_café_ñandú-çà",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "2020-03-04_fecha rota",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "2022-01-02_foto con espacios",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "2015-05-05_gemela_a",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "2015-05-05_gemela_b",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "2024-05-06_IMG_0001",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "2024-05-06_IMG_0002",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "2024-05-06_IMG_0003",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "2012-12-12_llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "2019-10-11_MAYÚSCULAS",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "2018-02-28_mezcla",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "2020-03-04_sin-exif",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "2021-07-08_símbolos #&@!(1)+[2]{3}~'",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "2023-12-31_Árbol niño",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "date_stem|yyyy-mm-dd|recursive": [
+  [
+   ".oculta.jpg",
+   "2016-08-09_.oculta",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024-05-06_2024_05_06_IMG_0003",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "2017-06-15_café_ñandú-çà",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "2020-03-04_fecha rota",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "2022-01-02_foto con espacios",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "2015-05-05_gemela_a",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "2015-05-05_gemela_b",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "2024-05-06_IMG_0001",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "2024-05-06_IMG_0002",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "2024-05-06_IMG_0003",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "2012-12-12_llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "2019-10-11_MAYÚSCULAS",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "2018-02-28_mezcla",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "2020-03-04_sin-exif",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "subcarpeta con tilde á/anidada/2013-03-03_Ñ",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "subcarpeta con tilde á/2014-04-04_IMG_9000",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "2021-07-08_símbolos #&@!(1)+[2]{3}~'",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "2023-12-31_Árbol niño",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "date_stem|yyyymmdd|flat": [
+  [
+   ".oculta.jpg",
+   "20160809_.oculta",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "20240506_2024_05_06_IMG_0003",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "20170615_café_ñandú-çà",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "20200304_fecha rota",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "20220102_foto con espacios",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "20150505_gemela_a",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "20150505_gemela_b",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "20240506_IMG_0001",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "20240506_IMG_0002",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "20240506_IMG_0003",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "20121212_llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "20191011_MAYÚSCULAS",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "20180228_mezcla",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "20200304_sin-exif",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "20210708_símbolos #&@!(1)+[2]{3}~'",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "20231231_Árbol niño",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "date_stem|yyyymmdd|recursive": [
+  [
+   ".oculta.jpg",
+   "20160809_.oculta",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "20240506_2024_05_06_IMG_0003",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "20170615_café_ñandú-çà",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "20200304_fecha rota",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "20220102_foto con espacios",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "20150505_gemela_a",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "20150505_gemela_b",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "20240506_IMG_0001",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "20240506_IMG_0002",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "20240506_IMG_0003",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "20121212_llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "20191011_MAYÚSCULAS",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "20180228_mezcla",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "20200304_sin-exif",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "subcarpeta con tilde á/anidada/20130303_Ñ",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "subcarpeta con tilde á/20140404_IMG_9000",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "20210708_símbolos #&@!(1)+[2]{3}~'",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "20231231_Árbol niño",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "original_date|yyyy_mm_dd|flat": [
+  [
+   ".oculta.jpg",
+   ".oculta_2016_08_09.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024_05_06_IMG_0003_2024_05_06.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "café_ñandú-çà_2017_06_15.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "fecha rota_2020_03_04.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "foto con espacios_2022_01_02.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "gemela_a_2015_05_05.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "gemela_b_2015_05_05.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "IMG_0001_2024_05_06.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "IMG_0002_2024_05_06.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "IMG_0003_2024_05_06.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo_2012_12_12.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "MAYÚSCULAS_2019_10_11.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "mezcla_2018_02_28.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "sin-exif_2020_03_04.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "símbolos #&@!(1)+[2]{3}~'_2021_07_08.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "Árbol niño_2023_12_31.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "original_date|yyyy_mm_dd|recursive": [
+  [
+   ".oculta.jpg",
+   ".oculta_2016_08_09.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024_05_06_IMG_0003_2024_05_06.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "café_ñandú-çà_2017_06_15.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "fecha rota_2020_03_04.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "foto con espacios_2022_01_02.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "gemela_a_2015_05_05.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "gemela_b_2015_05_05.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "IMG_0001_2024_05_06.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "IMG_0002_2024_05_06.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "IMG_0003_2024_05_06.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo_2012_12_12.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "MAYÚSCULAS_2019_10_11.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "mezcla_2018_02_28.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "sin-exif_2020_03_04.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "subcarpeta con tilde á/anidada/Ñ_2013_03_03.PNG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "subcarpeta con tilde á/IMG_9000_2014_04_04.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "símbolos #&@!(1)+[2]{3}~'_2021_07_08.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "Árbol niño_2023_12_31.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "original_date|yyyy-mm-dd|flat": [
+  [
+   ".oculta.jpg",
+   ".oculta_2016-08-09.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024_05_06_IMG_0003_2024-05-06.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "café_ñandú-çà_2017-06-15.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "fecha rota_2020-03-04.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "foto con espacios_2022-01-02.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "gemela_a_2015-05-05.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "gemela_b_2015-05-05.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "IMG_0001_2024-05-06.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "IMG_0002_2024-05-06.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "IMG_0003_2024-05-06.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo_2012-12-12.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "MAYÚSCULAS_2019-10-11.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "mezcla_2018-02-28.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "sin-exif_2020-03-04.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "símbolos #&@!(1)+[2]{3}~'_2021-07-08.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "Árbol niño_2023-12-31.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "original_date|yyyy-mm-dd|recursive": [
+  [
+   ".oculta.jpg",
+   ".oculta_2016-08-09.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024_05_06_IMG_0003_2024-05-06.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "café_ñandú-çà_2017-06-15.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "fecha rota_2020-03-04.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "foto con espacios_2022-01-02.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "gemela_a_2015-05-05.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "gemela_b_2015-05-05.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "IMG_0001_2024-05-06.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "IMG_0002_2024-05-06.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "IMG_0003_2024-05-06.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo_2012-12-12.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "MAYÚSCULAS_2019-10-11.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "mezcla_2018-02-28.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "sin-exif_2020-03-04.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "subcarpeta con tilde á/anidada/Ñ_2013-03-03.PNG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "subcarpeta con tilde á/IMG_9000_2014-04-04.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "símbolos #&@!(1)+[2]{3}~'_2021-07-08.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "Árbol niño_2023-12-31.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "original_date|yyyymmdd|flat": [
+  [
+   ".oculta.jpg",
+   ".oculta_20160809.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024_05_06_IMG_0003_20240506.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "café_ñandú-çà_20170615.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "fecha rota_20200304.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "foto con espacios_20220102.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "gemela_a_20150505.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "gemela_b_20150505.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "IMG_0001_20240506.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "IMG_0002_20240506.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "IMG_0003_20240506.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo_20121212.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "MAYÚSCULAS_20191011.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "mezcla_20180228.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "sin-exif_20200304.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "símbolos #&@!(1)+[2]{3}~'_20210708.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "Árbol niño_20231231.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "original_date|yyyymmdd|recursive": [
+  [
+   ".oculta.jpg",
+   ".oculta_20160809.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024_05_06_IMG_0003_20240506.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "café_ñandú-çà_20170615.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "fecha rota_20200304.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "foto con espacios_20220102.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "gemela_a_20150505.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "gemela_b_20150505.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "IMG_0001_20240506.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "IMG_0002_20240506.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "IMG_0003_20240506.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo_20121212.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "MAYÚSCULAS_20191011.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "mezcla_20180228.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "sin-exif_20200304.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "subcarpeta con tilde á/anidada/Ñ_20130303.PNG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "subcarpeta con tilde á/IMG_9000_20140404.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "símbolos #&@!(1)+[2]{3}~'_20210708.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "Árbol niño_20231231.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "date_only_with_extension|yyyy_mm_dd|flat": [
+  [
+   ".oculta.jpg",
+   "2016_08_09.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024_05_06.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "2017_06_15.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "2020_03_04.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "2022_01_02.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "2015_05_05.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "2015_05_05.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "2024_05_06.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "2024_05_06.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "2024_05_06.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "2012_12_12.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "2019_10_11.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "2018_02_28.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "2020_03_04.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "2021_07_08.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "2023_12_31.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "date_only_with_extension|yyyy_mm_dd|recursive": [
+  [
+   ".oculta.jpg",
+   "2016_08_09.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024_05_06.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "2017_06_15.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "2020_03_04.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "2022_01_02.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "2015_05_05.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "2015_05_05.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "2024_05_06.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "2024_05_06.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "2024_05_06.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "2012_12_12.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "2019_10_11.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "2018_02_28.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "2020_03_04.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "subcarpeta con tilde á/anidada/2013_03_03.PNG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "subcarpeta con tilde á/2014_04_04.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "2021_07_08.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "2023_12_31.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "date_only_with_extension|yyyy-mm-dd|flat": [
+  [
+   ".oculta.jpg",
+   "2016-08-09.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024-05-06.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "2017-06-15.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "2020-03-04.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "2022-01-02.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "2015-05-05.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "2015-05-05.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "2024-05-06.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "2024-05-06.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "2024-05-06.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "2012-12-12.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "2019-10-11.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "2018-02-28.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "2020-03-04.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "2021-07-08.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "2023-12-31.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "date_only_with_extension|yyyy-mm-dd|recursive": [
+  [
+   ".oculta.jpg",
+   "2016-08-09.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024-05-06.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "2017-06-15.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "2020-03-04.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "2022-01-02.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "2015-05-05.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "2015-05-05.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "2024-05-06.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "2024-05-06.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "2024-05-06.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "2012-12-12.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "2019-10-11.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "2018-02-28.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "2020-03-04.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "subcarpeta con tilde á/anidada/2013-03-03.PNG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "subcarpeta con tilde á/2014-04-04.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "2021-07-08.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "2023-12-31.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "date_only_with_extension|yyyymmdd|flat": [
+  [
+   ".oculta.jpg",
+   "20160809.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "20240506.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "20170615.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "20200304.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "20220102.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "20150505.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "20150505.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "20240506.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "20240506.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "20240506.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "20121212.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "20191011.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "20180228.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "20200304.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "20210708.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "20231231.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "date_only_with_extension|yyyymmdd|recursive": [
+  [
+   ".oculta.jpg",
+   "20160809.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "20240506.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "20170615.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "20200304.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "20220102.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "20150505.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "20150505.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "20240506.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "20240506.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "20240506.jpg",
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "20121212.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "20191011.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "20180228.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "20200304.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "subcarpeta con tilde á/anidada/20130303.PNG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "subcarpeta con tilde á/20140404.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "20210708.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "20231231.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "literal_prefix|yyyy_mm_dd|flat": [
+  [
+   ".oculta.jpg",
+   "viaje á 2016_08_09 - .oculta.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "viaje á 2024_05_06 - 2024_05_06_IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "viaje á 2017_06_15 - café_ñandú-çà.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "viaje á 2020_03_04 - fecha rota.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "viaje á 2022_01_02 - foto con espacios.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "viaje á 2015_05_05 - gemela_a.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "viaje á 2015_05_05 - gemela_b.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "viaje á 2024_05_06 - IMG_0001.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "viaje á 2024_05_06 - IMG_0002.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "viaje á 2024_05_06 - IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "viaje á 2012_12_12 - llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "viaje á 2019_10_11 - MAYÚSCULAS.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "viaje á 2018_02_28 - mezcla.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "viaje á 2020_03_04 - sin-exif.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "viaje á 2021_07_08 - símbolos #&@!(1)+[2]{3}~'.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "viaje á 2023_12_31 - Árbol niño.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "literal_prefix|yyyy_mm_dd|recursive": [
+  [
+   ".oculta.jpg",
+   "viaje á 2016_08_09 - .oculta.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "viaje á 2024_05_06 - 2024_05_06_IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "viaje á 2017_06_15 - café_ñandú-çà.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "viaje á 2020_03_04 - fecha rota.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "viaje á 2022_01_02 - foto con espacios.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "viaje á 2015_05_05 - gemela_a.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "viaje á 2015_05_05 - gemela_b.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "viaje á 2024_05_06 - IMG_0001.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "viaje á 2024_05_06 - IMG_0002.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "viaje á 2024_05_06 - IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "viaje á 2012_12_12 - llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "viaje á 2019_10_11 - MAYÚSCULAS.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "viaje á 2018_02_28 - mezcla.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "viaje á 2020_03_04 - sin-exif.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "subcarpeta con tilde á/anidada/viaje á 2013_03_03 - Ñ.PNG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "subcarpeta con tilde á/viaje á 2014_04_04 - IMG_9000.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "viaje á 2021_07_08 - símbolos #&@!(1)+[2]{3}~'.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "viaje á 2023_12_31 - Árbol niño.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "literal_prefix|yyyy-mm-dd|flat": [
+  [
+   ".oculta.jpg",
+   "viaje á 2016-08-09 - .oculta.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "viaje á 2024-05-06 - 2024_05_06_IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "viaje á 2017-06-15 - café_ñandú-çà.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "viaje á 2020-03-04 - fecha rota.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "viaje á 2022-01-02 - foto con espacios.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "viaje á 2015-05-05 - gemela_a.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "viaje á 2015-05-05 - gemela_b.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "viaje á 2024-05-06 - IMG_0001.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "viaje á 2024-05-06 - IMG_0002.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "viaje á 2024-05-06 - IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "viaje á 2012-12-12 - llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "viaje á 2019-10-11 - MAYÚSCULAS.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "viaje á 2018-02-28 - mezcla.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "viaje á 2020-03-04 - sin-exif.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "viaje á 2021-07-08 - símbolos #&@!(1)+[2]{3}~'.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "viaje á 2023-12-31 - Árbol niño.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "literal_prefix|yyyy-mm-dd|recursive": [
+  [
+   ".oculta.jpg",
+   "viaje á 2016-08-09 - .oculta.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "viaje á 2024-05-06 - 2024_05_06_IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "viaje á 2017-06-15 - café_ñandú-çà.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "viaje á 2020-03-04 - fecha rota.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "viaje á 2022-01-02 - foto con espacios.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "viaje á 2015-05-05 - gemela_a.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "viaje á 2015-05-05 - gemela_b.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "viaje á 2024-05-06 - IMG_0001.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "viaje á 2024-05-06 - IMG_0002.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "viaje á 2024-05-06 - IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "viaje á 2012-12-12 - llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "viaje á 2019-10-11 - MAYÚSCULAS.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "viaje á 2018-02-28 - mezcla.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "viaje á 2020-03-04 - sin-exif.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "subcarpeta con tilde á/anidada/viaje á 2013-03-03 - Ñ.PNG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "subcarpeta con tilde á/viaje á 2014-04-04 - IMG_9000.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "viaje á 2021-07-08 - símbolos #&@!(1)+[2]{3}~'.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "viaje á 2023-12-31 - Árbol niño.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "literal_prefix|yyyymmdd|flat": [
+  [
+   ".oculta.jpg",
+   "viaje á 20160809 - .oculta.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "viaje á 20240506 - 2024_05_06_IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "viaje á 20170615 - café_ñandú-çà.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "viaje á 20200304 - fecha rota.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "viaje á 20220102 - foto con espacios.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "viaje á 20150505 - gemela_a.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "viaje á 20150505 - gemela_b.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "viaje á 20240506 - IMG_0001.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "viaje á 20240506 - IMG_0002.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "viaje á 20240506 - IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "viaje á 20121212 - llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "viaje á 20191011 - MAYÚSCULAS.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "viaje á 20180228 - mezcla.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "viaje á 20200304 - sin-exif.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "viaje á 20210708 - símbolos #&@!(1)+[2]{3}~'.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "viaje á 20231231 - Árbol niño.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "literal_prefix|yyyymmdd|recursive": [
+  [
+   ".oculta.jpg",
+   "viaje á 20160809 - .oculta.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "viaje á 20240506 - 2024_05_06_IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "viaje á 20170615 - café_ñandú-çà.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "viaje á 20200304 - fecha rota.jpg",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "viaje á 20220102 - foto con espacios.jpeg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "viaje á 20150505 - gemela_a.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "viaje á 20150505 - gemela_b.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "viaje á 20240506 - IMG_0001.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "viaje á 20240506 - IMG_0002.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "viaje á 20240506 - IMG_0003.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "viaje á 20121212 - llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "viaje á 20191011 - MAYÚSCULAS.TIFF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "viaje á 20180228 - mezcla.TiF",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "viaje á 20200304 - sin-exif.png",
+   "ready",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "subcarpeta con tilde á/anidada/viaje á 20130303 - Ñ.PNG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "subcarpeta con tilde á/viaje á 20140404 - IMG_9000.jpg",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "viaje á 20210708 - símbolos #&@!(1)+[2]{3}~'.png",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "viaje á 20231231 - Árbol niño.JPG",
+   "ready",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "invalid_character|yyyy_mm_dd|flat": [
+  [
+   ".oculta.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "invalid_character|yyyy_mm_dd|recursive": [
+  [
+   ".oculta.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "invalid_character|yyyy-mm-dd|flat": [
+  [
+   ".oculta.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "invalid_character|yyyy-mm-dd|recursive": [
+  [
+   ".oculta.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "invalid_character|yyyymmdd|flat": [
+  [
+   ".oculta.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "invalid_character|yyyymmdd|recursive": [
+  [
+   ".oculta.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "original_only|yyyy_mm_dd|flat": [
+  [
+   ".oculta.jpg",
+   ".oculta.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024_05_06_IMG_0003.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "café_ñandú-çà.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "fecha rota.jpg",
+   "unchanged",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "foto con espacios.jpeg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "gemela_a.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "gemela_b.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "IMG_0001.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "IMG_0002.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "IMG_0003.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "MAYÚSCULAS.TIFF",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "mezcla.TiF",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "sin-exif.png",
+   "unchanged",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "Árbol niño.JPG",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "original_only|yyyy_mm_dd|recursive": [
+  [
+   ".oculta.jpg",
+   ".oculta.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024_05_06_IMG_0003.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "café_ñandú-çà.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "fecha rota.jpg",
+   "unchanged",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "foto con espacios.jpeg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "gemela_a.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "gemela_b.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "IMG_0001.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "IMG_0002.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "IMG_0003.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "MAYÚSCULAS.TIFF",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "mezcla.TiF",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "sin-exif.png",
+   "unchanged",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "Árbol niño.JPG",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "original_only|yyyy-mm-dd|flat": [
+  [
+   ".oculta.jpg",
+   ".oculta.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024_05_06_IMG_0003.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "café_ñandú-çà.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "fecha rota.jpg",
+   "unchanged",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "foto con espacios.jpeg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "gemela_a.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "gemela_b.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "IMG_0001.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "IMG_0002.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "IMG_0003.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "MAYÚSCULAS.TIFF",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "mezcla.TiF",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "sin-exif.png",
+   "unchanged",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "Árbol niño.JPG",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "original_only|yyyy-mm-dd|recursive": [
+  [
+   ".oculta.jpg",
+   ".oculta.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024_05_06_IMG_0003.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "café_ñandú-çà.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "fecha rota.jpg",
+   "unchanged",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "foto con espacios.jpeg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "gemela_a.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "gemela_b.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "IMG_0001.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "IMG_0002.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "IMG_0003.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "MAYÚSCULAS.TIFF",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "mezcla.TiF",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "sin-exif.png",
+   "unchanged",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "Árbol niño.JPG",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "original_only|yyyymmdd|flat": [
+  [
+   ".oculta.jpg",
+   ".oculta.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024_05_06_IMG_0003.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "café_ñandú-çà.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "fecha rota.jpg",
+   "unchanged",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "foto con espacios.jpeg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "gemela_a.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "gemela_b.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "IMG_0001.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "IMG_0002.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "IMG_0003.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "MAYÚSCULAS.TIFF",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "mezcla.TiF",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "sin-exif.png",
+   "unchanged",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "Árbol niño.JPG",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "original_only|yyyymmdd|recursive": [
+  [
+   ".oculta.jpg",
+   ".oculta.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   "2024_05_06_IMG_0003.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   "café_ñandú-çà.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   "fecha rota.jpg",
+   "unchanged",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   "foto con espacios.jpeg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   "gemela_a.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   "gemela_b.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   "IMG_0001.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   "IMG_0002.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   "IMG_0003.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   "MAYÚSCULAS.TIFF",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   "mezcla.TiF",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   "sin-exif.png",
+   "unchanged",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   "Árbol niño.JPG",
+   "unchanged",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "trailing_dot|yyyy_mm_dd|flat": [
+  [
+   ".oculta.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "trailing_dot|yyyy_mm_dd|recursive": [
+  [
+   ".oculta.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "trailing_dot|yyyy-mm-dd|flat": [
+  [
+   ".oculta.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "trailing_dot|yyyy-mm-dd|recursive": [
+  [
+   ".oculta.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "trailing_dot|yyyymmdd|flat": [
+  [
+   ".oculta.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ]
+ ],
+ "trailing_dot|yyyymmdd|recursive": [
+  [
+   ".oculta.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "2024_05_06_IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "café_ñandú-çà.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "corrupta.jpg",
+   null,
+   "skipped",
+   null
+  ],
+  [
+   "fecha rota.jpg",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "foto con espacios.jpeg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_a.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "gemela_b.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0001.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0002.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "IMG_0003.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll-largo.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "MAYÚSCULAS.TIFF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "mezcla.TiF",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "sin-exif.png",
+   null,
+   "conflict",
+   "Archivo · última modificación"
+  ],
+  [
+   "subcarpeta con tilde á/anidada/Ñ.PNG",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "subcarpeta con tilde á/IMG_9000.jpg",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "símbolos #&@!(1)+[2]{3}~'.png",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ],
+  [
+   "Árbol niño.JPG",
+   null,
+   "conflict",
+   "EXIF · DateTimeOriginal"
+  ]
+ ]
+}
