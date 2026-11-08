@@ -4,6 +4,36 @@ Notable changes to PhotoDateRenamer are documented here.
 
 ## Unreleased
 
+### Added
+- «Revelado», a redesigned darkroom-themed interface for the local application, with:
+  - a single first step;
+  - an automatic preview that refreshes when the format changes;
+  - a virtualised contact sheet with filters, search, and a detail loupe;
+  - a styled confirmation dialog;
+  - dedicated views for empty folders, folders without photos, cancelled scans, applying, success, partial failure, total failure, and undo.
+- Self-hosted OFL fonts (Fraunces, Instrument Sans, JetBrains Mono, DSEG7).
+- Apply progress, and a per-file report of renamed and failed files.
+- Keyboard shortcuts: `O` chooses a folder and `/` searches the preview.
+- Optional fixed port through `PHOTODATERENAMER_PORT`, still bound to `127.0.0.1`.
+- Regression tests that pin the proposed names of 0.5.0, plus data-safety tests on generated folders. They cover:
+  - empty folders;
+  - accents, symbols, and uppercase extensions;
+  - collisions;
+  - read-only and locked files;
+  - long names;
+  - hidden files;
+  - thousands of files.
+
+### Changed
+- A confirmed batch is applied file by file. A locked or changed file is reported with its reason while the rest continue, and undo restores the renamed files. Previously the whole batch was rolled back.
+- Cancelling a scan, and checking a missing folder, return explicit results instead of HTTP errors.
+
+### Fixed
+- Destination names longer than 255 characters are flagged as conflicts in the preview instead of failing during the rename.
+- Unreadable images and OS errors show a readable message instead of a raw exception with escaped paths.
+- On Windows the local server no longer binds to a port another process is already using.
+- The interface no longer overflows horizontally on narrow windows.
+
 ## [0.5.0] - 2026-10-29
 
 ### Security

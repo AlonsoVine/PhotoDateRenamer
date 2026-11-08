@@ -51,6 +51,8 @@ class LocalServerTests(unittest.TestCase):
         with urlopen(f"{self.base_url}/styles.css") as response:
             stylesheet = response.read().decode("utf-8")
         self.assertIn("--paper:", stylesheet)
+        self.assertNotIn("@import", stylesheet)
+        self.assertNotIn("url(http", stylesheet)
 
         with urlopen(f"{self.base_url}/") as response:
             page = response.read().decode("utf-8")
@@ -62,12 +64,19 @@ class LocalServerTests(unittest.TestCase):
         self.assertNotIn("unsafe-inline", policy)
         self.assertIn('src="/images/hero-illustration.png"', page)
         self.assertIn("Creado por Alonso Viñé", page)
-        self.assertIn('id="operation-progress"', page)
-        self.assertIn('id="preview-pagination"', page)
-        for image_path in ("/images/app-icon.png", "/images/hero-illustration.png"):
+        self.assertIn('id="progress-view"', page)
+        self.assertIn('id="list-scroller"', page)
+        self.assertIn('id="confirm-dialog"', page)
+        self.assertIn("font-src 'self'", policy)
+        self.assertNotRegex(page, r'(src|href)="(https?:)?//(?!alonsovine|github|www\.linkedin)')
+        for image_path in ("/images/app-icon.png", "/images/hero-illustration.png", "/images/grain.png"):
             with urlopen(f"{self.base_url}{image_path}") as response:
                 self.assertEqual(response.headers.get_content_type(), "image/png")
                 self.assertTrue(response.read().startswith(b"\x89PNG\r\n\x1a\n"))
+        for font in ("fraunces", "fraunces-italic", "instrument-sans", "jetbrains-mono", "dseg7"):
+            with urlopen(f"{self.base_url}/fonts/{font}.woff2") as response:
+                self.assertEqual(response.headers.get_content_type(), "font/woff2")
+                self.assertTrue(response.read().startswith(b"wOF2"))
 
         with self.assertRaises(HTTPError) as error:
             self.post("/api/preview", {"folder": str(self.folder)}, token="incorrect")
@@ -196,6 +205,7 @@ class LocalServerTests(unittest.TestCase):
     def test_scan_can_be_cancelled_over_http(self) -> None:
         started = threading.Event()
         errors: list[int] = []
+        responses: list[dict] = []
 
         def wait_until_cancelled(*args: Any, **kwargs: Any) -> Any:
             started.set()
@@ -204,9 +214,11 @@ class LocalServerTests(unittest.TestCase):
 
         def request_preview() -> None:
             try:
-                self.post(
-                    "/api/preview",
-                    {"folder": str(self.folder), "scan_id": "cancel-scan"},
+                responses.append(
+                    self.post(
+                        "/api/preview",
+                        {"folder": str(self.folder), "scan_id": "cancel-scan"},
+                    )
                 )
             except HTTPError as error:
                 errors.append(error.code)
@@ -221,7 +233,19 @@ class LocalServerTests(unittest.TestCase):
 
         self.assertFalse(preview_thread.is_alive())
         self.assertEqual(result["cancelled"], True)
-        self.assertEqual(errors, [409])
+        self.assertEqual(errors, [])
+        self.assertEqual(responses, [{"cancelled": True, "scan_id": "cancel-scan"}])
+        late = self.post("/api/cancel", {"scan_id": "cancel-scan"})
+        self.assertEqual(late["cancelled"], False)
+
+    def test_check_folder_reports_missing_and_existing_folders(self) -> None:
+        missing = self.post("/api/check-folder", {"folder": str(self.folder / "no-existe")})
+        present = self.post("/api/check-folder", {"folder": str(self.folder)})
+
+        self.assertFalse(missing["ok"])
+        self.assertIn("no existe", missing["error"])
+        self.assertTrue(present["ok"])
+        self.assertEqual(Path(present["folder"]), self.folder.resolve())
 
     def test_folder_picker_runs_in_a_separate_main_thread_process(self) -> None:
         with patch("photodaterenamer.server.platform.system", return_value="Linux"), patch(

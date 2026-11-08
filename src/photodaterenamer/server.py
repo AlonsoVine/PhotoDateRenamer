@@ -29,6 +29,12 @@ MAX_REQUEST_SIZE = 64 * 1024
 STATIC_IMAGES = {
     "/images/app-icon.png": "image/png",
     "/images/hero-illustration.png": "image/png",
+    "/images/grain.png": "image/png",
+    "/fonts/fraunces.woff2": "font/woff2",
+    "/fonts/fraunces-italic.woff2": "font/woff2",
+    "/fonts/instrument-sans.woff2": "font/woff2",
+    "/fonts/jetbrains-mono.woff2": "font/woff2",
+    "/fonts/dseg7.woff2": "font/woff2",
 }
 
 
@@ -92,7 +98,7 @@ class AppRequestHandler(BaseHTTPRequestHandler):
                 "Content-Security-Policy",
                 "default-src 'none'; "
                 f"script-src 'self' 'nonce-{csp_nonce}'; "
-                "style-src 'self'; img-src 'self'; connect-src 'self'; "
+                "style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; "
                 "form-action 'self'; base-uri 'none'; frame-ancestors 'none'; object-src 'none'",
             )
         self.end_headers()
@@ -165,6 +171,8 @@ class AppRequestHandler(BaseHTTPRequestHandler):
             path = urlparse(self.path).path
             if path == "/api/select-folder":
                 self._send_json(200, self._select_folder())
+            elif path == "/api/check-folder":
+                self._check_folder(payload)
             elif path == "/api/preview":
                 self._preview(payload)
             elif path == "/api/progress":
@@ -207,6 +215,24 @@ class AppRequestHandler(BaseHTTPRequestHandler):
             detail = result.stderr.strip() or "el selector terminó con un error."
             raise ValueError(f"No se pudo abrir el selector de carpetas: {detail}")
         return {"folder": result.stdout.strip()}
+
+    def _check_folder(self, payload: dict[str, Any]) -> None:
+        folder = payload.get("folder")
+        if not isinstance(folder, str) or not folder.strip():
+            self._send_json(200, {"ok": False, "error": "Escribe la ruta de una carpeta."})
+            return
+        try:
+            resolved = Path(folder.strip()).expanduser().resolve()
+            exists = resolved.is_dir()
+        except (OSError, RuntimeError, ValueError):
+            exists = False
+        if not exists:
+            self._send_json(
+                200,
+                {"ok": False, "error": "La carpeta seleccionada no existe o no es una carpeta."},
+            )
+            return
+        self._send_json(200, {"ok": True, "folder": str(resolved)})
 
     def _preview(self, payload: dict[str, Any]) -> None:
         folder = payload.get("folder")
@@ -260,6 +286,11 @@ class AppRequestHandler(BaseHTTPRequestHandler):
                 progress_callback=update_progress,
                 cancellation_event=cancellation_event,
             )
+        except RenamePlanError:
+            if not cancellation_event.is_set():
+                raise
+            self._send_json(200, {"cancelled": True, "scan_id": scan_id})
+            return
         finally:
             with self.server.state_lock:
                 active_scan = self.server.state["scan"]
@@ -324,7 +355,7 @@ class AppRequestHandler(BaseHTTPRequestHandler):
         if cancelled:
             self._send_json(200, {"cancelled": True})
         else:
-            self._send_json(409, {"error": "El análisis ya terminó o no existe."})
+            self._send_json(200, {"cancelled": False, "reason": "El análisis ya terminó o no existe."})
 
     def _confirm(self, payload: dict[str, Any]) -> None:
         plan_id = payload.get("plan_id")
