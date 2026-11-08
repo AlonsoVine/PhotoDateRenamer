@@ -62,7 +62,7 @@ class LocalServerTests(unittest.TestCase):
         self.assertIn('href="/images/app-icon.png"', page)
         self.assertIn(f"nonce-{self.token}", policy)
         self.assertNotIn("unsafe-inline", policy)
-        self.assertIn('src="/images/hero-illustration.png"', page)
+        self.assertIn('src="/images/hero-print.webp"', page)
         self.assertIn("Creado por Alonso Viñé", page)
         self.assertIn('id="progress-view"', page)
         self.assertIn('id="list-scroller"', page)

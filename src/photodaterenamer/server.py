@@ -30,6 +30,7 @@ STATIC_IMAGES = {
     "/images/app-icon.png": "image/png",
     "/images/hero-illustration.png": "image/png",
     "/images/grain.png": "image/png",
+    "/images/hero-print.webp": "image/webp",
     "/fonts/fraunces.woff2": "font/woff2",
     "/fonts/fraunces-italic.woff2": "font/woff2",
     "/fonts/instrument-sans.woff2": "font/woff2",
