@@ -18,8 +18,8 @@ from .renamer import (
     RenameExecutionError,
     RenamePlan,
     RenamePlanError,
+    apply_plan,
     create_preview,
-    execute_plan,
     undo_renames,
 )
 
@@ -33,15 +33,19 @@ STATIC_IMAGES = {
 
 
 class AppServer(ThreadingHTTPServer):
-    def __init__(self) -> None:
+    # On Windows SO_REUSEADDR lets a second process bind an occupied port; refuse instead.
+    allow_reuse_address = sys.platform != "win32"
+
+    def __init__(self, port: int = 0) -> None:
         self.state_lock = Lock()
         self.state: dict[str, Any] = {
             "token": secrets.token_urlsafe(32),
             "plans": {},
             "runs": {},
             "scan": None,
+            "apply": None,
         }
-        super().__init__(("127.0.0.1", 0), AppRequestHandler)
+        super().__init__(("127.0.0.1", port), AppRequestHandler)
 
 
 class AppRequestHandler(BaseHTTPRequestHandler):
@@ -167,6 +171,8 @@ class AppRequestHandler(BaseHTTPRequestHandler):
                 self._progress(payload)
             elif path == "/api/cancel":
                 self._cancel(payload)
+            elif path == "/api/apply-progress":
+                self._apply_progress(payload)
             elif path == "/api/confirm":
                 self._confirm(payload)
             elif path == "/api/undo":
@@ -268,7 +274,9 @@ class AppRequestHandler(BaseHTTPRequestHandler):
             {
                 "plan_id": plan.plan_id,
                 "folder": str(plan.directory),
+                "folder_name": plan.directory.name or str(plan.directory),
                 "scan_id": scan_id,
+                "entry_count": plan.entry_count,
                 "rename_count": plan.rename_count,
                 "items": [
                     {
@@ -277,6 +285,7 @@ class AppRequestHandler(BaseHTTPRequestHandler):
                         "status": item.status,
                         "reason": item.reason,
                         "date_source": item.date_source,
+                        "date_text": item.date_text,
                     }
                     for item in plan.items
                 ],
@@ -324,18 +333,65 @@ class AppRequestHandler(BaseHTTPRequestHandler):
         plan = self.server.state["plans"].get(plan_id)
         if not isinstance(plan, RenamePlan):
             raise ValueError("La vista previa ha caducado. Genera una nueva antes de continuar.")
-        renamed = execute_plan(plan)
-        self.server.state["plans"].pop(plan_id, None)
+        with self.server.state_lock:
+            current_apply = self.server.state["apply"]
+            if current_apply is not None and not current_apply["completed"]:
+                raise ValueError("Ya se están aplicando cambios.")
+            if self.server.state["plans"].pop(plan_id, None) is None:
+                raise ValueError("La vista previa ya se aplicó o ha caducado.")
+            self.server.state["apply"] = {
+                "plan_id": plan_id,
+                "completed": False,
+                "done": 0,
+                "total": plan.rename_count,
+            }
+
+        def update_progress(_phase: str, done: int, total: int | None) -> None:
+            with self.server.state_lock:
+                self.server.state["apply"].update(done=done, total=total)
+
+        try:
+            result = apply_plan(plan, progress_callback=update_progress)
+        finally:
+            with self.server.state_lock:
+                self.server.state["apply"]["completed"] = True
+        renamed = list(result.renamed)
         self.server.state["runs"].clear()
-        self.server.state["runs"][plan_id] = renamed
+        if renamed:
+            self.server.state["runs"][plan_id] = renamed
         self._send_json(
             200,
             {
-                "run_id": plan_id,
+                "run_id": plan_id if renamed else None,
                 "renamed_count": len(renamed),
-                "renamed": [{"old_name": old.name, "new_name": new.name} for old, new in renamed],
+                "failed_count": len(result.failures),
+                "renamed": [
+                    {
+                        "old_name": old.relative_to(plan.directory).as_posix(),
+                        "new_name": new.relative_to(plan.directory).as_posix(),
+                    }
+                    for old, new in renamed
+                ],
+                "failures": [
+                    {
+                        "original_name": failure.original_name,
+                        "new_name": failure.new_name,
+                        "reason": failure.reason,
+                    }
+                    for failure in result.failures
+                ],
             },
         )
+
+    def _apply_progress(self, payload: dict[str, Any]) -> None:
+        plan_id = payload.get("plan_id")
+        with self.server.state_lock:
+            current = self.server.state["apply"]
+            if current is None or current["plan_id"] != plan_id:
+                progress = {"plan_id": plan_id, "completed": False, "done": 0, "total": None}
+            else:
+                progress = dict(current)
+        self._send_json(200, progress)
 
     def _undo(self, payload: dict[str, Any]) -> None:
         run_id = payload.get("run_id")

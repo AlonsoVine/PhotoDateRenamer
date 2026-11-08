@@ -94,6 +94,60 @@ class LocalServerTests(unittest.TestCase):
         self.assertTrue(image_path.exists())
         self.assertEqual(undo["restored_count"], 1)
 
+    def write_photo(self, name: str, capture_date: str = "2024:05:06 07:08:09") -> Path:
+        image_path = self.folder / name
+        image = Image.new("RGB", (4, 4), color="olive")
+        exif = Image.Exif()
+        exif[36867] = capture_date
+        image.save(image_path, exif=exif)
+        return image_path
+
+    def test_preview_reports_entries_folder_name_and_date_text(self) -> None:
+        self.write_photo("IMG_001.jpg")
+        (self.folder / "notas.txt").write_text("x", encoding="utf-8")
+
+        preview = self.post("/api/preview", {"folder": str(self.folder), "date_format": "yyyymmdd"})
+
+        self.assertEqual(preview["entry_count"], 2)
+        self.assertEqual(preview["folder_name"], self.folder.name)
+        self.assertEqual(preview["items"][0]["date_text"], "20240506")
+
+    def test_partial_failure_is_reported_and_successful_renames_can_be_undone(self) -> None:
+        for name in ("a.jpg", "b.jpg", "c.jpg"):
+            self.write_photo(name)
+        preview = self.post("/api/preview", {"folder": str(self.folder)})
+        (self.folder / "2024_05_06_b.jpg").write_bytes(b"intruso")
+
+        result = self.post("/api/confirm", {"plan_id": preview["plan_id"]})
+        progress = self.post("/api/apply-progress", {"plan_id": preview["plan_id"]})
+
+        self.assertEqual(result["renamed_count"], 2)
+        self.assertEqual(result["failed_count"], 1)
+        self.assertEqual(result["failures"][0]["original_name"], "b.jpg")
+        self.assertEqual((self.folder / "2024_05_06_b.jpg").read_bytes(), b"intruso")
+        self.assertEqual(progress, {"plan_id": preview["plan_id"], "completed": True, "done": 3, "total": 3})
+
+        undo = self.post("/api/undo", {"run_id": result["run_id"]})
+
+        self.assertEqual(undo["restored_count"], 2)
+        self.assertTrue((self.folder / "a.jpg").exists())
+        self.assertTrue((self.folder / "c.jpg").exists())
+
+    def test_total_failure_has_no_undo_and_a_plan_cannot_be_applied_twice(self) -> None:
+        self.write_photo("a.jpg")
+        preview = self.post("/api/preview", {"folder": str(self.folder)})
+        (self.folder / "2024_05_06_a.jpg").write_bytes(b"intruso")
+
+        result = self.post("/api/confirm", {"plan_id": preview["plan_id"]})
+
+        self.assertEqual(result["renamed_count"], 0)
+        self.assertEqual(result["failed_count"], 1)
+        self.assertIsNone(result["run_id"])
+        with self.assertRaises(HTTPError) as error:
+            self.post("/api/confirm", {"plan_id": preview["plan_id"]})
+        self.assertEqual(error.exception.code, 400)
+        error.exception.close()
+
     def test_preview_can_include_subfolders(self) -> None:
         nested_folder = self.folder / "vacaciones"
         nested_folder.mkdir()

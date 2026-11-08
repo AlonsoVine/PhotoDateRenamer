@@ -38,6 +38,7 @@ class RenameItem:
     reason: str | None = None
     date_source: str | None = None
     source_fingerprint: tuple[int, int, int, int, int] | None = None
+    date_text: str | None = None
 
 
 @dataclass(frozen=True)
@@ -47,10 +48,24 @@ class RenamePlan:
     date_format: str
     components: tuple[dict[str, str], ...]
     items: tuple[RenameItem, ...]
+    entry_count: int = 0
 
     @property
     def rename_count(self) -> int:
         return sum(item.status == "ready" for item in self.items)
+
+
+@dataclass(frozen=True)
+class ApplyFailure:
+    original_name: str
+    new_name: str
+    reason: str
+
+
+@dataclass(frozen=True)
+class ApplyResult:
+    renamed: tuple[tuple[Path, Path], ...]
+    failures: tuple[ApplyFailure, ...]
 
 
 class RenamePlanError(ValueError):
@@ -62,6 +77,7 @@ class RenameExecutionError(RuntimeError):
 
 
 ProgressCallback = Callable[[str, int, int | None], None]
+MAX_NAME_LENGTH = 255
 
 
 def _is_windows() -> bool:
@@ -85,6 +101,16 @@ def _move_without_overwrite(source: Path, destination: Path) -> None:
                 f"{destination.name}: {cleanup_error}"
             ) from error
         raise
+
+
+def _name_is_too_long(name: str) -> bool:
+    if _is_windows():
+        return len(name.encode("utf-16-le")) // 2 > MAX_NAME_LENGTH
+    return len(name.encode("utf-8")) > MAX_NAME_LENGTH
+
+
+def _describe_os_error(error: OSError) -> str:
+    return error.strerror or str(error)
 
 
 def _file_fingerprint(path: Path) -> tuple[int, int, int, int, int]:
@@ -263,7 +289,9 @@ def create_preview(
     destinations: dict[str, list[int]] = {}
     existing_names: set[str] = set()
     photo_count = 0
+    entry_count = 0
     for path_count, path in enumerate(_walk_entries(folder, recursive), start=1):
+        entry_count = path_count
         _check_cancelled(cancellation_event)
         existing_names.add(path.relative_to(folder).as_posix().casefold())
         if path.is_file() and path.suffix.lower() in SUPPORTED_EXTENSIONS:
@@ -289,7 +317,27 @@ def create_preview(
             fingerprint_after = _file_fingerprint(source)
             if fingerprint_before != fingerprint_after:
                 raise OSError("El archivo cambió mientras se analizaba.")
-        except (OSError, UnidentifiedImageError, ValueError, Image.DecompressionBombError) as error:
+        except UnidentifiedImageError:
+            entries.append(
+                RenameItem(
+                    relative_name,
+                    None,
+                    "skipped",
+                    "No se pudieron leer los metadatos: el archivo no es una imagen reconocible.",
+                )
+            )
+            continue
+        except OSError as error:
+            entries.append(
+                RenameItem(
+                    relative_name,
+                    None,
+                    "skipped",
+                    f"No se pudieron leer los metadatos: {_describe_os_error(error)}",
+                )
+            )
+            continue
+        except (ValueError, Image.DecompressionBombError) as error:
             entries.append(
                 RenameItem(
                     relative_name,
@@ -310,16 +358,40 @@ def create_preview(
             )
             continue
         capture_date, date_source = capture_date_result
+        date_text = capture_date.strftime(DATE_FORMATS[date_format])
 
         try:
             new_name = _build_name(source, capture_date, date_format, selected_components)
         except ValueError as error:
-            entries.append(RenameItem(relative_name, None, "conflict", str(error), date_source))
+            entries.append(
+                RenameItem(
+                    relative_name, None, "conflict", str(error), date_source, date_text=date_text
+                )
+            )
             continue
 
         if new_name == source.name:
             entries.append(
-                RenameItem(relative_name, relative_name, "unchanged", date_source=date_source)
+                RenameItem(
+                    relative_name,
+                    relative_name,
+                    "unchanged",
+                    date_source=date_source,
+                    date_text=date_text,
+                )
+            )
+            continue
+
+        if _name_is_too_long(new_name):
+            entries.append(
+                RenameItem(
+                    relative_name,
+                    None,
+                    "conflict",
+                    f"El nombre resultante supera los {MAX_NAME_LENGTH} caracteres permitidos.",
+                    date_source,
+                    date_text=date_text,
+                )
             )
             continue
 
@@ -333,6 +405,7 @@ def create_preview(
                 "ready",
                 date_source=date_source,
                 source_fingerprint=fingerprint_after,
+                date_text=date_text,
             )
         )
         destinations.setdefault(destination, []).append(entry_index)
@@ -349,6 +422,7 @@ def create_preview(
                     "El nombre de destino ya existe o se repite en la vista previa.",
                     item.date_source,
                     item.source_fingerprint,
+                    item.date_text,
                 )
 
     _check_cancelled(cancellation_event)
@@ -359,6 +433,7 @@ def create_preview(
         date_format=date_format,
         components=selected_components,
         items=tuple(entries),
+        entry_count=entry_count,
     )
 
 
@@ -403,6 +478,50 @@ def execute_plan(plan: RenamePlan) -> list[tuple[Path, Path]]:
             detail += " No se pudieron revertir todos los cambios: " + "; ".join(rollback_errors)
         raise RenameExecutionError(detail) from error
     return renamed
+
+
+def apply_plan(
+    plan: RenamePlan, progress_callback: ProgressCallback | None = None
+) -> ApplyResult:
+    """Apply each ready item independently: a failure is reported and the rest continue.
+
+    Every item is re-validated right before it moves. A destination is never overwritten
+    and no file is deleted; failed items keep their original name.
+    """
+    ready_items = [item for item in plan.items if item.status == "ready"]
+    total = len(ready_items)
+    renamed: list[tuple[Path, Path]] = []
+    failures: list[ApplyFailure] = []
+    if progress_callback is not None:
+        progress_callback("applying", 0, total)
+    for done, item in enumerate(ready_items, start=1):
+        source = plan.directory / Path(item.original_name)
+        destination = plan.directory / Path(str(item.new_name))
+        reason: str | None = None
+        if not source.is_file():
+            reason = "El archivo ya no existe."
+        elif item.source_fingerprint is not None:
+            try:
+                if _file_fingerprint(source) != item.source_fingerprint:
+                    reason = "El archivo cambió desde la vista previa."
+            except OSError as error:
+                reason = f"No se pudo comprobar el archivo: {_describe_os_error(error)}"
+        if reason is None and destination.exists():
+            reason = "Ya existe un archivo con el nombre de destino."
+        if reason is None:
+            try:
+                _move_without_overwrite(source, destination)
+            except FileExistsError:
+                reason = "Ya existe un archivo con el nombre de destino."
+            except OSError as error:
+                reason = _describe_os_error(error)
+            else:
+                renamed.append((source, destination))
+        if reason is not None:
+            failures.append(ApplyFailure(item.original_name, str(item.new_name), reason))
+        if progress_callback is not None:
+            progress_callback("applying", done, total)
+    return ApplyResult(tuple(renamed), tuple(failures))
 
 
 def undo_renames(renamed: list[tuple[Path, Path]]) -> None:
