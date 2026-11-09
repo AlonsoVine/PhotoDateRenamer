@@ -25,8 +25,14 @@
    */
   function middleEllipsis(text, max) {
     if (max < 5 || text.length <= max) return text;
-    const keepEnd = Math.max(6, Math.floor((max - 1) * 0.4));
-    const keepStart = max - 1 - keepEnd;
+    let keepEnd = Math.max(6, Math.floor((max - 1) * 0.4));
+    let keepStart = max - 1 - keepEnd;
+    // Never cut a leading date in half: it is the part the user is checking.
+    const date = LEADING_DATE.exec(text);
+    if (date && keepStart < date[0].length && max - 1 - date[0].length >= 4) {
+      keepStart = date[0].length;
+      keepEnd = max - 1 - keepStart;
+    }
     return `${text.slice(0, keepStart)}…${text.slice(text.length - keepEnd)}`;
   }
 

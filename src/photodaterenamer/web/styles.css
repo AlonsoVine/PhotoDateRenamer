@@ -104,6 +104,21 @@ legend + * { clear: both; }
 
 main { flex: 1; display: flex; flex-direction: column; outline: none; }
 
+.last-run {
+  position: relative; z-index: 2;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px;
+  min-height: 48px; padding: 6px clamp(18px, 4vw, 56px);
+  border-bottom: 1px solid rgba(139, 224, 189, .22);
+  background: linear-gradient(90deg, rgba(139, 224, 189, .1), rgba(139, 224, 189, .03) 60%, transparent);
+  color: var(--muted); font-size: 14px;
+  animation: token-in .4s var(--ease-out) both;
+}
+.last-run-text { min-width: 0; }
+.last-run-text b { color: var(--paper); font-weight: 600; }
+.last-run-text em { color: var(--paper); }
+.last-run-icon { color: var(--fix); font-weight: 700; }
+body:has(#last-run:not([hidden])) .workbench { height: calc(100dvh - 65px - 49px); }
+
 /* ---------- shared bits ---------- */
 .kicker, .panel-label {
   display: flex; align-items: center; gap: 10px;
@@ -294,7 +309,7 @@ mark.stamp { background: none; color: var(--stamp); text-shadow: 0 0 12px var(--
   transition: background .2s, color .2s, border-color .2s;
 }
 .preset:hover:not(:disabled), .seg-option:hover span, .add-piece:hover:not(:disabled) { color: var(--paper); border-color: var(--paper); }
-.preset[aria-pressed="true"] { background: var(--paper); border-color: var(--paper); color: var(--ink); }
+.preset[aria-pressed="true"], .preset[aria-pressed="true"]:hover:not(:disabled) { background: var(--paper); border-color: var(--paper); color: var(--ink); }
 .preset:disabled, .add-piece:disabled { cursor: not-allowed; opacity: .55; }
 .seg-option { position: relative; cursor: pointer; }
 .seg-option input { position: absolute; opacity: 0; width: 1px; height: 1px; }
@@ -342,6 +357,7 @@ mark.stamp { background: none; color: var(--stamp); text-shadow: 0 0 12px var(--
 .filter-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
 .filter-ready .filter-dot { background: var(--stamp); }
 .filter-dated .filter-dot { background: transparent; box-shadow: inset 0 0 0 2px var(--stamp); }
+.filter-filedate .filter-dot { background: transparent; outline: 1.5px dashed var(--muted); outline-offset: -1.5px; }
 .filter-conflict .filter-dot, .filter-failed .filter-dot, .filter-pending .filter-dot { background: var(--safe); }
 .filter-skipped .filter-dot { background: var(--faint); }
 .filter-unchanged .filter-dot { background: var(--muted); }
@@ -349,6 +365,10 @@ mark.stamp { background: none; color: var(--stamp); text-shadow: 0 0 12px var(--
 
 /* film strip around the list */
 .list-view { flex: 1; display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 12px; min-height: 0; }
+.list-view .strip, .filters { transition: opacity .25s, filter .25s; }
+body.is-refreshing .list-view .strip, body.is-refreshing .filters { opacity: .45; filter: saturate(.4); }
+body.is-refreshing #sheet-kicker::after { content: ""; display: inline-block; width: 8px; height: 8px; margin-left: 4px; border-radius: 50%; background: var(--stamp); animation: blink 1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: .2; } }
 .strip {
   position: relative; min-height: 0; padding: 0 30px;
   background: #0b0908; border-radius: 6px;
@@ -390,6 +410,14 @@ mark.stamp { background: none; color: var(--stamp); text-shadow: 0 0 12px var(--
   background: rgba(11, 9, 8, .78); color: var(--stamp); font: 600 10px/1.2 var(--mono); letter-spacing: .04em;
 }
 .row.is-skipped .row-thumb { opacity: .5; }
+.row-src {
+  position: absolute; right: 3px; top: 3px; padding: 1px 3px; border-radius: 2px;
+  background: rgba(11, 9, 8, .82); color: var(--paper); box-shadow: inset 0 0 0 1px var(--muted);
+  outline: 1px dashed var(--muted); outline-offset: -1px;
+  font: 700 9px/1.2 var(--sans); letter-spacing: .08em;
+}
+.row-pending { color: var(--paper); font-family: var(--mono); }
+.row-pending .arrow { color: var(--safe); }
 .row-names { display: grid; gap: 3px; min-width: 0; }
 .row-old, .row-new { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-family: var(--mono); font-size: 13px; line-height: 1.35; }
 .row-old { color: var(--muted); }
@@ -411,6 +439,7 @@ mark.stamp { background: none; color: var(--stamp); text-shadow: 0 0 12px var(--
 .badge-renamed { color: var(--fix); background: rgba(139, 224, 189, .08); }
 .badge-dated { padding: 3px 7px; color: var(--stamp-hot); background: transparent; box-shadow: inset 0 0 0 1px rgba(255, 154, 60, .4); font-size: 10px; }
 .badge-dated::before { background: transparent; box-shadow: inset 0 0 0 1.5px currentColor; }
+.badge-abbr { display: none; }
 .list-empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 14px; pointer-events: none; }
 
 .bench-foot { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 340px); gap: 12px; }
@@ -492,6 +521,13 @@ mark.stamp { background: none; color: var(--stamp); text-shadow: 0 0 12px var(--
 .scene[data-art="fogged"] span:nth-child(2n) { background: radial-gradient(circle at 70% 60%, rgba(255, 154, 60, .55), rgba(163, 36, 26, .3) 55%, #1a100d 85%); }
 .scene[data-art="restored"] span { background: linear-gradient(160deg, rgba(139, 224, 189, .22), #14201b 70%); box-shadow: inset 0 0 0 1px rgba(139, 224, 189, .35); }
 
+@media (min-width: 1280px) {
+  .scene { width: min(760px, 100%); gap: 12px; padding: 24px 16px; }
+  .scene::before, .scene::after { height: 9px; background-size: 16px 9px; }
+  .scene::before { top: 6px; }
+  .scene::after { bottom: 6px; }
+  .message-view .state-text { font-size: 18px; }
+}
 .scene-progress { display: block; width: min(560px, 100%); padding: 0; background: none; box-shadow: none; }
 .scene-progress::before, .scene-progress::after { content: none; }
 .film-progress { position: relative; width: 100%; height: 28px; border-radius: 3px; overflow: hidden; background: #0b0908; box-shadow: inset 0 0 0 1px var(--line); }
@@ -569,6 +605,11 @@ body[data-mode="idle"] .shortcuts > span:nth-child(n+3) { display: none; }
 
 /* ---------- responsive ---------- */
 @media (max-width: 1080px) {
+  .hero { grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); gap: 36px; }
+  .hero-title { font-size: clamp(52px, 7.6vw, 96px); }
+  .tray { width: min(100%, 300px); }
+}
+@media (max-width: 860px) {
   .hero { grid-template-columns: minmax(0, 1fr); }
   .tray { display: none; }
 }
@@ -599,8 +640,13 @@ body[data-mode="idle"] .shortcuts > span:nth-child(n+3) { display: none; }
   .format-panel[open] .format-summary { padding-bottom: 0; }
   .format-summary:focus-visible { outline-offset: -3px; }
 }
+@media (max-width: 960px) {
+  body:has(#last-run:not([hidden])) .workbench { height: auto; }
+}
 @media (max-width: 640px) {
   body { font-size: 14px; }
+  .last-run { padding: 8px 16px; font-size: 13px; }
+  .last-run .btn { width: 100%; }
   .topbar { padding: 14px 16px; }
   .local-badge { font-size: 12px; }
   .wordmark-name { font-size: 16px; }
@@ -620,9 +666,12 @@ body[data-mode="idle"] .shortcuts > span:nth-child(n+3) { display: none; }
   .row { grid-template-columns: 44px minmax(0, 1fr) auto; padding: 0 8px 0 6px; gap: 10px; }
   .row-thumb { width: 44px; height: 44px; }
   .row-frame, .row-why { display: none; }
-  .row .badge { padding: 6px; }
+  .row .badge { gap: 4px; padding: 4px 5px; font-size: 10px; letter-spacing: .04em; }
+  .row .badge::before { width: 5px; height: 5px; }
   .row .badge-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  .row .badge-dated { padding: 5px; }
+  .row .badge-abbr { display: inline; }
+  .row .badge-dated { padding: 4px 5px; }
+  .row .badge-dated .badge-text { position: static; width: auto; height: auto; clip: auto; }
   .sheet-tools, .search, .search input { width: 100%; }
   .search .kbd-combo { display: none; }
   .search input { padding-right: 14px; }
@@ -652,3 +701,6 @@ body[data-mode="idle"] .shortcuts > span:nth-child(n+3) { display: none; }
   .btn, .preset, .filter, .sleeve, .add-piece, .seg-option span { border: 1px solid CanvasText; }
   .seg::before { content: none; }
 }
+
+/* Undo reports no per-file progress: show the sweeping strip, not a frozen counter. */
+body[data-view="undoing"] .progress-view .counter { display: none; }

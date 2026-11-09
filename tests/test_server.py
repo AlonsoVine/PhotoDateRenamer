@@ -159,6 +159,67 @@ class LocalServerTests(unittest.TestCase):
         self.assertEqual(error.exception.code, 400)
         error.exception.close()
 
+    def test_last_run_survives_analysing_another_folder_and_ends_after_undo(self) -> None:
+        self.write_photo("a.jpg")
+        self.assertEqual(self.post("/api/last-run", {}), {"run_id": None})
+        preview = self.post("/api/preview", {"folder": str(self.folder)})
+        result = self.post("/api/confirm", {"plan_id": preview["plan_id"]})
+        other = self.folder / "otra"
+        other.mkdir()
+        self.post("/api/preview", {"folder": str(other)})
+
+        last = self.post("/api/last-run", {})
+
+        self.assertEqual(last["run_id"], result["run_id"])
+        self.assertEqual(last["count"], 1)
+        self.assertEqual(last["folder"], str(self.folder.resolve()))
+        undo = self.post("/api/undo", {"run_id": last["run_id"]})
+        self.assertEqual(undo["restored_count"], 1)
+        self.assertEqual(undo["folder"], str(self.folder.resolve()))
+        self.assertTrue((self.folder / "a.jpg").exists())
+        self.assertEqual(self.post("/api/last-run", {}), {"run_id": None})
+
+    def test_an_interrupted_apply_keeps_the_files_already_renamed_undoable(self) -> None:
+        for name in ("a.jpg", "b.jpg"):
+            self.write_photo(name)
+        preview = self.post("/api/preview", {"folder": str(self.folder)})
+        from photodaterenamer import renamer
+
+        real_move = renamer._move_without_overwrite
+        calls = {"count": 0}
+
+        def move_then_crash(source: Path, destination: Path) -> None:
+            calls["count"] += 1
+            if calls["count"] == 2:
+                raise RuntimeError("fallo inesperado del servidor")
+            real_move(source, destination)
+
+        with patch.object(renamer, "_move_without_overwrite", move_then_crash):
+            with self.assertRaises(Exception):
+                self.post("/api/confirm", {"plan_id": preview["plan_id"]})
+
+        last = self.post("/api/last-run", {})
+        self.assertEqual(last["count"], 1)
+        undo = self.post("/api/undo", {"run_id": last["run_id"]})
+        self.assertEqual(undo["restored_count"], 1)
+        self.assertEqual(sorted(path.name for path in self.folder.iterdir()), ["a.jpg", "b.jpg"])
+
+    def test_a_format_change_reuses_dates_without_reading_metadata_again(self) -> None:
+        self.write_photo("a.jpg")
+        first = self.post("/api/preview", {"folder": str(self.folder)})
+        from photodaterenamer import renamer
+
+        with patch.object(renamer, "_read_capture_date", side_effect=AssertionError("re-read")):
+            second = self.post(
+                "/api/preview", {"folder": str(self.folder), "date_format": "yyyymmdd"}
+            )
+        self.assertEqual(first["items"][0]["date_source"], second["items"][0]["date_source"])
+        self.assertEqual(second["items"][0]["new_name"], "20240506_a.jpg")
+
+        self.write_photo("a.jpg", "2020:01:02 03:04:05")
+        third = self.post("/api/preview", {"folder": str(self.folder)})
+        self.assertEqual(third["items"][0]["new_name"], "2020_01_02_a.jpg")
+
     def test_thumbnails_are_limited_to_the_analysed_folder(self) -> None:
         self.write_photo("IMG_001.jpg")
         (self.folder / "rota.jpg").write_bytes(b"no es un jpeg")

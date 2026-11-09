@@ -25,6 +25,9 @@ test("middle ellipsis keeps the date at the start and the extension at the end",
   assert.ok(short.endsWith(".jpeg"));
   assert.ok(short.includes("…"));
   assert.equal(middleEllipsis("corto.jpg", 30), "corto.jpg");
+  const narrow = middleEllipsis("2024_08_14_cumpleaños abuela (1).jpg", 16);
+  assert.equal(narrow.length, 16);
+  assert.ok(narrow.startsWith("2024_08_14…"), narrow);
 });
 
 test("seven-segment digits group thousands with a dot and ghosts match their width", () => {

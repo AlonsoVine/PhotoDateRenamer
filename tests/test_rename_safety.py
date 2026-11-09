@@ -117,6 +117,40 @@ class RenameSafetyTests(unittest.TestCase):
 
         self.assertEqual(snapshot(self.folder), before)
 
+    def test_cached_dates_produce_exactly_the_same_plan(self) -> None:
+        for index, name in enumerate(["Árbol niño.JPG", "b.png", "sub/c.jpg", "IMG_0001.jpg"]):
+            self.write(name, jpeg_bytes(f"2023:0{index + 1}:15 10:00:00"))
+        self.write("sin_fecha.jpg", bytes([0xFF, 0xD8]) + b" roto")
+        self.write("IMG_0001_copia.jpg", jpeg_bytes("2023:04:15 10:00:00"))
+        components = [
+            {"kind": "field", "value": "original_stem"},
+            {"kind": "text", "value": "-"},
+            {"kind": "field", "value": "date"},
+            {"kind": "field", "value": "extension"},
+        ]
+        cache: dict = {}
+
+        def summary(plan):
+            return [(i.original_name, i.new_name, i.status, i.reason, i.date_source, i.date_text) for i in plan.items]
+
+        fresh = create_preview(self.folder, components, "yyyy-mm-dd", True)
+        create_preview(self.folder, None, "yyyymmdd", True, date_cache=cache)
+        cached = create_preview(self.folder, components, "yyyy-mm-dd", True, date_cache=cache)
+
+        self.assertTrue(cache)
+        self.assertEqual(summary(cached), summary(fresh))
+
+    def test_apply_reports_each_rename_as_it_happens(self) -> None:
+        for name in ("a.jpg", "b.jpg"):
+            self.write(name)
+        plan = create_preview(self.folder)
+        seen: list[tuple[str, str]] = []
+
+        result = apply_plan(plan, on_renamed=lambda old, new: seen.append((old.name, new.name)))
+
+        self.assertEqual(seen, [(old.name, new.name) for old, new in result.renamed])
+        self.assertEqual(len(seen), 2)
+
     def test_colliding_destinations_are_never_renamed_or_overwritten(self) -> None:
         self.write("uno.jpg", jpeg_bytes(color="red"))
         self.write("dos.jpg", jpeg_bytes(color="blue"))

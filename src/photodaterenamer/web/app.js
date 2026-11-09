@@ -31,7 +31,7 @@ const PRESETS = {
 };
 const PRESET_LABELS = {
   date_original: "Fecha + nombre",
-  date_stem: "Fecha + título",
+  date_stem: "Fecha, sin extensión",
   original_date: "Nombre + fecha",
   custom: "A medida"
 };
@@ -44,10 +44,21 @@ const STATUS_LABELS = {
   failed: "Falló",
   pending: "Sin restaurar"
 };
+/* Short visible labels for narrow screens: state is never conveyed by colour alone. */
+const STATUS_SHORT = {
+  ready: "Cambia",
+  conflict: "Choque",
+  skipped: "Omitida",
+  unchanged: "Igual",
+  renamed: "Hecho",
+  failed: "Falló",
+  pending: "Pendiente"
+};
 const FILTER_LABELS = {
   all: "Todas",
   ready: "Se renombran",
   dated: "Ya fechadas",
+  filedate: "Fecha del archivo",
   conflict: "Conflictos",
   skipped: "Omitidas",
   unchanged: "Sin cambio",
@@ -58,6 +69,7 @@ const FILTER_LABELS = {
 const SAMPLE = { name: "IMG_0412.jpg", date: new Date(2024, 7, 14) };
 const INVALID_NAME_TEXT = /[<>:"/\\|?*\u0000-\u001f]/;
 const RESULT_VIEWS = ["success", "partial", "total", "undo-partial"];
+const BUSY_VIEWS = ["applying", "undoing"];
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 const narrowScreen = window.matchMedia("(max-width: 960px)");
 const numberFormat = new Intl.NumberFormat("es-ES", { useGrouping: "always" });
@@ -136,7 +148,10 @@ const ui = {
   confirmExample: $("#confirm-example"),
   confirmDated: $("#confirm-dated"),
   confirmApply: $("#confirm-apply"),
-  wordmark: $(".wordmark")
+  wordmark: $(".wordmark"),
+  lastRun: $("#last-run"),
+  lastRunText: $("#last-run-text"),
+  lastRunUndo: $("#last-run-undo")
 };
 
 const state = {
@@ -149,7 +164,7 @@ const state = {
   plan: null,
   planSettings: null,
   result: null,
-  lastRunId: null,
+  lastRun: null,
   filter: "all",
   query: ""
 };
@@ -406,7 +421,7 @@ function fillFrame(image, stamp, item, size) {
   if (!canShowThumbnail(item)) return;
   const path = currentPathOf(item);
   image.dataset.path = path;
-  thumbnails.get(path, size).then((url) => {
+  thumbnails.get(path, size, () => image.dataset.path === path).then((url) => {
     if (url && image.dataset.path === path) {
       image.src = url;
       image.hidden = false;
@@ -437,6 +452,7 @@ function setMode(mode) {
 const VIEW_PANELS = {
   scanning: "progress",
   applying: "progress",
+  undoing: "progress",
   empty: "message",
   nophotos: "message",
   cancelled: "message",
@@ -464,6 +480,7 @@ function setView(view) {
   if (hasList) list.measure();
   updateApplyPanel();
   updateControlsLock();
+  renderLastRun();
 }
 
 function setSheetHeading(kicker, title) {
@@ -482,9 +499,13 @@ function focusHeading() {
   });
 }
 
+function isBusy() {
+  return BUSY_VIEWS.includes(state.view);
+}
+
 function updateControlsLock() {
   const resultView = RESULT_VIEWS.includes(state.view);
-  const locked = state.view === "applying" || resultView;
+  const locked = isBusy() || resultView;
   ui.formatLock.hidden = !resultView;
   const controls = [
     ...ui.presets, ...ui.addPieces, ...ui.dateRadios, ...ui.recursiveInputs,
@@ -492,7 +513,7 @@ function updateControlsLock() {
   ];
   const lockable = [...controls, ui.changeFolder];
   for (const element of lockable) {
-    const shouldLock = element === ui.changeFolder ? state.view === "applying" : locked;
+    const shouldLock = element === ui.changeFolder ? isBusy() : locked;
     if (shouldLock) {
       if (!("lockedDisabled" in element.dataset)) element.dataset.lockedDisabled = element.disabled ? "1" : "";
       element.disabled = true;
@@ -501,6 +522,31 @@ function updateControlsLock() {
       delete element.dataset.lockedDisabled;
     }
   }
+}
+
+/* ------------------------------------------------------------- last batch */
+
+/** The last renamed batch stays undoable from anywhere until another batch is applied. */
+function renderLastRun() {
+  const run = state.lastRun;
+  const ownUndo = ["success", "partial", "undo-partial", "undoing"].includes(state.view);
+  ui.lastRun.hidden = !run || ownUndo;
+  ui.lastRunUndo.disabled = isBusy();
+  if (!run) return;
+  ui.lastRunText.replaceChildren(...strong(
+    `Último lote: **${plural(run.count, "foto renombrada", "fotos renombradas")}** en *${run.folder_name}*. Puedes deshacerlo mientras la aplicación siga abierta.`
+  ));
+  ui.lastRunUndo.textContent = run.count === 1 ? "Deshacer" : `Deshacer ${count(run.count)}`;
+}
+
+async function refreshLastRun() {
+  try {
+    const run = await request("/api/last-run");
+    state.lastRun = run.run_id ? run : null;
+  } catch (error) {
+    /* keep what we know */
+  }
+  renderLastRun();
 }
 
 /* ---------------------------------------------------------- folder panel */
@@ -519,7 +565,7 @@ function showHeroMessage(message, isError) {
 }
 
 async function pickFolder() {
-  if (state.view === "applying") return;
+  if (isBusy()) return;
   const button = state.mode === "idle" ? ui.heroBrowse : ui.changeFolder;
   button.disabled = true;
   try {
@@ -544,7 +590,6 @@ async function pickFolder() {
 
 function chooseFolder(folder) {
   state.folder = folder;
-  state.lastRunId = null;
   ui.heroPath.value = folder;
   ui.heroMessage.hidden = true;
   renderFolder();
@@ -631,7 +676,7 @@ function formatChanged(preset, message) {
 
 function scheduleRefresh() {
   updateApplyPanel();
-  if (state.mode === "idle" || !state.folder || state.view === "applying" || RESULT_VIEWS.includes(state.view)) return;
+  if (state.mode === "idle" || !state.folder || isBusy() || RESULT_VIEWS.includes(state.view)) return;
   window.clearTimeout(refreshTimer);
   if (!state.components.length) {
     cancelActiveScan();
@@ -756,14 +801,18 @@ async function startPreview({ origin }) {
   const settings = currentSettings();
   const scan = { id: crypto.randomUUID(), cancelled: false, settled: false, done: null };
   activeScan = scan;
+  // A format change keeps the sheet on screen (dimmed), with its filter and search.
+  const inPlace = origin === "format" && state.view === "preview" && state.plan?.folder === state.folder;
   state.plan = null;
   state.planSettings = null;
   state.result = null;
-  state.filter = "all";
-  state.query = "";
-  ui.search.value = "";
-  thumbnails.clear();
-  list.setItems([]);
+  if (!inPlace) {
+    state.filter = "all";
+    state.query = "";
+    ui.search.value = "";
+    thumbnails.clear();
+    list.setItems([]);
+  }
 
   let revealTimer = null;
   if (fromIdle) {
@@ -776,6 +825,10 @@ async function startPreview({ origin }) {
         focusHeading();
       }
     }, 260);
+  } else if (inPlace) {
+    ui.body.classList.add("is-refreshing");
+    ui.sheetKicker.textContent = "Actualizando la vista previa…";
+    updateApplyPanel();
   } else {
     renderFolder();
     showScanning();
@@ -810,6 +863,7 @@ async function startPreview({ origin }) {
     showError("No se pudo leer *la carpeta*", error.message, () => startPreview({ origin: "retry" }));
   } finally {
     window.clearTimeout(revealTimer);
+    if (generation === scanGeneration) ui.body.classList.remove("is-refreshing");
     ui.heroBrowse.removeAttribute("aria-busy");
     if (activeScan === scan) activeScan = null;
   }
@@ -861,8 +915,37 @@ function countsOf(items) {
   return items.reduce((summary, item) => {
     summary[item.status] = (summary[item.status] || 0) + 1;
     if (item.dated) summary.dated = (summary.dated || 0) + 1;
+    if (item.fileDate) summary.filedate = (summary.filedate || 0) + 1;
     return summary;
   }, {});
+}
+
+function isFileDate(source) {
+  return typeof source === "string" && source.startsWith("Archivo");
+}
+
+/** Client-side notes that never change a proposed name: dated names, file dates, clashes. */
+function annotate(items) {
+  const byDestination = new Map();
+  const originals = new Map();
+  for (const item of items) {
+    originals.set(item.original_name.toLocaleLowerCase(), item.original_name);
+    if (item.new_name && item.status !== "unchanged") {
+      const key = item.new_name.toLocaleLowerCase();
+      if (!byDestination.has(key)) byDestination.set(key, []);
+      byDestination.get(key).push(item.original_name);
+    }
+  }
+  for (const item of items) {
+    item.dated = item.status === "ready" && H.looksDated(item.original_name);
+    item.fileDate = item.status !== "skipped" && isFileDate(item.date_source);
+    if (item.status === "conflict" && item.new_name) {
+      const key = item.new_name.toLocaleLowerCase();
+      const others = (byDestination.get(key) || []).filter((name) => name !== item.original_name);
+      const existing = originals.get(key);
+      item.clashWith = existing && existing !== item.original_name ? [existing, ...others.filter((name) => name !== existing)] : others;
+    }
+  }
 }
 
 function showPlan(plan, origin) {
@@ -870,7 +953,7 @@ function showPlan(plan, origin) {
   if (!plan.items.length) {
     state.plan = null;
     if (plan.entry_count === 0) {
-      setSheetHeading("Carrete vacío", `*${folderName}* no tiene archivos`);
+      setSheetHeading("Carrete vacío", `La carpeta *${folderName}* está vacía`);
       showMessage({
         view: "empty",
         art: "empty",
@@ -898,12 +981,12 @@ function showPlan(plan, origin) {
     return;
   }
 
-  for (const item of plan.items) item.dated = item.status === "ready" && H.looksDated(item.original_name);
+  annotate(plan.items);
   const counts = countsOf(plan.items);
   setSheetHeading(`Hoja de contactos · ${folderName}`, `*${count(plan.items.length)}* ${plan.items.length === 1 ? "foto revisada" : "fotos revisadas"}`);
   setView("preview");
-  renderFilters(counts, ["all", "ready", "dated", "conflict", "skipped", "unchanged"]);
-  list.setItems(filteredItems(), { develop: origin !== "format" });
+  renderFilters(counts, ["all", "ready", "dated", "filedate", "conflict", "skipped", "unchanged"]);
+  list.setItems(filteredItems(), { develop: origin !== "format", keepScroll: origin === "format" });
   renderExample();
   const ready = counts.ready || 0;
   announce(
@@ -917,8 +1000,12 @@ function showPlan(plan, origin) {
 
 function renderFilters(counts, keys) {
   const total = sourceItems().length;
-  const buttons = keys
-    .filter((key) => key === "all" || counts[key])
+  const shown = keys.filter((key) => key === "all" || counts[key]);
+  if (!shown.includes(state.filter)) state.filter = "all";
+  // A single category that covers everything adds nothing to «Todas».
+  const informative = shown.filter((key) => key !== "all" && counts[key] !== total);
+  ui.filters.hidden = shown.length <= 2 && !informative.length;
+  const buttons = shown
     .map((key) => {
       const button = h(
         "button",
@@ -947,7 +1034,13 @@ function sourceItems() {
 function filteredItems() {
   const query = state.query.trim().toLocaleLowerCase("es");
   return sourceItems().filter((item) => {
-    if (state.filter === "dated" ? !item.dated : state.filter !== "all" && item.status !== state.filter) return false;
+    if (state.filter === "dated") {
+      if (!item.dated) return false;
+    } else if (state.filter === "filedate") {
+      if (!item.fileDate) return false;
+    } else if (state.filter !== "all" && item.status !== state.filter) {
+      return false;
+    }
     if (!query) return true;
     return (
       item.original_name.toLocaleLowerCase("es").includes(query) ||
@@ -989,7 +1082,8 @@ function shortReason(item) {
 function renderRow(item, index, chars) {
   const thumb = h("span", { class: "row-thumb", "aria-hidden": "true" },
     h("img", { alt: "", hidden: true, decoding: "async" }),
-    h("span", { class: "row-frame" }, String(index + 1).padStart(4, "0")));
+    h("span", { class: "row-frame" }, String(index + 1).padStart(4, "0")),
+    item.fileDate ? h("span", { class: "row-src" }, item.date_source.includes("creación") ? "CREA" : "MOD") : null);
   let second;
   if (item.status === "ready" || item.status === "renamed") {
     second = h("span", { class: "row-new" },
@@ -997,13 +1091,16 @@ function renderRow(item, index, chars) {
       h("span", { class: "sr-only" }, item.status === "renamed" ? "ahora se llama " : "pasará a llamarse "),
       ...nameWithStamp(item.new_name, item.date_text, chars - 2));
   } else if (item.status === "conflict" && item.new_name) {
+    const clash = item.clashWith?.length ? ` · como ${splitPath(item.clashWith[0])[1]}` : " · ya existe";
+    const wide = chars > 48;
+    const room = Math.max(14, chars - 2 - (wide ? Math.min(clash.length, 26) : 0));
     second = h("span", { class: "row-new row-clash" },
       h("span", { class: "arrow", "aria-hidden": "true" }, "⨯ "),
-      h("span", { class: "sr-only" }, "chocaría con "),
-      ...pathNodes(item.new_name, Math.max(12, chars - 34)),
-      h("span", { class: "row-why" }, ` · ${shortReason(item)}`));
+      h("span", { class: "sr-only" }, "chocaría con el nombre "),
+      ...pathNodes(item.new_name, room),
+      wide ? h("span", { class: "row-why" }, clash) : null);
   } else if (item.status === "pending") {
-    second = h("span", { class: "row-new row-reason" },
+    second = h("span", { class: "row-new row-pending" },
       h("span", { class: "arrow", "aria-hidden": "true" }, "↺ "),
       h("span", { class: "sr-only" }, "debía volver a "),
       ...pathNodes(item.new_name, Math.max(12, chars - 2)));
@@ -1014,7 +1111,9 @@ function renderRow(item, index, chars) {
   }
   const tags = [h("span", { class: `badge badge-${item.status}` },
     h("span", { class: "sr-only" }, ". "),
-    h("span", { class: "badge-text" }, STATUS_LABELS[item.status]))];
+    h("span", { class: "badge-text" }, STATUS_LABELS[item.status]),
+    h("span", { class: "badge-abbr", "aria-hidden": "true" }, STATUS_SHORT[item.status]))];
+  if (item.fileDate) tags.push(h("span", { class: "sr-only" }, ", fecha tomada del archivo"));
   if (item.dated) {
     tags.push(h("span", { class: "badge badge-dated" },
       h("span", { class: "sr-only" }, ", "),
@@ -1043,12 +1142,14 @@ function loupeContent(item) {
     } else if (item.status === "failed") {
       rows.push(["Destino previsto", h("span", { class: "mono loupe-strike" }, item.new_name, h("span", { class: "sr-only" }, " (no aplicado)"))]);
     } else if (item.status === "conflict" && item.new_name) {
-      rows.push(["Chocaría con", mono(item.new_name)]);
+      rows.push(["Nombre propuesto", mono(item.new_name)]);
+      if (item.clashWith?.length) rows.push(["Choca con", mono(item.clashWith.join(", "))]);
     }
   }
   if (item.date_source) rows.push(["Origen de la fecha", item.date_source]);
+  if (item.fileDate) rows.push(["Aviso", "La foto no guarda la fecha de captura; se usa la del archivo, que puede ser la de una copia."]);
   if (item.reason) rows.push(["Motivo", h("span", { class: "loupe-reason" }, item.reason)]);
-  if (item.dated) rows.push(["Aviso", "El nombre ya empieza por una fecha; recibirá otra delante."]);
+  if (item.dated) rows.push(["Aviso", "El nombre ya empieza por una fecha; recibirá otra."]);
   rows.push(["Estado", STATUS_LABELS[item.status]]);
   return h("dl", {}, ...rows.flatMap(([term, value]) => [h("dt", {}, term), h("dd", {}, value)]));
 }
@@ -1121,7 +1222,8 @@ class VirtualList {
       this.charWidth = context.measureText("0000000000").width / 10 || 7.8;
     }
     const sample = this.spacer.querySelector(".row-names");
-    const chars = sample ? Math.max(14, Math.floor(sample.clientWidth / this.charWidth)) : this.chars;
+    // One character of margin so the CSS ellipsis never has to cut a shortened name again.
+    const chars = sample ? Math.max(14, Math.floor(sample.clientWidth / this.charWidth) - 1) : this.chars;
     if (chars !== this.chars) {
       this.chars = chars;
       this.redraw();
@@ -1135,17 +1237,19 @@ class VirtualList {
     this.render();
   }
 
-  setItems(items, { develop = false } = {}) {
+  setItems(items, { develop = false, keepScroll = false } = {}) {
+    const previousActive = keepScroll ? this.active : -1;
+    const previousScroll = this.scroller.scrollTop;
     this.items = items;
     this.spacer.style.height = `${items.length * this.rowHeight}px`;
-    this.scroller.scrollTop = 0;
+    this.scroller.scrollTop = keepScroll ? previousScroll : 0;
     this.emptyNote.hidden = items.length > 0;
     this.active = -1;
     this.hover = -1;
     this.scroller.removeAttribute("aria-activedescendant");
     this.redraw();
     this.measure();
-    this.setActive(items.length ? 0 : -1, false);
+    this.setActive(items.length ? Math.min(Math.max(previousActive, 0), items.length - 1) : -1, false);
     if (develop) this.develop();
   }
 
@@ -1214,7 +1318,6 @@ class VirtualList {
     this.rows.get(this.hover)?.classList.remove("is-hover");
     this.hover = index;
     this.rows.get(index)?.classList.add("is-hover");
-    renderLoupe(this.items[index >= 0 ? index : this.active]);
   }
 
   setActive(index, scroll) {
@@ -1242,7 +1345,7 @@ class VirtualList {
       row.setAttribute("aria-selected", "true");
     }
     this.scroller.setAttribute("aria-activedescendant", `frame-${index}`);
-    if (this.hover < 0) renderLoupe(this.items[index]);
+    renderLoupe(this.items[index]);
   }
 
   onKey(event) {
@@ -1277,6 +1380,11 @@ class VirtualList {
 }
 
 const list = new VirtualList(ui.listScroller, ui.listEmpty);
+// Character width depends on JetBrains Mono: measure again once the font has loaded.
+document.fonts?.ready.then(() => {
+  list.charWidth = 0;
+  list.measure();
+});
 
 /* ------------------------------------------------------------ apply panel */
 
@@ -1322,12 +1430,16 @@ function openConfirm() {
     h("span", { class: "sr-only" }, " pasará a llamarse "),
     h("span", { class: "example-new" }, ...nameWithStamp(splitPath(sample.new_name)[1], sample.date_text))
   );
-  ui.confirmDated.hidden = !counts.dated;
+  const readyFileDates = state.plan.items.filter((item) => item.status === "ready" && item.fileDate).length;
+  const warnings = [];
   if (counts.dated) {
-    ui.confirmDated.replaceChildren(...strong(
-      `Atención: **${plural(counts.dated, "foto ya empieza", "fotos ya empiezan")}** por una fecha y ${counts.dated === 1 ? "recibirá" : "recibirán"} otra. Cancela y usa el filtro «Ya fechadas» para revisarlas.`
-    ));
+    warnings.push(`**${plural(counts.dated, "foto ya empieza", "fotos ya empiezan")}** por una fecha y ${counts.dated === 1 ? "recibirá" : "recibirán"} otra (filtro «Ya fechadas»).`);
   }
+  if (readyFileDates) {
+    warnings.push(`**${plural(readyFileDates, "foto usa", "fotos usan")}** la fecha del archivo porque no guarda la de captura (filtro «Fecha del archivo»).`);
+  }
+  ui.confirmDated.hidden = !warnings.length;
+  if (warnings.length) ui.confirmDated.replaceChildren(...strong(`Revisa antes: ${warnings.join(" ")}`));
   ui.confirmApply.textContent = `Renombrar ${count(ready)}`;
   ui.confirmDialog.returnValue = "";
   ui.confirmDialog.showModal();
@@ -1374,7 +1486,13 @@ async function applyPlan() {
   } catch (error) {
     state.plan = null;
     state.planSettings = null;
-    showUnknown(error.message);
+    if (error.status >= 400 && error.status < 500) {
+      // The server rejected the plan before touching any file.
+      showError("No se aplicó *ningún cambio*", `${error.message} Ningún archivo se ha modificado.`, () => startPreview({ origin: "retry" }));
+    } else {
+      showUnknown(error.message);
+      refreshLastRun();
+    }
   }
 }
 
@@ -1384,7 +1502,7 @@ function showUnknown(message) {
   showMessage({
     view: "unknown",
     art: "fogged",
-    text: `La aplicación no pudo confirmar el resultado (${message}) Algunos archivos pueden haber cambiado de nombre. **Vuelve a analizar la carpeta** para ver su estado real antes de seguir.`,
+    text: `La aplicación no pudo confirmar el resultado: ${message.replace(/[.?!]?$/, ".")} Algunos archivos pueden haber cambiado de nombre. **Vuelve a analizar la carpeta** para ver su estado real; si se renombró alguno, podrás deshacerlo desde «Último lote».`,
     primary: { label: "Volver a analizar", action: () => startPreview({ origin: "retry" }) }
   });
   announce("Resultado desconocido. Vuelve a analizar la carpeta para comprobar su estado.");
@@ -1409,7 +1527,9 @@ function showResult(plan, result) {
     date_source: byOriginal.get(entry.old_name)?.date_source
   }));
   state.result = { items: [...failures, ...renamed] };
-  state.lastRunId = result.run_id || null;
+  state.lastRun = result.run_id
+    ? { run_id: result.run_id, count: result.renamed_count, folder: plan.folder, folder_name: folderNameOf(plan.folder) }
+    : null;
   const renamedCount = result.renamed_count;
   const failedCount = result.failed_count;
   let view;
@@ -1429,7 +1549,7 @@ function showResult(plan, result) {
   setSeg(ui.resultCount, renamedCount);
   ui.resultOf.hidden = view === "success";
   setSeg(ui.resultTotal, renamedCount + failedCount);
-  ui.undoButton.hidden = !state.lastRunId;
+  ui.undoButton.hidden = !state.lastRun;
   ui.undoButton.textContent = renamedCount === 1 ? "Deshacer este cambio" : `Deshacer ${count(renamedCount)} cambios`;
   configureResultPrimary(view === "success"
     ? { label: "Elegir otra carpeta", action: pickFolder, back: true }
@@ -1455,39 +1575,65 @@ function configureResultPrimary({ label, action, back }) {
 }
 
 async function undoLastRun() {
-  const runId = state.lastRunId;
-  if (!runId) return;
-  ui.undoButton.disabled = true;
-  ui.resultPrimary.disabled = true;
+  const run = state.lastRun;
+  if (!run || isBusy()) return;
+  window.clearTimeout(refreshTimer);
+  if (activeScan) await cancelActiveScan();
+  scanGeneration += 1;
+  ui.body.classList.remove("is-refreshing");
+  if (state.mode === "idle") setMode("workbench");
+  setSheetHeading("Deshaciendo", `Devolviendo sus nombres en *${run.folder_name}*`);
+  resetProgress(run.count);
+  ui.progressBar.parentElement.classList.add("is-indeterminate");
+  ui.progressLabel.textContent = `Restaurando ${plural(run.count, "archivo", "archivos")}…`;
+  ui.cancelScan.hidden = true;
+  ui.applyWarning.hidden = false;
+  setView("undoing");
+  focusHeading();
+  const backToFolder = () => {
+    state.folder = run.folder;
+    renderFolder();
+    startPreview({ origin: "retry" });
+  };
   try {
-    const result = await request("/api/undo", { run_id: runId });
-    state.lastRunId = result.run_id || null;
+    const result = await request("/api/undo", { run_id: run.run_id });
+    state.lastRun = result.run_id ? { ...run, count: result.failed_count } : null;
     if (!result.failed_count) {
       state.result = null;
       thumbnails.clear();
-      setSheetHeading("Restaurado", result.restored_count === 1 ? "*1 archivo* vuelve a su nombre" : `*${count(result.restored_count)} archivos* vuelven a su nombre`);
+      setSheetHeading("Restaurado", result.restored_count === 1
+        ? "*1 archivo* vuelve a su nombre"
+        : `*${count(result.restored_count)} archivos* vuelven a su nombre`);
       showMessage({
         view: "restored",
         art: "restored",
-        text: "La carpeta está como antes de renombrar. Puedes preparar otra vista previa o elegir otra carpeta.",
-        primary: { label: "Volver a analizar", action: () => startPreview({ origin: "retry" }) },
+        text: `La carpeta *${run.folder_name}* está como antes de renombrar. Puedes preparar otra vista previa o elegir otra carpeta.`,
+        primary: { label: "Volver a analizar", action: backToFolder },
         secondary: { label: "Elegir otra carpeta", action: pickFolder }
       });
       announce("Lote deshecho. Los archivos han recuperado su nombre original.");
     } else {
-      showUndoPartial(result);
+      showUndoPartial(result, run);
     }
-    focusHeading();
   } catch (error) {
-    showToast(`No se pudo deshacer: ${error.message}`);
-    announce(`No se pudo deshacer: ${error.message}`);
-  } finally {
-    ui.undoButton.disabled = false;
-    ui.resultPrimary.disabled = false;
+    if (error.status >= 400 && error.status < 500) {
+      state.lastRun = null;
+      showError("No se pudo *deshacer*", `${error.message} Ningún archivo se ha modificado.`, backToFolder);
+    } else {
+      setSheetHeading("Resultado desconocido", "No sé si se *restauró* todo");
+      showMessage({
+        view: "unknown",
+        art: "fogged",
+        text: "La aplicación no pudo confirmar el resultado del deshacer. Algunos archivos pueden haber recuperado su nombre. **Vuelve a analizar la carpeta** para ver su estado real; lo que siga pendiente aparecerá en «Último lote».",
+        primary: { label: "Volver a analizar", action: backToFolder }
+      });
+      refreshLastRun();
+    }
   }
+  focusHeading();
 }
 
-function showUndoPartial(result) {
+function showUndoPartial(result, run) {
   state.result = {
     items: result.failures.map((failure) => ({
       original_name: failure.current_name,
@@ -1504,7 +1650,9 @@ function showUndoPartial(result) {
   ui.resultOf.hidden = false;
   setSeg(ui.resultTotal, result.restored_count + result.failed_count);
   ui.undoButton.hidden = true;
-  configureResultPrimary(state.lastRunId
+  state.folder = run.folder;
+  renderFolder();
+  configureResultPrimary(state.lastRun
     ? { label: "Reintentar deshacer", action: undoLastRun, back: true }
     : { label: "Volver a analizar", action: () => startPreview({ origin: "retry" }), back: false });
   state.filter = "all";
@@ -1519,7 +1667,7 @@ function showUndoPartial(result) {
 function setRecursive(value) {
   state.recursive = value;
   for (const input of ui.recursiveInputs) input.checked = value;
-  if (state.mode !== "idle") startPreview({ origin: "format" });
+  if (state.mode !== "idle") startPreview({ origin: "recursive" });
 }
 
 /* ------------------------------------------------------------- listeners */
@@ -1593,6 +1741,7 @@ ui.cancelScan.addEventListener("click", async () => {
   await cancelActiveScan();
 });
 ui.undoButton.addEventListener("click", undoLastRun);
+ui.lastRunUndo.addEventListener("click", undoLastRun);
 ui.resultBack.addEventListener("click", () => startPreview({ origin: "retry" }));
 
 let searchTimer = null;
@@ -1607,7 +1756,7 @@ ui.search.addEventListener("input", () => {
 
 ui.wordmark.addEventListener("click", (event) => {
   event.preventDefault();
-  if (state.view === "applying") return;
+  if (isBusy()) return;
   window.clearTimeout(refreshTimer);
   if (activeScan) cancelActiveScan();
   scanGeneration += 1;
@@ -1617,8 +1766,11 @@ ui.wordmark.addEventListener("click", (event) => {
 });
 
 /* Shortcuts use Alt so they never fire while typing or reading (WCAG 2.1.4). */
+const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 document.addEventListener("keydown", (event) => {
   if (!event.altKey || event.ctrlKey || event.metaKey || document.querySelector("dialog[open]")) return;
+  // On macOS Option+letter types characters (ø, ∫): never steal it from a text field.
+  if (isMac && event.target.closest?.("input, textarea, [contenteditable]")) return;
   if (event.code === "KeyO") {
     event.preventDefault();
     pickFolder();
@@ -1640,3 +1792,4 @@ syncFormatDisclosure();
 renderTokens();
 renderLoupe(null);
 updateApplyPanel();
+refreshLastRun();

@@ -52,6 +52,8 @@ class AppServer(ThreadingHTTPServer):
             "scan": None,
             "apply": None,
             "gallery": {"root": None, "paths": set()},
+            # Dates already read, per folder, so a format change does not re-read metadata.
+            "date_cache": {"root": None, "dates": {}},
         }
         super().__init__(("127.0.0.1", port), AppRequestHandler)
 
@@ -189,6 +191,8 @@ class AppRequestHandler(BaseHTTPRequestHandler):
                 self._confirm(payload)
             elif path == "/api/undo":
                 self._undo(payload)
+            elif path == "/api/last-run":
+                self._last_run()
             else:
                 self.send_error(404)
         except RenamePlanError as error:
@@ -305,6 +309,12 @@ class AppRequestHandler(BaseHTTPRequestHandler):
                 if active_scan is not None and active_scan["scan_id"] == scan_id:
                     active_scan.update(phase=phase, scanned=scanned, total=total)
 
+        resolved_folder = Path(folder.strip()).expanduser().resolve()
+        with self.server.state_lock:
+            cache = self.server.state["date_cache"]
+            if cache["root"] != resolved_folder or len(cache["dates"]) > 200_000:
+                cache = {"root": resolved_folder, "dates": {}}
+                self.server.state["date_cache"] = cache
         try:
             plan = create_preview(
                 folder,
@@ -313,6 +323,7 @@ class AppRequestHandler(BaseHTTPRequestHandler):
                 recursive,
                 progress_callback=update_progress,
                 cancellation_event=cancellation_event,
+                date_cache=cache["dates"],
             )
         except RenamePlanError:
             if not cancellation_event.is_set():
@@ -414,8 +425,18 @@ class AppRequestHandler(BaseHTTPRequestHandler):
             with self.server.state_lock:
                 self.server.state["apply"].update(done=done, total=total)
 
+        # The undo record is kept as files move, so even an interrupted batch can be undone.
+        run = {"root": plan.directory, "pairs": []}
+        with self.server.state_lock:
+            self.server.state["runs"].clear()
+
+        def remember(source: Path, destination: Path) -> None:
+            with self.server.state_lock:
+                run["pairs"].append((source, destination))
+                self.server.state["runs"][plan_id] = run
+
         try:
-            result = apply_plan(plan, progress_callback=update_progress)
+            result = apply_plan(plan, progress_callback=update_progress, on_renamed=remember)
         finally:
             with self.server.state_lock:
                 self.server.state["apply"]["completed"] = True
@@ -426,9 +447,6 @@ class AppRequestHandler(BaseHTTPRequestHandler):
                 gallery["paths"].update(
                     new.relative_to(plan.directory).as_posix() for _, new in renamed
                 )
-        self.server.state["runs"].clear()
-        if renamed:
-            self.server.state["runs"][plan_id] = renamed
         self._send_json(
             200,
             {
@@ -453,6 +471,25 @@ class AppRequestHandler(BaseHTTPRequestHandler):
             },
         )
 
+    def _last_run(self) -> None:
+        """The batch that can still be undone, so the interface never loses it."""
+        with self.server.state_lock:
+            run_id, run = next(iter(self.server.state["runs"].items()), (None, None))
+            count = len(run["pairs"]) if run is not None else 0
+            root = run["root"] if run is not None else None
+        if not count or root is None:
+            self._send_json(200, {"run_id": None})
+            return
+        self._send_json(
+            200,
+            {
+                "run_id": run_id,
+                "count": count,
+                "folder": str(root),
+                "folder_name": root.name or str(root),
+            },
+        )
+
     def _apply_progress(self, payload: dict[str, Any]) -> None:
         plan_id = payload.get("plan_id")
         with self.server.state_lock:
@@ -467,16 +504,21 @@ class AppRequestHandler(BaseHTTPRequestHandler):
         run_id = payload.get("run_id")
         if not isinstance(run_id, str):
             raise ValueError("El identificador del renombrado no es válido.")
-        renamed = self.server.state["runs"].get(run_id)
-        if renamed is None:
+        with self.server.state_lock:
+            run = self.server.state["runs"].get(run_id)
+            current_apply = self.server.state["apply"]
+            if current_apply is not None and not current_apply["completed"]:
+                raise ValueError("Espera a que terminen de aplicarse los cambios.")
+        if run is None:
             raise ValueError("No hay un renombrado disponible para deshacer.")
-        root = self.server.state.get("gallery", {}).get("root")
-        result = undo_each(renamed)
+        root = run["root"]
+        result = undo_each(list(run["pairs"]))
         pending = [(failure.original, failure.current) for failure in result.failures]
-        if pending:
-            self.server.state["runs"][run_id] = pending
-        else:
-            self.server.state["runs"].pop(run_id, None)
+        with self.server.state_lock:
+            if pending:
+                run["pairs"] = pending
+            else:
+                self.server.state["runs"].pop(run_id, None)
 
         def relative(path: Path) -> str:
             if root is not None:
@@ -490,6 +532,7 @@ class AppRequestHandler(BaseHTTPRequestHandler):
             200,
             {
                 "run_id": run_id if pending else None,
+                "folder": str(root),
                 "restored_count": len(result.restored),
                 "failed_count": len(result.failures),
                 "failures": [

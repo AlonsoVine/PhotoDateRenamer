@@ -27,13 +27,18 @@
     <p class="local-badge"><span class="dot" aria-hidden="true"></span> <span class="badge-long">Todo ocurre en este equipo</span><span class="badge-short" aria-hidden="true">Solo en tu equipo</span></p>
   </header>
 
+  <div id="last-run" class="last-run" role="region" aria-labelledby="last-run-text" hidden>
+    <p class="last-run-text"><span class="last-run-icon" aria-hidden="true">↺</span> <span id="last-run-text"></span></p>
+    <button id="last-run-undo" class="btn btn-ghost btn-sm" type="button">Deshacer</button>
+  </div>
+
   <main id="main" tabindex="-1">
     <!-- ============ IDLE: hero + first step ============ -->
     <section id="hero" class="hero" aria-labelledby="hero-title">
       <div class="hero-copy">
         <p class="kicker"><span class="kicker-num">01</span> Cuarto oscuro para tus archivos</p>
         <h1 id="hero-title" class="hero-title">Pon fecha<br><em>a tus fotos.</em></h1>
-        <p class="hero-lede">Renombra las imágenes de una carpeta con el día en que se tomaron. Verás cada nombre nuevo antes de aplicar nada y podrás deshacerlo.</p>
+        <p class="hero-lede">Renombra las imágenes de una carpeta con el día en que se tomaron. Si la cámara no guardó la fecha, se usa la del archivo y te lo marcamos. Verás cada nombre nuevo antes de aplicar nada y podrás deshacerlo.</p>
 
         <form id="hero-form" class="hero-form" novalidate>
           <button id="hero-browse" class="btn btn-stamp btn-xl" type="button" aria-keyshortcuts="Alt+O">
@@ -104,7 +109,7 @@
               <legend class="field-label">Receta</legend>
               <div class="seg-group">
                 <button class="preset" data-preset="date_original" type="button" aria-pressed="true">Fecha + nombre</button>
-                <button class="preset" data-preset="date_stem" type="button" aria-pressed="false">Fecha + título</button>
+                <button class="preset" data-preset="date_stem" type="button" aria-pressed="false">Fecha, sin extensión</button>
                 <button class="preset" data-preset="original_date" type="button" aria-pressed="false">Nombre + fecha</button>
                 <button class="preset" data-preset="custom" type="button" aria-pressed="false">A medida</button>
               </div>
@@ -194,7 +199,7 @@
                 <img id="loupe-image" class="loupe-image" alt="" hidden>
                 <span id="loupe-stamp" class="loupe-stamp"></span>
               </div>
-              <div id="loupe-body" class="loupe-body" aria-live="polite"></div>
+              <div id="loupe-body" class="loupe-body"></div>
             </div>
             <section id="apply-box" class="apply-box" aria-labelledby="apply-title" hidden>
               <h2 id="apply-title" class="panel-label"><span class="kicker-num">03</span> Aplicar</h2>
@@ -258,7 +263,7 @@
       <ul class="promise">
         <li>Ningún archivo se sobrescribe ni se borra.</li>
         <li>Si alguno falla, el resto continúa y verás el motivo.</li>
-        <li>Puedes deshacer el lote mientras la aplicación siga abierta.</li>
+        <li>Puedes deshacer el lote mientras la aplicación siga abierta, aunque cambies de carpeta.</li>
       </ul>
       <div class="dialog-actions">
         <button class="btn btn-ghost" value="cancel" type="submit" autofocus>Cancelar</button>

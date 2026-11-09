@@ -267,7 +267,13 @@ def create_preview(
     recursive: bool = False,
     progress_callback: ProgressCallback | None = None,
     cancellation_event: Event | None = None,
+    date_cache: dict[tuple[str, tuple[int, ...]], tuple[datetime, str] | None] | None = None,
 ) -> RenamePlan:
+    """Build a preview. ``date_cache`` may carry dates read by an earlier preview.
+
+    Cache keys include the file fingerprint, so a file that changed is read again; the
+    proposed names are identical with or without the cache.
+    """
     folder = Path(directory).expanduser().resolve()
     if not folder.exists() or not folder.is_dir():
         raise ValueError("La carpeta seleccionada no existe o no es una carpeta.")
@@ -313,10 +319,17 @@ def create_preview(
         relative_name = source.relative_to(folder).as_posix()
         try:
             fingerprint_before = _file_fingerprint(source)
-            capture_date_result = _read_capture_date(source)
-            fingerprint_after = _file_fingerprint(source)
-            if fingerprint_before != fingerprint_after:
-                raise OSError("El archivo cambió mientras se analizaba.")
+            cache_key = (str(source), fingerprint_before)
+            if date_cache is not None and cache_key in date_cache:
+                capture_date_result = date_cache[cache_key]
+                fingerprint_after = fingerprint_before
+            else:
+                capture_date_result = _read_capture_date(source)
+                fingerprint_after = _file_fingerprint(source)
+                if fingerprint_before != fingerprint_after:
+                    raise OSError("El archivo cambió mientras se analizaba.")
+                if date_cache is not None:
+                    date_cache[cache_key] = capture_date_result
         except UnidentifiedImageError:
             entries.append(
                 RenameItem(
@@ -481,12 +494,16 @@ def execute_plan(plan: RenamePlan) -> list[tuple[Path, Path]]:
 
 
 def apply_plan(
-    plan: RenamePlan, progress_callback: ProgressCallback | None = None
+    plan: RenamePlan,
+    progress_callback: ProgressCallback | None = None,
+    on_renamed: Callable[[Path, Path], None] | None = None,
 ) -> ApplyResult:
     """Apply each ready item independently: a failure is reported and the rest continue.
 
     Every item is re-validated right before it moves. A destination is never overwritten
-    and no file is deleted; failed items keep their original name.
+    and no file is deleted; failed items keep their original name. ``on_renamed`` is
+    called after each successful move, so a caller can keep an undo record even if the
+    batch is interrupted.
     """
     ready_items = [item for item in plan.items if item.status == "ready"]
     total = len(ready_items)
@@ -517,6 +534,8 @@ def apply_plan(
                 reason = _describe_os_error(error)
             else:
                 renamed.append((source, destination))
+                if on_renamed is not None:
+                    on_renamed(source, destination)
         if reason is not None:
             failures.append(ApplyFailure(item.original_name, str(item.new_name), reason))
         if progress_callback is not None:
