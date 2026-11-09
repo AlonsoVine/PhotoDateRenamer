@@ -107,6 +107,8 @@ El arte no estorba:
 30. **Nombre nuevo en dos líneas por debajo de 1280 px** (vuelta 4). Allí no hay lupa, y el nombre nuevo es lo que el usuario revisa. Las filas pasan a 84 px fijos, así que la virtualización no cambia.
 31. **Rótulo literal y titular metafórico** (vuelta 4). El rótulo pequeño dice lo que pasa, para quien no conoce el cuarto oscuro; el titular conserva la metáfora. La carpeta se escribe entre comillas angulares.
 32. **De negativo a positivo** (vuelta 4). Al terminar de renombrar, las miniaturas de las fotos renombradas se «fijan»: pasan de negativo a positivo en 1,1 s, escalonadas. Con movimiento reducido no hay animación.
+33. **Aviso de nombres sin extensión** (tras la revisión de la vuelta 4). La receta «Fecha, sin extensión» se mantiene igual que en 0.5.0, pero la confirmación avisa de cuántas fotos quedarán sin extensión.
+34. **Respuesta explícita ante errores imprevistos** (tras la revisión de la vuelta 4). El servidor responde 500 con un mensaje en lugar de cortar la conexión, así la interfaz no confunde un error con una aplicación cerrada.
 
 ## 4. Dependencias
 
@@ -128,3 +130,7 @@ Herramientas de desarrollo, que no se empaquetan ni se versionan: Playwright 1.6
 3. **Política ante fallos.** Ahora un fallo no detiene el lote y el resto se aplica, con «Deshacer» disponible. ¿Prefieres ofrecer también el modo «todo o nada» de 0.5.0 como opción?
 4. **Versión web estática (`site/`).** No se ha rediseñado en esta rama. ¿Quieres llevar «Revelado» también a la versión de GitHub Pages?
 5. **Tests de interfaz en el proyecto.** Los estados de la interfaz se recorren con Playwright en el script de capturas, que no forma parte de `unittest`. ¿Quieres añadir Playwright como dependencia de desarrollo y convertir ese recorrido en tests?
+6. **Diseño estrecho.** En móvil, la carpeta y el formato van debajo del botón de confirmar. La revisión final propone un resumen fijo del formato que abra una hoja inferior. ¿Lo hago en una iteración aparte?
+7. **Excluir fotos.** ¿Quieres poder apartar una foto o el grupo «Ya fechadas» antes de confirmar? Cambia el contrato de `/api/confirm`, aunque no el motor de nombres.
+8. **Versión de Pillow.** `pyproject.toml` pide `Pillow>=13.0`. ¿La fijo a una versión exacta, como pide el encargo para dependencias nuevas?
+9. **Dos pestañas a la vez.** El servidor no impide deshacer dos veces en paralelo, ni deshacer mientras se confirma desde otra pestaña. ¿Añado esa exclusión mutua?

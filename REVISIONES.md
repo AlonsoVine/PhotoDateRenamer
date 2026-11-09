@@ -9,6 +9,7 @@ Ponderada = 0,4·Diseño + 0,3·Usabilidad + 0,2·Creatividad + 0,1·Contenido. 
 | 1 | 7,5 | 6,5 | 7,5 | 7,5 | 7,2 |
 | 2 | 8,3 | 7,6 | 8,5 | 7,9 | 8,09 |
 | 3 | 8,3 | 7,8 | 8,4 | 7,8 | 8,12 |
+| 4 | 8,3 | 7,6 | 8,5 | 8,0 | 8,10 |
 
 ---
 
@@ -186,3 +187,36 @@ No señaló bloqueantes. La mejora frente a la vuelta 2 fue de 0,03, por debajo 
   - el código de la vuelta 4 dio 49–60 fps, sin tareas largas;
   - el perfil de CPU atribuye a JavaScript menos del 5 % del tiempo;
   - los 38 fps se debían a carga del equipo durante la captura, no al código.
+
+### Puntuación y defectos señalados por el revisor (vuelta 4)
+
+La ponderada fue 8,10: Diseño 8,3, Usabilidad 7,6, Creatividad 8,5 y Contenido 8,0. **No se alcanza el listón**: faltan Diseño ≥ 8,5, Usabilidad ≥ 8,0 y ponderada ≥ 8,5.
+
+| Prioridad | Defecto | Resolución |
+| --- | --- | --- |
+| Bloqueante | En ventanas de 960 px o menos, la fila de la rejilla crecía hasta `--content-h`, que equivale a todas las filas, y dejaba un hueco de unos 250.000 px con 3.000 fotos. Lo introdujo el ajuste de la tira de esta misma vuelta. | Corregido: en el diseño estrecho y en ventanas bajas, la rejilla usa `auto` y la tira conserva su altura máxima. Sonda: con 2.000 fotos la página mide 1.183 px a 360×720, 857 px a 900×600 y 909 px a 1280×600. |
+| Mayor | En dos líneas, el navegador cortaba en los espacios y `line-clamp` se comía la extensión. | Corregido: `word-break: break-all` llena las dos líneas, y el nombre se ve completo, con la extensión. |
+| Mayor | Ningún aviso cuando el formato deja las fotos sin extensión. | Corregido: la confirmación avisa de cuántas fotos quedarán sin extensión y de que el sistema podría no abrirlas. El comportamiento de renombrado no cambia. |
+| Mayor | «Resultado sin confirmar» prometía deshacer desde «Último lote» aunque la aplicación se hubiera cerrado. Además, un error imprevisto cortaba la conexión. | Corregido: el texto distingue si la aplicación sigue abierta. El servidor responde 500 con mensaje ante cualquier error imprevisto (test `test_an_unexpected_server_error_answers_500_instead_of_dropping_the_connection`). |
+| Mayor | En móvil, la carpeta y el formato quedan después del botón de confirmar. | Pendiente. Requiere rediseñar el diseño estrecho (resumen fijo del formato y hoja inferior), y no queda vuelta de revisión para validarlo. El resumen de la caja Aplicar y la confirmación siguen mostrando la receta y un ejemplo. |
+| Menor | No hay exclusión mutua entre dos deshacer, ni entre deshacer y confirmar. | Pendiente. Solo ocurre con dos pestañas a la vez; se anota como pregunta pendiente. |
+| Menor | Contadores que repiten el titular o se contradicen con él (13, 16, 17b). | Pendiente. |
+| Menor | Panel de ajustes cortado a 1024×768 sin indicar que se puede desplazar. | Pendiente. |
+| Menor | En móvil, el buscador aparece antes del resumen del resultado. | Pendiente. |
+| Menor | Los estados de espera tienen poco contenido, y deshacer no muestra progreso. | Pendiente. |
+| Menor | Pillow sin versión fijada (`>=13.0`). | Pendiente: fijarla es una decisión de empaquetado que conviene tomar contigo, porque cambia lo que se instala. |
+
+### Ideas del revisor (vuelta 4)
+
+| Idea | Decisión | Motivo |
+| --- | --- | --- |
+| Formato fijo en móvil como hoja inferior | Pendiente | Es el cambio que más subiría la Usabilidad, pero rediseña el diseño estrecho y no queda ninguna vuelta de revisión. |
+| Excluir fotos por grupo y por fila | Pendiente | Cambia el contrato de `/api/confirm`; conviene decidirlo contigo. |
+| Resultado con tiras que se fijan en lugar del contador grande | Pendiente | Mismo motivo: mejora creativa sin vuelta de validación. |
+| Avisos de riesgo con la misma voz que el resto | Adoptada en parte | Se adopta el aviso «sin extensión». La traducción de los errores del sistema queda pendiente. |
+| Arte distinto por estado | Pendiente | Prioridad menor que los defectos. |
+| Medir la altura de página en las capturas | Adoptada como sonda | Se midió aparte (ver arriba). Pasarlo a `capturar.py` queda pendiente. |
+
+## Cierre del bucle
+
+La vuelta 4 era la última permitida (máximo 4). Además, se cumple la regla de parada: la vuelta 3 mejoró 0,03 y la vuelta 4 bajó 0,02, dos vueltas seguidas con menos de 0,2 de mejora. **El listón no se alcanza**: la nota final es 8,10, con Diseño 8,3 y Usabilidad 7,6. Los arreglos posteriores a la revisión (el bloqueante y tres mayores) no tienen nota propia, porque no queda vuelta para puntuarlos.

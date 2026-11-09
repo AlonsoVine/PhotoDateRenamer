@@ -1,4 +1,4 @@
-== Vuelta 4 · comprobaciones (2026-11-09) ==
+== Vuelta 4 · comprobaciones finales, tras corregir los defectos de la revisión (2026-11-09) ==
 
 ## python -m unittest discover -s tests -b -v
 test_native_picker_builds_shell_dialog_without_spawning_a_process (test_folder_picker.FolderPickerTests.test_native_picker_builds_shell_dialog_without_spawning_a_process) ... ok
@@ -41,6 +41,7 @@ test_xmp_capture_date_is_used_when_exif_dates_are_missing (test_renamer.RenamePr
 test_a_batch_that_renames_nothing_keeps_the_previous_batch_undoable (test_server.LocalServerTests.test_a_batch_that_renames_nothing_keeps_the_previous_batch_undoable) ... ok
 test_a_format_change_reuses_dates_without_reading_metadata_again (test_server.LocalServerTests.test_a_format_change_reuses_dates_without_reading_metadata_again) ... ok
 test_an_interrupted_apply_keeps_the_files_already_renamed_undoable (test_server.LocalServerTests.test_an_interrupted_apply_keeps_the_files_already_renamed_undoable) ... ok
+test_an_unexpected_server_error_answers_500_instead_of_dropping_the_connection (test_server.LocalServerTests.test_an_unexpected_server_error_answers_500_instead_of_dropping_the_connection) ... ok
 test_check_folder_reports_missing_and_existing_folders (test_server.LocalServerTests.test_check_folder_reports_missing_and_existing_folders) ... ok
 test_folder_picker_runs_in_a_separate_main_thread_process (test_server.LocalServerTests.test_folder_picker_runs_in_a_separate_main_thread_process) ... ok
 test_last_run_survives_analysing_another_folder_and_ends_after_undo (test_server.LocalServerTests.test_last_run_survives_analysing_another_folder_and_ends_after_undo) ... ok
@@ -59,7 +60,7 @@ test_static_site_assets_are_local_and_present (test_site.StaticSiteTests.test_st
 test_static_site_does_not_depend_on_python_api_routes (test_site.StaticSiteTests.test_static_site_does_not_depend_on_python_api_routes) ... ok
 
 ----------------------------------------------------------------------
-Ran 56 tests in 32.495s
+Ran 57 tests in 22.551s
 
 OK (skipped=1)
 
@@ -68,79 +69,79 @@ TAP version 13
 # Subtest: paginates a large preview, renames after confirmation, and supports undo
 ok 1 - paginates a large preview, renames after confirmation, and supports undo
   ---
-  duration_ms: 119.939
+  duration_ms: 129.3891
   type: 'test'
   ...
 # Subtest: cancels a long folder scan without changing any files
 ok 2 - cancels a long folder scan without changing any files
   ---
-  duration_ms: 3.8508
+  duration_ms: 4.1702
   type: 'test'
   ...
 # Subtest: prefers EXIF capture date over digitized and general dates
 ok 3 - prefers EXIF capture date over digitized and general dates
   ---
-  duration_ms: 3.58
+  duration_ms: 8.5498
   type: 'test'
   ...
 # Subtest: reads EXIF capture dates from JPEG and PNG containers
 ok 4 - reads EXIF capture dates from JPEG and PNG containers
   ---
-  duration_ms: 0.6506
+  duration_ms: 0.6865
   type: 'test'
   ...
 # Subtest: parses filesystem fallback dates as local calendar dates
 ok 5 - parses filesystem fallback dates as local calendar dates
   ---
-  duration_ms: 1.0231
+  duration_ms: 1.1243
   type: 'test'
   ...
 # Subtest: ignores malformed metadata and rejects invalid date strings
 ok 6 - ignores malformed metadata and rejects invalid date strings
   ---
-  duration_ms: 0.2437
+  duration_ms: 0.2894
   type: 'test'
   ...
 # Subtest: reads JPEG metadata without loading the complete large photo
 ok 7 - reads JPEG metadata without loading the complete large photo
   ---
-  duration_ms: 5.5884
+  duration_ms: 6.5973
   type: 'test'
   ...
 # Subtest: skips large PNG image chunks while reading EXIF metadata
 ok 8 - skips large PNG image chunks while reading EXIF metadata
   ---
-  duration_ms: 4.2537
+  duration_ms: 5.0563
   type: 'test'
   ...
 # Subtest: reads TIFF directories from large files using bounded byte ranges
 ok 9 - reads TIFF directories from large files using bounded byte ranges
   ---
-  duration_ms: 4.6213
+  duration_ms: 5.6413
   type: 'test'
   ...
 # Subtest: detects names that already start with a date in any supported format
 ok 10 - detects names that already start with a date in any supported format
   ---
-  duration_ms: 1.389
+  duration_ms: 1.0277
   type: 'test'
   ...
 # Subtest: middle ellipsis keeps the date at the start and the extension at the end
 ok 11 - middle ellipsis keeps the date at the start and the extension at the end
   ---
-  duration_ms: 0.352
+  duration_ms: 0.2461
   type: 'test'
   ...
 # Subtest: seven-segment digits group thousands with a dot and ghosts match their width
 ok 12 - seven-segment digits group thousands with a dot and ghosts match their width
   ---
-  duration_ms: 0.3585
+  duration_ms: 0.243
   type: 'test'
   ...
 # Subtest: date stamps are built from any supported date format
 ok 13 - date stamps are built from any supported date format
   ---
-  duration_ms: 0.254
+  duration_ms: 0.1849
   type: 'test'
   ...
 1..13
@@ -151,12 +152,11 @@ ok 13 - date stamps are built from any supported date format
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 220.7543
+# duration_ms 230.0237
 
 ## Lighthouse 13.6 (127.0.0.1:8770, Chromium 1248)
 mobile {"performance": 100, "accessibility": 100, "best-practices": 100} LCP 1.1 s
 desktop {"performance": 99, "accessibility": 100, "best-practices": 100} LCP 0.9 s
-Una primera pasada en móvil dio rendimiento 67 (TBT 3,310 ms) con el equipo ocupado por las capturas; repetida en reposo, la de arriba.
 Referencia 0.5.0: escritorio 83/92/100, móvil 100/92/100 (perf/a11y/bp)
 
 ## capturar.py (Playwright + axe-core 4.14, axe en todos los tamaños y sin movimiento)
@@ -165,11 +165,12 @@ mensajes de consola error/warning: 0
 estados con desbordamiento: []
 violaciones axe: {} en 88 estados auditados
 titular fuera de la primera vista: []
-fps desplazamiento 3.000 filas (primera pasada, miniaturas generándose): {'min': 48, 'medio': 52, 'grande': 45} tareas largas: {'min': 2, 'medio': 0, 'grande': 3}
-fps animación de revelado: {'min': 60, 'medio': 60, 'grande': 56}
+fps desplazamiento 3.000 filas: {'min': 60, 'medio': 60, 'grande': 60} tareas largas: {'min': 0, 'medio': 0, 'grande': 0}
+fps animación de revelado: {'min': 61, 'medio': 61, 'grande': 60}
 
-## Fluidez con la caché de miniaturas caliente (sonda aparte, misma carpeta de miles, 3 pasadas de 2 s)
-1680x1050: 54, 60, 60 fps · 0 tareas largas
-360x720:   59, 61, 60 fps · 0 tareas largas
-Comparación alterna con el código de la vuelta 3 en el mismo equipo: 57/59/60 (v3) frente a 49–55/60/60 (v4).
-La primera pasada baja mientras el servidor genera miniaturas; el perfil de CPU atribuye a JavaScript menos del 5 % del tiempo.
+## Altura de página con la carpeta de miles (sonda aparte, defecto bloqueante D1 de la revisión)
+360x720: 1183 px · 900x600: 857 px · 1280x600: 909 px (antes del arreglo: unos 250.000 px en el diseño estrecho)
+
+## Nota sobre fluidez
+En una pasada anterior de esta vuelta, con el equipo ocupado, la primera pasada dio 45–52 fps; con la caché caliente, 60.
+En la pasada final de arriba, 60 fps en los tres tamaños y sin tareas largas.

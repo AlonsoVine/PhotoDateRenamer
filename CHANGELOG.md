@@ -41,6 +41,8 @@ Notable changes to PhotoDateRenamer are documented here.
 - Applying a batch that renames nothing keeps the previous batch undoable. The confirmation warns when the previous batch will stop being undoable.
 - Below 1280 px the new name wraps onto two lines instead of being cut in the middle.
 - Result views show the summary before the filters. Counters are green for what succeeded and red only when nothing changed.
+- The confirmation warns when the chosen format leaves photos without an extension.
+- An unexpected server error now answers HTTP 500 with a message instead of dropping the connection, and the «result unknown» view no longer promises undo after the application has closed.
 - Conflicts name the frame they clash with. Wide screens show where each date comes from (EXIF, XMP or Archivo).
 
 ### Fixed

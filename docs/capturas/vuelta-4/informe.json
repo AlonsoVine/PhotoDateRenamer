@@ -534,39 +534,39 @@
  },
  "fps": {
   "min": {
-   "fps": 48,
-   "worstFrameMs": 67,
-   "longTasks": 2,
-   "renderedRows": 19,
-   "scrolledTo": 13440
+   "fps": 60,
+   "worstFrameMs": 17,
+   "longTasks": 0,
+   "renderedRows": 18,
+   "scrolledTo": 16940
   },
   "medio": {
-   "fps": 52,
-   "worstFrameMs": 50,
+   "fps": 60,
+   "worstFrameMs": 17,
    "longTasks": 0,
    "renderedRows": 19,
-   "scrolledTo": 14700
+   "scrolledTo": 16940
   },
   "grande": {
-   "fps": 45,
-   "worstFrameMs": 67,
-   "longTasks": 3,
+   "fps": 60,
+   "worstFrameMs": 17,
+   "longTasks": 0,
    "renderedRows": 25,
-   "scrolledTo": 12740
+   "scrolledTo": 16940
   }
  },
  "fps_develop": {
   "min": {
-   "fps": 60,
+   "fps": 61,
    "worstFrameMs": 17
   },
   "medio": {
-   "fps": 60,
+   "fps": 61,
    "worstFrameMs": 17
   },
   "grande": {
-   "fps": 56,
-   "worstFrameMs": 50
+   "fps": 60,
+   "worstFrameMs": 17
   }
  },
  "heading": {
@@ -640,8 +640,8 @@
    "visible": true
   },
   "18-error-total-min": {
-   "top": 90,
-   "bottom": 122,
+   "top": 32,
+   "bottom": 64,
    "viewport": 720,
    "visible": true
   },
