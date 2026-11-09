@@ -8,6 +8,7 @@ PhotoDateRenamer is a local-first desktop utility for organizing photo filenames
 
 - Keep file-naming and filesystem rules in `src/photodaterenamer/renamer.py`.
 - Keep the loopback HTTP adapter in `server.py`; keep browser assets under `web/`.
+- Keep the web version's request handling in `site/backend.js`, answering the same routes and response shapes as `server.py`; do not fork the interface.
 - Keep platform-specific folder selection and packaging out of the naming engine.
 - Bind the local application only to loopback. Do not add a remote upload or network service.
 - Preview must be generated before a user confirms file changes. Preserve collision checks and undo behavior.
@@ -17,7 +18,7 @@ PhotoDateRenamer is a local-first desktop utility for organizing photo filenames
 1. Read the relevant source, tests, and current ADRs.
 2. Add or update tests for behavior changes.
 3. Run `python -m unittest discover -s tests -v`.
-4. When changing the browser-only version, run `node --test tests/browser_metadata.test.cjs`.
+4. When changing the browser-only version (`site/backend.js`, `site/metadata.js`), run `node --test`. The web version reuses the interface in `src/photodaterenamer/web/`, so keep asset paths relative and check `python scripts/build_site.py`.
 5. Update `CHANGELOG.md` for user-visible changes.
 6. Add or update an ADR in `docs/adr/` when an architectural decision changes.
 7. Update this file when project-wide agent or contributor rules change.

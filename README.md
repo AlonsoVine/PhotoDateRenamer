@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="site/images/app-icon.png" alt="Icono de PhotoDateRenamer" width="120">
+  <img src="src/photodaterenamer/web/images/app-icon.png" alt="Icono de PhotoDateRenamer" width="120">
 </p>
 
 <h1 align="center">PhotoDateRenamer</h1>
@@ -13,7 +13,7 @@ PhotoDateRenamer está disponible como aplicación portable para Windows y como 
 </p>
 
 <p align="center">
-  <img src="site/images/hero-illustration.png" alt="Paisaje cálido de colinas al atardecer, ilustración de PhotoDateRenamer" width="800">
+  <img src="docs/capturas/vuelta-4/09-vista-previa-grande.jpg" alt="Hoja de contactos de PhotoDateRenamer con la vista previa de los nombres nuevos" width="800">
 </p>
 
 ## Funcionalidades
@@ -40,11 +40,11 @@ Selecciona una carpeta con **Explorar** o escribe su ruta. Activa **Incluir tamb
 
 ## Usar la versión web
 
-La versión estática está en `site/` y se publica en GitHub Pages mediante `.github/workflows/pages.yml`. Para habilitar la publicación en el repositorio, abre **Settings → Pages**, elige **GitHub Actions** como fuente y ejecuta el workflow **Deploy static website** o publica cambios en `site/` sobre `main`. La dirección del proyecto será `https://alonsovine.github.io/PhotoDateRenamer/`.
+La versión web usa la misma interfaz que la aplicación (`src/photodaterenamer/web/`). `site/` solo contiene las dos piezas propias del navegador: `metadata.js`, que lee las fechas, y `backend.js`, que responde dentro de la página a las mismas peticiones que el servidor local de Python. `scripts/build_site.py` monta la web en `_site/`, y `.github/workflows/pages.yml` la publica en GitHub Pages. Para habilitar la publicación en el repositorio, abre **Settings → Pages**, elige **GitHub Actions** como fuente y ejecuta el workflow **Deploy static website** o publica cambios en `site/`, en la interfaz o en el script de montaje sobre `main`. La dirección del proyecto será `https://alonsovine.github.io/PhotoDateRenamer/`.
 
 La web solo puede seleccionar y modificar carpetas en navegadores compatibles con la File System Access API, actualmente Chrome y Edge actualizados en un contexto HTTPS. El navegador solicita permiso para la carpeta elegida. En Firefox, Safari u otros navegadores incompatibles, usa el `.exe` portable de Windows.
 
-Las imágenes se leen en el navegador, sin subirlas al sitio. La web consulta EXIF en JPEG, PNG y TIFF y XMP en JPEG y PNG mediante lecturas parciales de metadatos: no carga el contenido completo de cada fotografía en memoria. Los bloques individuales de metadatos mayores de 16 MiB se marcan como omitidos por seguridad; no hay un límite al tamaño total de las fotos. Usa la última modificación disponible en el navegador como último recurso. Para aplicar cada cambio crea el archivo nuevo con el mismo contenido y después elimina el original, ya que el navegador no ofrece una operación de renombrado de archivos ampliamente compatible. La vista previa detecta conflictos y no reemplaza destinos existentes; conserva la estructura de subcarpetas si está activada la opción recursiva. El deshacer está disponible mientras la página permanezca abierta. La aplicación portable mantiene el motor Python y el selector nativo de Windows.
+Las imágenes se leen en el navegador, sin subirlas al sitio. La web consulta EXIF en JPEG, PNG y TIFF y XMP en JPEG y PNG mediante lecturas parciales de metadatos: no carga el contenido completo de cada fotografía en memoria. Los bloques individuales de metadatos mayores de 16 MiB se marcan como omitidos por seguridad; no hay un límite al tamaño total de las fotos. Usa la última modificación disponible en el navegador como último recurso. Para aplicar cada cambio usa el renombrado real del navegador cuando existe (`move()`, que conserva las fechas del archivo); si no, crea el archivo nuevo con el mismo contenido y después elimina el original. Cada foto se aplica por separado: si una falla, se informa del motivo y el resto continúa, igual que en la aplicación. La vista previa detecta conflictos y no reemplaza destinos existentes; conserva la estructura de subcarpetas si está activada la opción recursiva. El deshacer está disponible mientras la página permanezca abierta. La página declara una política de seguridad con `connect-src 'none'`: no puede enviar nada por la red. La aplicación portable mantiene el motor Python y el selector nativo de Windows.
 
 ## Ejecución desde el código
 
@@ -85,7 +85,7 @@ python -m unittest discover -s tests -v
 node --test
 ```
 
-Los tests construyen imágenes temporales con metadatos de prueba y no modifican fotografías del repositorio. Node ejecuta las pruebas del lector incremental de metadatos y de la interfaz web con APIs de carpeta simuladas, incluyendo paginación, cancelación, renombrado y deshacer. La integración continua prueba el motor en Windows, Linux y macOS; el trabajo de compilación produce el `.exe` de Windows.
+Los tests construyen imágenes temporales con metadatos de prueba y no modifican fotografías del repositorio. Node ejecuta las pruebas del lector incremental de metadatos y del motor de la versión web con APIs de carpeta simuladas, incluyendo estados de la vista previa, cancelación, archivos bloqueados, destinos que aparecen después, renombrado y deshacer. La integración continua prueba el motor en Windows, Linux y macOS; el trabajo de compilación produce el `.exe` de Windows.
 
 ## Estructura
 
@@ -95,11 +95,11 @@ src/photodaterenamer/
   renamer.py             Lectura EXIF/XMP/archivo, vista previa, renombrado y deshacer
   server.py              HTTP local y operaciones de la interfaz
   web/                   Interfaz y recursos estáticos (ilustración e icono)
-site/                    Aplicación web estática y recursos publicados con Pages
+site/                    Piezas propias de la versión web (lectura de metadatos y motor en el navegador)
 tests/                   Pruebas del motor de nombres
 docs/adr/                Decisiones arquitectónicas
 AGENTS.md                Reglas para agentes y contribuidores
-scripts/                 Automatización de compilación
+scripts/                 Compilación del .exe y montaje de la versión web
 ```
 
 ## Evolución a otras plataformas
@@ -114,6 +114,7 @@ El motor de nombres y el formato de componentes no dependen de la interfaz ni de
 - [ADR 0004: Prioridad de fuentes para la fecha de las fotos](docs/adr/0004-photo-date-source-priority.md)
 - [ADR 0005: Versión mínima de Python](docs/adr/0005-python-version-support.md)
 - [ADR 0006: Versión estática para navegador](docs/adr/0006-static-browser-app.md)
+- [ADR 0010: Una sola interfaz para la aplicación y la web](docs/adr/0010-one-interface-for-app-and-web.md)
 
 Consulta [AGENTS.md](AGENTS.md) para las convenciones del proyecto y las actualizaciones requeridas en cada iteración.
 Las instrucciones para contribuir y el formato de commits están en [CONTRIBUTING.md](CONTRIBUTING.md).

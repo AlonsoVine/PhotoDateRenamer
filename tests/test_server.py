@@ -66,10 +66,10 @@ class LocalServerTests(unittest.TestCase):
             self.assertEqual(response.headers.get("X-Content-Type-Options"), "nosniff")
             self.assertEqual(response.headers.get("Referrer-Policy"), "no-referrer")
             policy = response.headers.get("Content-Security-Policy") or ""
-        self.assertIn('href="/images/app-icon.png"', page)
+        self.assertIn('href="images/app-icon.png"', page)
         self.assertIn(f"nonce-{self.token}", policy)
         self.assertNotIn("unsafe-inline", policy)
-        self.assertIn('src="/images/hero-print.webp"', page)
+        self.assertIn('src="images/hero-print.webp"', page)
         self.assertIn("Creado por Alonso Viñé", page)
         self.assertIn('id="progress-view"', page)
         self.assertIn('id="list-scroller"', page)
