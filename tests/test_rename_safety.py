@@ -241,7 +241,9 @@ class RenameSafetyTests(unittest.TestCase):
         self.assert_same_contents(before, snapshot(self.folder))
 
     def test_long_names_are_renamed_and_overlong_results_are_conflicts(self) -> None:
-        long_stem = "ñ" * 120 + " recuerdo"
+        # 110 «ñ» are 220 bytes in UTF-8: the dated name (244 bytes) fits the 255-byte
+        # limit of Linux and macOS as well as the 255-character limit of Windows.
+        long_stem = "ñ" * 110 + " recuerdo"
         self.write(f"{long_stem}.jpg")
         self.write("corta.jpg", jpeg_bytes(color="blue"))
         overlong = [{"kind": "text", "value": "x" * 64}] * 4 + [
