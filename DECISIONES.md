@@ -61,9 +61,11 @@ Recursos y por qué:
 - **Movimiento**: View Transitions entre el héroe y la mesa, las primeras filas se «revelan» escalonadas, el contador de siete segmentos avanza y aparecen las piezas del formato. Todo se desactiva con `prefers-reduced-motion`: la versión estática conserva el color, la tipografía, las perforaciones y la copia ya revelada.
 
 El arte no estorba:
-- La primera pantalla tiene un solo botón principal («Elegir carpeta», tecla `O`) y una línea que explica qué hace la app y que nada cambia sin confirmación.
+- La primera pantalla tiene un solo botón principal («Elegir carpeta», `Alt+O`) y una línea que explica qué hace la app y que nada cambia sin confirmación.
 - La vista previa empieza sola al elegir carpeta y se actualiza sola al cambiar el formato.
 - El botón «Renombrar N fotos» siempre está a la vista junto a la hoja: abajo en escritorio, como barra fija en pantallas estrechas.
+- En pantallas estrechas (≤ 960 px) la hoja va primero y el formato se pliega en un resumen («Fecha + nombre · 2024_08_14»): el estado de la carpeta es lo primero que se ve.
+- Cada estado tiene un solo titular (el de la hoja) y una pequeña tira de película propia: vacía, «documentos» rayados, tira cortada, película velada en rojo o fotogramas verdes de restaurado.
 
 ## 3. Decisiones tomadas ante ambigüedades
 
@@ -82,9 +84,19 @@ El arte no estorba:
 8. **Selección cancelada**: mensaje neutro en el héroe, o aviso flotante en la mesa; nunca se trata como error.
 9. **Ruta escrita a mano**: se mantiene el campo («o pega la ruta») porque el selector nativo no está disponible en todos los entornos.
 10. **Lista virtualizada** en lugar de paginación: solo se pintan las filas visibles más un margen (unas 20-25 de 3000), con `role="listbox"`, `aria-activedescendant`, `aria-setsize` y `aria-posinset`. Se recorre con flechas, RePág, AvPág, Inicio y Fin. Intro abre el detalle en pantallas donde la lupa no cabe.
-11. **Atajos**: `O` (elegir carpeta) y `/` (buscar). No se asignan atajos a «Renombrar» ni a «Deshacer», para no provocar cambios en archivos por accidente.
+11. **Atajos con `Alt`** (vuelta 2): `Alt+O` elige carpeta y `Alt+B` busca. En la vuelta 1 eran `O` y `/` sin modificador, lo que incumple WCAG 2.1.4 (atajos de un solo carácter). No se asignan atajos a «Renombrar» ni a «Deshacer», para no provocar cambios en archivos por accidente.
 12. **Capturas y herramientas de auditoría** (`docs/capturas/`): no se empaquetan (`package-data` solo incluye `web/`) ni se despliegan (Pages publica `site/`). El selector nativo no se puede automatizar, así que el script responde a `/api/select-folder` con carpetas sintéticas creadas en una carpeta temporal.
 13. **Medición de fluidez**: en Chromium headless sin GPU el scroll a 1680 px medía 36 fps, incluso sin ninguna decoración. Una página trivial daba 60, y con Chromium con GPU daba 60. Las mediciones se hacen con aceleración por GPU (`--use-angle=d3d11`).
+
+14. **Miniaturas locales** (vuelta 2). La hoja y la lupa muestran la foto real para que el usuario reconozca qué está renombrando. `thumbnails.py` genera un JPEG de 96 o 360 px en memoria con Pillow (ya era dependencia), abriendo el archivo solo para leer. `/api/thumbnail` exige el token y solo sirve rutas que estén en la última carpeta analizada; cualquier otra ruta da 400. El navegador las recibe como `blob:` (la CSP añade `img-src blob:`), con 4 peticiones simultáneas como máximo y una caché de 500 entradas. Al cambiar de carpeta se abortan las pendientes. Nada sale del equipo.
+15. **Deshacer por archivo** (vuelta 2). `undo_each` revierte en orden inverso, sin sobrescribir nunca, y si un archivo está bloqueado lo anota y sigue. La interfaz muestra un estado «Deshacer incompleto» persistente con la lista de pendientes y «Reintentar deshacer», en lugar de un aviso flotante de 4 s. `undo_renames` (todo o nada) se conserva.
+16. **Error de red al aplicar → «Resultado desconocido»** (vuelta 2). Si la petición de confirmar falla, la app no puede saber cuántos archivos cambiaron. En la vuelta 1 decía «No se aplicó ningún cambio», una afirmación potencialmente falsa. Ahora pide volver a analizar para ver el estado real.
+17. **Aviso «ya fechada»** (vuelta 2). Si un nombre original ya empieza por una fecha (`2024_08_14`, `2024-08-14` o `20240814`), la fila lleva la etiqueta «ya fechada», hay un filtro propio y el diálogo de confirmación lo advierte. No cambia los nombres propuestos: es solo información, porque el motor de 0.5.0 se mantiene intacto (golden).
+18. **Nombres sin cortar a ciegas** (vuelta 2). Los nombres largos se acortan por el centro (`helpers.js`, con tests en Node) para que siempre se vean la fecha y la extensión. Los conflictos muestran el nombre con el que chocarían. La lupa y el detalle muestran el nombre completo. Se descartó que las filas crecieran en altura, porque la lista virtual necesita una altura fija para seguir a 60 fps con miles de filas.
+19. **Formato bloqueado en los resultados** (vuelta 2). Tras renombrar, el panel de formato queda atenuado y deshabilitado, con la nota «Pulsa Volver a analizar…». Cambiarlo ahí no tendría efecto y confundía.
+20. **Tras un éxito, la acción principal es «Elegir otra carpeta»** (vuelta 2). «Deshacer» pasa a secundaria: es una red de seguridad, no el siguiente paso esperado.
+21. **Ejemplo fijo `2024_08_14`** (vuelta 2), en lugar de la fecha de hoy. Así el ejemplo del formato y el del héroe coinciden. En cuanto hay vista previa, el ejemplo usa una foto real de la carpeta.
+22. **Sin halo que sigue al puntero** (vuelta 2). Era decorativo, costaba repintados y no aportaba a la tarea. La luz de seguridad es ahora estática.
 
 ## 4. Dependencias
 

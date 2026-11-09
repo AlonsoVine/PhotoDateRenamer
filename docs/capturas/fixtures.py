@@ -11,8 +11,24 @@ import shutil
 from PIL import Image
 
 
-def _jpeg_bytes(capture_date: str | None) -> bytes:
-    image = Image.new("RGB", (8, 8), color=(150, 120, 90))
+PALETTES = [
+    [(38, 62, 110), (210, 120, 70), (250, 196, 120), (60, 48, 40)],
+    [(120, 170, 210), (230, 230, 220), (70, 110, 60), (40, 60, 30)],
+    [(250, 150, 90), (180, 60, 70), (60, 30, 50), (20, 15, 25)],
+    [(200, 210, 200), (140, 160, 150), (90, 100, 80), (50, 45, 40)],
+    [(240, 200, 150), (200, 140, 100), (120, 80, 60), (60, 40, 30)],
+    [(90, 140, 170), (40, 90, 120), (230, 220, 190), (180, 150, 110)],
+]
+
+
+def _jpeg_bytes(capture_date: str | None, seed: int = 0, size: tuple[int, int] = (160, 120)) -> bytes:
+    """A soft, photo-like colour field: a 3x3 grid of tones blurred by upscaling."""
+    palette = PALETTES[seed % len(PALETTES)]
+    small = Image.new("RGB", (3, 3))
+    for y in range(3):
+        for x in range(3):
+            small.putpixel((x, y), palette[(y + (x * seed) % 2) % len(palette)])
+    image = small.resize(size, Image.Resampling.BICUBIC)
     exif = Image.Exif()
     if capture_date is not None:
         exif[36867] = capture_date
@@ -47,23 +63,23 @@ def build_fixtures(base: Path) -> dict[str, Path]:
         ("2024_08_14_IMG_0414.jpg", "2024:08:14 19:09:00"),
         ("IMG_0414.jpg", "2024:08:14 19:09:00"),
     ]
-    for name, capture_date in samples:
-        (mixed / name).write_bytes(_jpeg_bytes(capture_date))
+    for seed, (name, capture_date) in enumerate(samples):
+        (mixed / name).write_bytes(_jpeg_bytes(capture_date, seed))
     (mixed / "dañada.jpg").write_bytes(b"\xff\xd8 cabecera rota")
     (mixed / "léeme.txt").write_text("notas del viaje", encoding="utf-8")
     fixed = datetime(2021, 9, 30, 12, 0, 0).timestamp()
     os.utime(mixed / "scan_carrete_07.jpg", (fixed, fixed))
 
-    payload = _jpeg_bytes("2019:07:21 09:30:00")
+    payloads = [_jpeg_bytes("2019:07:21 09:30:00", seed, (64, 48)) for seed in range(6)]
     for index in range(3000):
-        (folders["miles"] / f"IMG_{index:05d}.jpg").write_bytes(payload)
+        (folders["miles"] / f"IMG_{index:05d}.jpg").write_bytes(payloads[index % 6])
 
     for index in range(6):
         (folders["parcial"] / f"IMG_{index:04d}.jpg").write_bytes(
-            _jpeg_bytes(f"2020:01:0{index + 1} 10:00:00")
+            _jpeg_bytes(f"2020:01:0{index + 1} 10:00:00", index)
         )
     for index in range(3):
         (folders["total"] / f"IMG_{index:04d}.jpg").write_bytes(
-            _jpeg_bytes(f"2020:02:0{index + 1} 10:00:00")
+            _jpeg_bytes(f"2020:02:0{index + 1} 10:00:00", index + 2)
         )
     return folders

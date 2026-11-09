@@ -13,7 +13,10 @@ Notable changes to PhotoDateRenamer are documented here.
   - dedicated views for empty folders, folders without photos, cancelled scans, applying, success, partial failure, total failure, and undo.
 - Self-hosted OFL fonts (Fraunces, Instrument Sans, JetBrains Mono, DSEG7).
 - Apply progress, and a per-file report of renamed and failed files.
-- Keyboard shortcuts: `O` chooses a folder and `/` searches the preview.
+- Keyboard shortcuts: `Alt+O` chooses a folder and `Alt+B` searches the preview.
+- Local thumbnails of each photo in the contact sheet and in the detail loupe. They are generated in memory and served only to the local window.
+- A «ya fechada» tag, filter, and confirmation warning for photos whose name already starts with a date.
+- A persistent «Deshacer incompleto» view that lists files that could not be restored and offers to retry.
 - Optional fixed port through `PHOTODATERENAMER_PORT`, still bound to `127.0.0.1`.
 - Regression tests that pin the proposed names of 0.5.0, plus data-safety tests on generated folders. They cover:
   - empty folders;
@@ -27,6 +30,9 @@ Notable changes to PhotoDateRenamer are documented here.
 ### Changed
 - A confirmed batch is applied file by file. A locked or changed file is reported with its reason while the rest continue, and undo restores the renamed files. Previously the whole batch was rolled back.
 - Cancelling a scan, and checking a missing folder, return explicit results instead of HTTP errors.
+- Undo restores file by file and never overwrites; a locked file no longer blocks the rest.
+- If the apply request itself fails, the interface says the result is unknown and asks to re-scan, instead of claiming nothing changed.
+- On narrow windows the contact sheet comes first and the format panel collapses into a summary.
 
 ### Fixed
 - Destination names longer than 255 characters are flagged as conflicts in the preview instead of failing during the rename.

@@ -62,6 +62,36 @@ async () => {
 }
 """
 
+DEVELOP_FPS_SCRIPT = """
+async () => {
+  let frames = 0;
+  let worst = 0;
+  const start = performance.now();
+  let last = start;
+  await new Promise((resolve) => {
+    function step(now) {
+      frames += 1;
+      worst = Math.max(worst, now - last);
+      last = now;
+      if (now - start < 900) requestAnimationFrame(step); else resolve();
+    }
+    requestAnimationFrame(step);
+  });
+  return { fps: Math.round(frames / ((performance.now() - start) / 1000)), worstFrameMs: Math.round(worst) };
+}
+"""
+
+HEADING_SCRIPT = """
+() => {
+  if (document.body.dataset.mode === 'idle') return null;
+  const box = document.querySelector('#sheet-title').getBoundingClientRect();
+  return { top: Math.round(box.top), bottom: Math.round(box.bottom), viewport: innerHeight,
+           visible: box.top >= 0 && box.bottom <= innerHeight };
+}
+"""
+
+COUNT = r"Number((document.querySelector('%s').textContent || '0').replace(/\./g, ''))"
+
 OVERFLOW_SCRIPT = """
 () => {
   const doc = document.documentElement;
@@ -90,7 +120,7 @@ def main() -> None:
     out = HERE / arguments.name
     out.mkdir(parents=True, exist_ok=True)
     axe_source = Path(arguments.axe).read_text(encoding="utf-8") if arguments.axe else None
-    report: dict[str, object] = {"console": [], "overflow": {}, "axe": {}, "fps": {}, "states": []}
+    report: dict[str, object] = {"console": [], "overflow": {}, "axe": {}, "fps": {}, "fps_develop": {}, "heading": {}, "states": []}
 
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(
@@ -108,11 +138,14 @@ def main() -> None:
     problems = [entry for entry in report["console"]]
     overflow = {key: value for key, value in report["overflow"].items() if value["offenders"] or value["scrollWidth"] > value["clientWidth"]}
     violations = {key: value for key, value in report["axe"].items() if value}
+    hidden_headings = [key for key, value in report["heading"].items() if value and not value["visible"]]
     print(json.dumps({
         "console_messages": len(problems),
         "overflow_states": list(overflow),
         "axe_violations": violations,
         "fps": report["fps"],
+        "fps_develop": report["fps_develop"],
+        "headings_outside_viewport": hidden_headings,
     }, ensure_ascii=False, indent=1))
 
 
@@ -124,8 +157,17 @@ def run_size(browser, scratch, out, size_name, suffix, width, height, motion, ax
     url = f"http://127.0.0.1:{server.server_port}/"
     context = browser.new_context(viewport={"width": width, "height": height}, reduced_motion=motion)
     page = context.new_page()
-    page.on("console", lambda message: report["console"].append(f"[{suffix}] {message.type}: {message.text}")
-            if message.type in ("error", "warning") else None)
+    simulated = {"network_failure": False}
+
+    def on_console(message) -> None:
+        if message.type not in ("error", "warning"):
+            return
+        # The «resultado desconocido» capture aborts /api/confirm on purpose.
+        if simulated["network_failure"] and "ERR_FAILED" in message.text:
+            return
+        report["console"].append(f"[{suffix}] {message.type}: {message.text}")
+
+    page.on("console", on_console)
     page.on("pageerror", lambda error: report["console"].append(f"[{suffix}] pageerror: {error}"))
     picked = {"folder": ""}
     page.route(
@@ -133,10 +175,22 @@ def run_size(browser, scratch, out, size_name, suffix, width, height, motion, ax
         lambda route: route.fulfill(status=200, content_type="application/json", body=json.dumps(picked)),
     )
 
-    def shot(state: str, full_page: bool = False) -> None:
+    def shot(state: str, full_page: bool = False, heading: bool = True, settle: bool = True) -> None:
+        if not settle:
+            page.screenshot(path=out / f"{state}-{suffix}.jpg", full_page=full_page, type="jpeg", quality=85)
+            report["states"].append(f"{state}-{suffix}")
+            return
         page.wait_for_timeout(450 if motion == "no-preference" else 120)
+        # Let finite animations (view transitions, the develop reveal) settle first.
+        page.wait_for_function(
+            "() => document.getAnimations().every(a => a.playState !== 'running'"
+            " || a.effect.getComputedTiming().iterations === Infinity)",
+            timeout=5000,
+        )
         page.screenshot(path=out / f"{state}-{suffix}.jpg", full_page=full_page, type="jpeg", quality=85)
         report["overflow"][f"{state}-{suffix}"] = page.evaluate(OVERFLOW_SCRIPT)
+        if heading and not page.evaluate("() => Boolean(document.querySelector('dialog[open]'))"):
+            report["heading"][f"{state}-{suffix}"] = page.evaluate(HEADING_SCRIPT)
         report["states"].append(f"{state}-{suffix}")
         if axe_source and motion == "no-preference" and size_name != "grande":
             if not page.evaluate("() => typeof window.axe === 'object'"):
@@ -186,8 +240,8 @@ def run_size(browser, scratch, out, size_name, suffix, width, height, motion, ax
 
     pick(folders["miles"])
     wait_view("scanning")
-    page.wait_for_function("() => document.querySelector('#progress-total').textContent !== '—'", timeout=30000)
-    shot("06-analizando")
+    page.wait_for_function(f"() => {COUNT % '#progress-total'} > 0", timeout=30000)
+    shot("06-analizando", settle=False)  # transient: the scan may finish at any moment
     page.click("#cancel-scan")
     wait_view("cancelled")
     shot("07-analisis-cancelado")
@@ -204,17 +258,30 @@ def run_size(browser, scratch, out, size_name, suffix, width, height, motion, ax
     page.focus("#list-scroller")
     for _ in range(3):
         page.keyboard.press("ArrowDown")
-    shot("09-vista-previa")
+    shot("09-vista-previa", heading=False)  # the user moved focus into the list
 
     page.click('.filter[data-filter="conflict"]')
-    shot("10-filtro-conflictos")
+    shot("10-filtro-conflictos", heading=False)
+    page.click('.filter[data-filter="dated"]')
+    shot("10b-filtro-ya-fechadas", heading=False)
     page.click('.filter[data-filter="all"]')
+    if size_name != "grande":
+        page.click("#frame-1")
+        page.wait_for_selector("#detail-dialog[open]")
+        shot("10c-detalle")
+        page.keyboard.press("Escape")
+    if size_name == "min":
+        page.click(".format-summary")
+        page.wait_for_timeout(200)
+        shot("10d-formato-abierto", full_page=True, heading=False)
 
+    if not page.evaluate("() => document.querySelector('#format-details').open"):
+        page.click(".format-summary")
     page.evaluate("() => { document.body.dataset.view = '__capture__'; }")
     page.click('.preset[data-preset="original_date"]')
     wait_view("preview")
     page.wait_for_selector("#apply-button:not([disabled])")
-    shot("11-formato-cambiado")
+    shot("11-formato-cambiado", heading=False)  # the user is editing the format panel
     page.evaluate("() => { document.body.dataset.view = '__capture__'; }")
     page.click('.preset[data-preset="date_original"]')
     wait_view("preview")
@@ -233,11 +300,13 @@ def run_size(browser, scratch, out, size_name, suffix, width, height, motion, ax
 
     pick(folders["miles"])
     wait_view("preview")
+    if motion == "no-preference":
+        report["fps_develop"][suffix] = page.evaluate(DEVELOP_FPS_SCRIPT)
     page.wait_for_selector("#apply-button:not([disabled])")
     page.click("#apply-button")
     page.click("#confirm-apply")
     wait_view("applying")
-    page.wait_for_function("() => Number(document.querySelector('#progress-count').textContent) > 0", timeout=30000)
+    page.wait_for_function(f"() => {COUNT % '#progress-count'} > 0", timeout=30000)
     page.screenshot(path=out / f"15-aplicando-{suffix}.jpg", type="jpeg", quality=85)
     report["states"].append(f"15-aplicando-{suffix}")
     wait_view("success", "partial", "total")
@@ -257,6 +326,31 @@ def run_size(browser, scratch, out, size_name, suffix, width, height, motion, ax
         for handle in locked:
             handle.close()
     shot("17-error-parcial")
+
+    renamed_now = sorted(path for path in folders["parcial"].iterdir() if path.name.startswith("2020_"))
+    held = open(renamed_now[0], "rb")
+    try:
+        page.click("#undo-button")
+        wait_view("undo-partial")
+        shot("17b-deshacer-incompleto")
+    finally:
+        held.close()
+    page.evaluate("() => { document.body.dataset.view = '__capture__'; }")
+    page.click("#result-primary")
+    wait_view("restored")
+
+    pick(folders["total"])
+    wait_view("preview")
+    page.wait_for_selector("#apply-button:not([disabled])")
+    simulated["network_failure"] = True
+    page.route("**/api/confirm", lambda route: route.abort())
+    page.click("#apply-button")
+    page.click("#confirm-apply")
+    wait_view("unknown")
+    page.unroute("**/api/confirm")
+    page.wait_for_timeout(300)
+    simulated["network_failure"] = False
+    shot("17c-resultado-desconocido")
 
     pick(folders["total"])
     wait_view("preview")
