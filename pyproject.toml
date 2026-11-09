@@ -28,7 +28,7 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
-photodaterenamer = ["web/*", "web/images/*"]
+photodaterenamer = ["web/*", "web/images/*", "web/fonts/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

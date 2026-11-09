@@ -1,0 +1,176 @@
+== Vuelta 4 · comprobaciones finales, tras corregir los defectos de la revisión (2026-11-09) ==
+
+## python -m unittest discover -s tests -b -v
+test_native_picker_builds_shell_dialog_without_spawning_a_process (test_folder_picker.FolderPickerTests.test_native_picker_builds_shell_dialog_without_spawning_a_process) ... ok
+test_tk_fallback_opens_picker_owned_by_a_foreground_root (test_folder_picker.FolderPickerTests.test_tk_fallback_opens_picker_owned_by_a_foreground_root) ... ok
+test_windows_entry_point_uses_native_folder_picker (test_folder_picker.FolderPickerTests.test_windows_entry_point_uses_native_folder_picker) ... ok
+test_golden_file_covers_every_status (test_naming_regression.NamingRegressionTests.test_golden_file_covers_every_status) ... ok
+test_proposed_names_match_the_original_engine (test_naming_regression.NamingRegressionTests.test_proposed_names_match_the_original_engine) ... ok
+test_accents_spaces_symbols_and_uppercase_extensions_round_trip (test_rename_safety.RenameSafetyTests.test_accents_spaces_symbols_and_uppercase_extensions_round_trip) ... ok
+test_apply_never_deletes_or_overwrites_any_file (test_rename_safety.RenameSafetyTests.test_apply_never_deletes_or_overwrites_any_file) ... ok
+test_apply_reports_each_rename_as_it_happens (test_rename_safety.RenameSafetyTests.test_apply_reports_each_rename_as_it_happens) ... ok
+test_cached_dates_produce_exactly_the_same_plan (test_rename_safety.RenameSafetyTests.test_cached_dates_produce_exactly_the_same_plan) ... ok
+test_colliding_destinations_are_never_renamed_or_overwritten (test_rename_safety.RenameSafetyTests.test_colliding_destinations_are_never_renamed_or_overwritten) ... ok
+test_destination_appearing_after_preview_is_reported_and_the_rest_continue (test_rename_safety.RenameSafetyTests.test_destination_appearing_after_preview_is_reported_and_the_rest_continue) ... ok
+test_empty_folder_produces_an_empty_plan_and_changes_nothing (test_rename_safety.RenameSafetyTests.test_empty_folder_produces_an_empty_plan_and_changes_nothing) ... ok
+test_folder_without_photos_reports_its_entries_but_no_items (test_rename_safety.RenameSafetyTests.test_folder_without_photos_reports_its_entries_but_no_items) ... ok
+test_hidden_files_are_handled_like_any_other_photo (test_rename_safety.RenameSafetyTests.test_hidden_files_are_handled_like_any_other_photo) ... ok
+test_locked_directory_failure_is_reported_without_aborting_the_rest (test_rename_safety.RenameSafetyTests.test_locked_directory_failure_is_reported_without_aborting_the_rest) ... skipped 'needs POSIX directory permissions'
+test_locked_file_failure_is_reported_without_aborting_the_rest (test_rename_safety.RenameSafetyTests.test_locked_file_failure_is_reported_without_aborting_the_rest) ... ok
+test_long_names_are_renamed_and_overlong_results_are_conflicts (test_rename_safety.RenameSafetyTests.test_long_names_are_renamed_and_overlong_results_are_conflicts) ... ok
+test_read_only_file_is_renamed_without_modifying_its_content (test_rename_safety.RenameSafetyTests.test_read_only_file_is_renamed_without_modifying_its_content) ... ok
+test_source_changed_after_preview_is_reported_and_not_renamed (test_rename_safety.RenameSafetyTests.test_source_changed_after_preview_is_reported_and_not_renamed) ... ok
+test_thousands_of_files_are_renamed_and_undone_without_loss (test_rename_safety.RenameSafetyTests.test_thousands_of_files_are_renamed_and_undone_without_loss) ... ok
+test_undo_never_overwrites_a_file_that_took_the_original_name (test_rename_safety.RenameSafetyTests.test_undo_never_overwrites_a_file_that_took_the_original_name) ... ok
+test_undo_reports_a_locked_file_restores_the_rest_and_can_be_retried (test_rename_safety.RenameSafetyTests.test_undo_reports_a_locked_file_restores_the_rest_and_can_be_retried) ... ok
+test_default_preview_and_undo (test_renamer.RenamePreviewTests.test_default_preview_and_undo) ... ok
+test_destination_created_after_preview_is_not_overwritten (test_renamer.RenamePreviewTests.test_destination_created_after_preview_is_not_overwritten) ... ok
+test_duplicate_custom_names_are_conflicts (test_renamer.RenamePreviewTests.test_duplicate_custom_names_are_conflicts) ... ok
+test_exif_digitized_date_is_used_when_original_date_is_missing (test_renamer.RenamePreviewTests.test_exif_digitized_date_is_used_when_original_date_is_missing) ... ok
+test_exif_image_date_is_used_when_more_specific_dates_are_missing (test_renamer.RenamePreviewTests.test_exif_image_date_is_used_when_more_specific_dates_are_missing) ... ok
+test_existing_destination_is_a_conflict (test_renamer.RenamePreviewTests.test_existing_destination_is_a_conflict) ... ok
+test_invalid_component_and_date_format_are_rejected (test_renamer.RenamePreviewTests.test_invalid_component_and_date_format_are_rejected) ... ok
+test_missing_or_invalid_exif_uses_filesystem_date_as_last_resort (test_renamer.RenamePreviewTests.test_missing_or_invalid_exif_uses_filesystem_date_as_last_resort) ... ok
+test_preview_reports_progress_and_can_be_cancelled (test_renamer.RenamePreviewTests.test_preview_reports_progress_and_can_be_cancelled) ... ok
+test_recursive_preview_detects_existing_destinations_in_subfolders (test_renamer.RenamePreviewTests.test_recursive_preview_detects_existing_destinations_in_subfolders) ... ok
+test_recursive_preview_renames_nested_photos_and_can_undo (test_renamer.RenamePreviewTests.test_recursive_preview_renames_nested_photos_and_can_undo) ... ok
+test_source_changed_after_preview_is_not_renamed (test_renamer.RenamePreviewTests.test_source_changed_after_preview_is_not_renamed) ... ok
+test_subfolders_are_ignored_by_default (test_renamer.RenamePreviewTests.test_subfolders_are_ignored_by_default) ... ok
+test_unsupported_files_are_not_included (test_renamer.RenamePreviewTests.test_unsupported_files_are_not_included) ... ok
+test_xmp_capture_date_is_used_when_exif_dates_are_missing (test_renamer.RenamePreviewTests.test_xmp_capture_date_is_used_when_exif_dates_are_missing) ... ok
+test_a_batch_that_renames_nothing_keeps_the_previous_batch_undoable (test_server.LocalServerTests.test_a_batch_that_renames_nothing_keeps_the_previous_batch_undoable) ... ok
+test_a_format_change_reuses_dates_without_reading_metadata_again (test_server.LocalServerTests.test_a_format_change_reuses_dates_without_reading_metadata_again) ... ok
+test_an_interrupted_apply_keeps_the_files_already_renamed_undoable (test_server.LocalServerTests.test_an_interrupted_apply_keeps_the_files_already_renamed_undoable) ... ok
+test_an_unexpected_server_error_answers_500_instead_of_dropping_the_connection (test_server.LocalServerTests.test_an_unexpected_server_error_answers_500_instead_of_dropping_the_connection) ... ok
+test_check_folder_reports_missing_and_existing_folders (test_server.LocalServerTests.test_check_folder_reports_missing_and_existing_folders) ... ok
+test_folder_picker_runs_in_a_separate_main_thread_process (test_server.LocalServerTests.test_folder_picker_runs_in_a_separate_main_thread_process) ... ok
+test_last_run_survives_analysing_another_folder_and_ends_after_undo (test_server.LocalServerTests.test_last_run_survives_analysing_another_folder_and_ends_after_undo) ... ok
+test_partial_failure_is_reported_and_successful_renames_can_be_undone (test_server.LocalServerTests.test_partial_failure_is_reported_and_successful_renames_can_be_undone) ... ok
+test_preview_can_include_subfolders (test_server.LocalServerTests.test_preview_can_include_subfolders) ... ok
+test_preview_confirm_and_undo_over_http (test_server.LocalServerTests.test_preview_confirm_and_undo_over_http) ... ok
+test_preview_progress_is_available_and_does_not_expose_fingerprints (test_server.LocalServerTests.test_preview_progress_is_available_and_does_not_expose_fingerprints) ... ok
+test_preview_rejects_non_boolean_recursive_option (test_server.LocalServerTests.test_preview_rejects_non_boolean_recursive_option) ... ok
+test_preview_reports_entries_folder_name_and_date_text (test_server.LocalServerTests.test_preview_reports_entries_folder_name_and_date_text) ... ok
+test_scan_can_be_cancelled_over_http (test_server.LocalServerTests.test_scan_can_be_cancelled_over_http) ... ok
+test_serves_browser_assets_and_limits_api_to_authorized_origin (test_server.LocalServerTests.test_serves_browser_assets_and_limits_api_to_authorized_origin) ... ok
+test_thumbnails_are_limited_to_the_analysed_folder (test_server.LocalServerTests.test_thumbnails_are_limited_to_the_analysed_folder) ... ok
+test_total_failure_has_no_undo_and_a_plan_cannot_be_applied_twice (test_server.LocalServerTests.test_total_failure_has_no_undo_and_a_plan_cannot_be_applied_twice) ... ok
+test_windows_api_uses_native_foreground_folder_picker (test_server.LocalServerTests.test_windows_api_uses_native_foreground_folder_picker) ... ok
+test_static_site_assets_are_local_and_present (test_site.StaticSiteTests.test_static_site_assets_are_local_and_present) ... ok
+test_static_site_does_not_depend_on_python_api_routes (test_site.StaticSiteTests.test_static_site_does_not_depend_on_python_api_routes) ... ok
+
+----------------------------------------------------------------------
+Ran 57 tests in 22.551s
+
+OK (skipped=1)
+
+## node --test
+TAP version 13
+# Subtest: paginates a large preview, renames after confirmation, and supports undo
+ok 1 - paginates a large preview, renames after confirmation, and supports undo
+  ---
+  duration_ms: 129.3891
+  type: 'test'
+  ...
+# Subtest: cancels a long folder scan without changing any files
+ok 2 - cancels a long folder scan without changing any files
+  ---
+  duration_ms: 4.1702
+  type: 'test'
+  ...
+# Subtest: prefers EXIF capture date over digitized and general dates
+ok 3 - prefers EXIF capture date over digitized and general dates
+  ---
+  duration_ms: 8.5498
+  type: 'test'
+  ...
+# Subtest: reads EXIF capture dates from JPEG and PNG containers
+ok 4 - reads EXIF capture dates from JPEG and PNG containers
+  ---
+  duration_ms: 0.6865
+  type: 'test'
+  ...
+# Subtest: parses filesystem fallback dates as local calendar dates
+ok 5 - parses filesystem fallback dates as local calendar dates
+  ---
+  duration_ms: 1.1243
+  type: 'test'
+  ...
+# Subtest: ignores malformed metadata and rejects invalid date strings
+ok 6 - ignores malformed metadata and rejects invalid date strings
+  ---
+  duration_ms: 0.2894
+  type: 'test'
+  ...
+# Subtest: reads JPEG metadata without loading the complete large photo
+ok 7 - reads JPEG metadata without loading the complete large photo
+  ---
+  duration_ms: 6.5973
+  type: 'test'
+  ...
+# Subtest: skips large PNG image chunks while reading EXIF metadata
+ok 8 - skips large PNG image chunks while reading EXIF metadata
+  ---
+  duration_ms: 5.0563
+  type: 'test'
+  ...
+# Subtest: reads TIFF directories from large files using bounded byte ranges
+ok 9 - reads TIFF directories from large files using bounded byte ranges
+  ---
+  duration_ms: 5.6413
+  type: 'test'
+  ...
+# Subtest: detects names that already start with a date in any supported format
+ok 10 - detects names that already start with a date in any supported format
+  ---
+  duration_ms: 1.0277
+  type: 'test'
+  ...
+# Subtest: middle ellipsis keeps the date at the start and the extension at the end
+ok 11 - middle ellipsis keeps the date at the start and the extension at the end
+  ---
+  duration_ms: 0.2461
+  type: 'test'
+  ...
+# Subtest: seven-segment digits group thousands with a dot and ghosts match their width
+ok 12 - seven-segment digits group thousands with a dot and ghosts match their width
+  ---
+  duration_ms: 0.243
+  type: 'test'
+  ...
+# Subtest: date stamps are built from any supported date format
+ok 13 - date stamps are built from any supported date format
+  ---
+  duration_ms: 0.1849
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 230.0237
+
+## Lighthouse 13.6 (127.0.0.1:8770, Chromium 1248)
+mobile {"performance": 100, "accessibility": 100, "best-practices": 100} LCP 1.1 s
+desktop {"performance": 99, "accessibility": 100, "best-practices": 100} LCP 0.9 s
+Referencia 0.5.0: escritorio 83/92/100, móvil 100/92/100 (perf/a11y/bp)
+
+## capturar.py (Playwright + axe-core 4.14, axe en todos los tamaños y sin movimiento)
+estados capturados: 100
+mensajes de consola error/warning: 0
+estados con desbordamiento: []
+violaciones axe: {} en 88 estados auditados
+titular fuera de la primera vista: []
+fps desplazamiento 3.000 filas: {'min': 60, 'medio': 60, 'grande': 60} tareas largas: {'min': 0, 'medio': 0, 'grande': 0}
+fps animación de revelado: {'min': 61, 'medio': 61, 'grande': 60}
+
+## Altura de página con la carpeta de miles (sonda aparte, defecto bloqueante D1 de la revisión)
+360x720: 1183 px · 900x600: 857 px · 1280x600: 909 px (antes del arreglo: unos 250.000 px en el diseño estrecho)
+
+## Nota sobre fluidez
+En una pasada anterior de esta vuelta, con el equipo ocupado, la primera pasada dio 45–52 fps; con la caché caliente, 60.
+En la pasada final de arriba, 60 fps en los tres tamaños y sin tareas largas.

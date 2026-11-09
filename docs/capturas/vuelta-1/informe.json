@@ -1,0 +1,478 @@
+{
+ "console": [],
+ "overflow": {
+  "01-inicial-min": {
+   "scrollWidth": 360,
+   "clientWidth": 360,
+   "offenders": []
+  },
+  "02-seleccion-cancelada-min": {
+   "scrollWidth": 360,
+   "clientWidth": 360,
+   "offenders": []
+  },
+  "03-ruta-inexistente-min": {
+   "scrollWidth": 360,
+   "clientWidth": 360,
+   "offenders": []
+  },
+  "04-carpeta-vacia-min": {
+   "scrollWidth": 360,
+   "clientWidth": 360,
+   "offenders": []
+  },
+  "05-sin-imagenes-min": {
+   "scrollWidth": 360,
+   "clientWidth": 360,
+   "offenders": []
+  },
+  "06-analizando-min": {
+   "scrollWidth": 360,
+   "clientWidth": 360,
+   "offenders": []
+  },
+  "07-analisis-cancelado-min": {
+   "scrollWidth": 360,
+   "clientWidth": 360,
+   "offenders": []
+  },
+  "08-miles-min": {
+   "scrollWidth": 360,
+   "clientWidth": 360,
+   "offenders": []
+  },
+  "09-vista-previa-min": {
+   "scrollWidth": 360,
+   "clientWidth": 360,
+   "offenders": []
+  },
+  "10-filtro-conflictos-min": {
+   "scrollWidth": 360,
+   "clientWidth": 360,
+   "offenders": []
+  },
+  "11-formato-cambiado-min": {
+   "scrollWidth": 360,
+   "clientWidth": 360,
+   "offenders": []
+  },
+  "12-confirmar-min": {
+   "scrollWidth": 360,
+   "clientWidth": 360,
+   "offenders": []
+  },
+  "13-exito-min": {
+   "scrollWidth": 360,
+   "clientWidth": 360,
+   "offenders": []
+  },
+  "14-deshecho-min": {
+   "scrollWidth": 360,
+   "clientWidth": 360,
+   "offenders": []
+  },
+  "16-exito-miles-min": {
+   "scrollWidth": 360,
+   "clientWidth": 360,
+   "offenders": []
+  },
+  "17-error-parcial-min": {
+   "scrollWidth": 360,
+   "clientWidth": 360,
+   "offenders": []
+  },
+  "18-error-total-min": {
+   "scrollWidth": 360,
+   "clientWidth": 360,
+   "offenders": []
+  },
+  "01-inicial-medio": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "02-seleccion-cancelada-medio": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "03-ruta-inexistente-medio": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "04-carpeta-vacia-medio": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "05-sin-imagenes-medio": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "06-analizando-medio": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "07-analisis-cancelado-medio": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "08-miles-medio": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "09-vista-previa-medio": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "10-filtro-conflictos-medio": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "11-formato-cambiado-medio": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "12-confirmar-medio": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "13-exito-medio": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "14-deshecho-medio": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "16-exito-miles-medio": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "17-error-parcial-medio": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "18-error-total-medio": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "01-inicial-medio-sin-movimiento": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "02-seleccion-cancelada-medio-sin-movimiento": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "03-ruta-inexistente-medio-sin-movimiento": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "04-carpeta-vacia-medio-sin-movimiento": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "05-sin-imagenes-medio-sin-movimiento": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "06-analizando-medio-sin-movimiento": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "07-analisis-cancelado-medio-sin-movimiento": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "08-miles-medio-sin-movimiento": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "09-vista-previa-medio-sin-movimiento": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "10-filtro-conflictos-medio-sin-movimiento": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "11-formato-cambiado-medio-sin-movimiento": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "12-confirmar-medio-sin-movimiento": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "13-exito-medio-sin-movimiento": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "14-deshecho-medio-sin-movimiento": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "16-exito-miles-medio-sin-movimiento": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "17-error-parcial-medio-sin-movimiento": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "18-error-total-medio-sin-movimiento": {
+   "scrollWidth": 1024,
+   "clientWidth": 1024,
+   "offenders": []
+  },
+  "01-inicial-grande": {
+   "scrollWidth": 1680,
+   "clientWidth": 1680,
+   "offenders": []
+  },
+  "02-seleccion-cancelada-grande": {
+   "scrollWidth": 1680,
+   "clientWidth": 1680,
+   "offenders": []
+  },
+  "03-ruta-inexistente-grande": {
+   "scrollWidth": 1680,
+   "clientWidth": 1680,
+   "offenders": []
+  },
+  "04-carpeta-vacia-grande": {
+   "scrollWidth": 1680,
+   "clientWidth": 1680,
+   "offenders": []
+  },
+  "05-sin-imagenes-grande": {
+   "scrollWidth": 1680,
+   "clientWidth": 1680,
+   "offenders": []
+  },
+  "06-analizando-grande": {
+   "scrollWidth": 1680,
+   "clientWidth": 1680,
+   "offenders": []
+  },
+  "07-analisis-cancelado-grande": {
+   "scrollWidth": 1680,
+   "clientWidth": 1680,
+   "offenders": []
+  },
+  "08-miles-grande": {
+   "scrollWidth": 1680,
+   "clientWidth": 1680,
+   "offenders": []
+  },
+  "09-vista-previa-grande": {
+   "scrollWidth": 1680,
+   "clientWidth": 1680,
+   "offenders": []
+  },
+  "10-filtro-conflictos-grande": {
+   "scrollWidth": 1680,
+   "clientWidth": 1680,
+   "offenders": []
+  },
+  "11-formato-cambiado-grande": {
+   "scrollWidth": 1680,
+   "clientWidth": 1680,
+   "offenders": []
+  },
+  "12-confirmar-grande": {
+   "scrollWidth": 1680,
+   "clientWidth": 1680,
+   "offenders": []
+  },
+  "13-exito-grande": {
+   "scrollWidth": 1680,
+   "clientWidth": 1680,
+   "offenders": []
+  },
+  "14-deshecho-grande": {
+   "scrollWidth": 1680,
+   "clientWidth": 1680,
+   "offenders": []
+  },
+  "16-exito-miles-grande": {
+   "scrollWidth": 1680,
+   "clientWidth": 1680,
+   "offenders": []
+  },
+  "17-error-parcial-grande": {
+   "scrollWidth": 1680,
+   "clientWidth": 1680,
+   "offenders": []
+  },
+  "18-error-total-grande": {
+   "scrollWidth": 1680,
+   "clientWidth": 1680,
+   "offenders": []
+  }
+ },
+ "axe": {
+  "01-inicial-min": [],
+  "02-seleccion-cancelada-min": [],
+  "03-ruta-inexistente-min": [],
+  "04-carpeta-vacia-min": [],
+  "05-sin-imagenes-min": [],
+  "06-analizando-min": [],
+  "07-analisis-cancelado-min": [],
+  "08-miles-min": [],
+  "09-vista-previa-min": [],
+  "10-filtro-conflictos-min": [],
+  "11-formato-cambiado-min": [],
+  "12-confirmar-min": [],
+  "13-exito-min": [],
+  "14-deshecho-min": [],
+  "16-exito-miles-min": [],
+  "17-error-parcial-min": [],
+  "18-error-total-min": [],
+  "01-inicial-medio": [],
+  "02-seleccion-cancelada-medio": [],
+  "03-ruta-inexistente-medio": [],
+  "04-carpeta-vacia-medio": [],
+  "05-sin-imagenes-medio": [],
+  "06-analizando-medio": [],
+  "07-analisis-cancelado-medio": [],
+  "08-miles-medio": [],
+  "09-vista-previa-medio": [],
+  "10-filtro-conflictos-medio": [],
+  "11-formato-cambiado-medio": [],
+  "12-confirmar-medio": [],
+  "13-exito-medio": [],
+  "14-deshecho-medio": [],
+  "16-exito-miles-medio": [],
+  "17-error-parcial-medio": [],
+  "18-error-total-medio": []
+ },
+ "fps": {
+  "min": {
+   "fps": 60,
+   "worstFrameMs": 17,
+   "longTasks": 0,
+   "renderedRows": 20,
+   "scrolledTo": 17080
+  },
+  "medio": {
+   "fps": 60,
+   "worstFrameMs": 17,
+   "longTasks": 0,
+   "renderedRows": 20,
+   "scrolledTo": 17080
+  },
+  "grande": {
+   "fps": 60,
+   "worstFrameMs": 17,
+   "longTasks": 0,
+   "renderedRows": 25,
+   "scrolledTo": 16940
+  }
+ },
+ "states": [
+  "01-inicial-min",
+  "02-seleccion-cancelada-min",
+  "03-ruta-inexistente-min",
+  "04-carpeta-vacia-min",
+  "05-sin-imagenes-min",
+  "06-analizando-min",
+  "07-analisis-cancelado-min",
+  "08-miles-min",
+  "09-vista-previa-min",
+  "10-filtro-conflictos-min",
+  "11-formato-cambiado-min",
+  "12-confirmar-min",
+  "13-exito-min",
+  "14-deshecho-min",
+  "15-aplicando-min",
+  "16-exito-miles-min",
+  "17-error-parcial-min",
+  "18-error-total-min",
+  "01-inicial-medio",
+  "02-seleccion-cancelada-medio",
+  "03-ruta-inexistente-medio",
+  "04-carpeta-vacia-medio",
+  "05-sin-imagenes-medio",
+  "06-analizando-medio",
+  "07-analisis-cancelado-medio",
+  "08-miles-medio",
+  "09-vista-previa-medio",
+  "10-filtro-conflictos-medio",
+  "11-formato-cambiado-medio",
+  "12-confirmar-medio",
+  "13-exito-medio",
+  "14-deshecho-medio",
+  "15-aplicando-medio",
+  "16-exito-miles-medio",
+  "17-error-parcial-medio",
+  "18-error-total-medio",
+  "01-inicial-medio-sin-movimiento",
+  "02-seleccion-cancelada-medio-sin-movimiento",
+  "03-ruta-inexistente-medio-sin-movimiento",
+  "04-carpeta-vacia-medio-sin-movimiento",
+  "05-sin-imagenes-medio-sin-movimiento",
+  "06-analizando-medio-sin-movimiento",
+  "07-analisis-cancelado-medio-sin-movimiento",
+  "08-miles-medio-sin-movimiento",
+  "09-vista-previa-medio-sin-movimiento",
+  "10-filtro-conflictos-medio-sin-movimiento",
+  "11-formato-cambiado-medio-sin-movimiento",
+  "12-confirmar-medio-sin-movimiento",
+  "13-exito-medio-sin-movimiento",
+  "14-deshecho-medio-sin-movimiento",
+  "15-aplicando-medio-sin-movimiento",
+  "16-exito-miles-medio-sin-movimiento",
+  "17-error-parcial-medio-sin-movimiento",
+  "18-error-total-medio-sin-movimiento",
+  "01-inicial-grande",
+  "02-seleccion-cancelada-grande",
+  "03-ruta-inexistente-grande",
+  "04-carpeta-vacia-grande",
+  "05-sin-imagenes-grande",
+  "06-analizando-grande",
+  "07-analisis-cancelado-grande",
+  "08-miles-grande",
+  "09-vista-previa-grande",
+  "10-filtro-conflictos-grande",
+  "11-formato-cambiado-grande",
+  "12-confirmar-grande",
+  "13-exito-grande",
+  "14-deshecho-grande",
+  "15-aplicando-grande",
+  "16-exito-miles-grande",
+  "17-error-parcial-grande",
+  "18-error-total-grande"
+ ]
+}

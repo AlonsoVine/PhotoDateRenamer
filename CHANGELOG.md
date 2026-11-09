@@ -4,6 +4,53 @@ Notable changes to PhotoDateRenamer are documented here.
 
 ## Unreleased
 
+### Added
+- «Revelado», a redesigned darkroom-themed interface for the local application, with:
+  - a single first step;
+  - an automatic preview that refreshes when the format changes;
+  - a virtualised contact sheet with filters, search, and a detail loupe;
+  - a styled confirmation dialog;
+  - dedicated views for empty folders, folders without photos, cancelled scans, applying, success, partial failure, total failure, and undo.
+- Self-hosted OFL fonts (Fraunces, Instrument Sans, JetBrains Mono, DSEG7).
+- Apply progress, and a per-file report of renamed and failed files.
+- Keyboard shortcuts: `Alt+O` chooses a folder and `Alt+B` searches the preview.
+- Local thumbnails of each photo in the contact sheet and in the detail loupe. They are generated in memory and served only to the local window.
+- A «ya fechada» tag, filter, and confirmation warning for photos whose name already starts with a date.
+- A persistent «Deshacer incompleto» view that lists files that could not be restored and offers to retry.
+- A «Último lote» bar that keeps the last batch undoable from any view, even after choosing another folder or after an interrupted apply.
+- A «MOD»/«CREA» sticker, a «Fecha del archivo» filter and a confirmation warning when a photo has no capture date and the file date is used.
+- Optional fixed port through `PHOTODATERENAMER_PORT`, still bound to `127.0.0.1`.
+- Regression tests that pin the proposed names of 0.5.0, plus data-safety tests on generated folders. They cover:
+  - empty folders;
+  - accents, symbols, and uppercase extensions;
+  - collisions;
+  - read-only and locked files;
+  - long names;
+  - hidden files;
+  - thousands of files.
+
+### Changed
+- A confirmed batch is applied file by file. A locked or changed file is reported with its reason while the rest continue, and undo restores the renamed files. Previously the whole batch was rolled back.
+- Cancelling a scan, and checking a missing folder, return explicit results instead of HTTP errors.
+- Undo restores file by file and never overwrites; a locked file no longer blocks the rest.
+- If the apply request itself fails, the interface says the result is unknown and asks to re-scan, instead of claiming nothing changed.
+- On narrow windows the contact sheet comes first and the format panel collapses into a summary.
+- Changing the format updates the preview in place, keeps the filter, search and selection, and reuses dates already read instead of reading every photo again.
+- The loupe follows the selected row, not the pointer. On narrow windows, statuses use short text labels instead of colour alone.
+- The «Fecha + título» recipe is now called «Fecha, sin extensión»; it produces the same names.
+- Applying a batch that renames nothing keeps the previous batch undoable. The confirmation warns when the previous batch will stop being undoable.
+- Below 1280 px the new name wraps onto two lines instead of being cut in the middle.
+- Result views show the summary before the filters. Counters are green for what succeeded and red only when nothing changed.
+- The confirmation warns when the chosen format leaves photos without an extension.
+- An unexpected server error now answers HTTP 500 with a message instead of dropping the connection, and the «result unknown» view no longer promises undo after the application has closed.
+- Conflicts name the frame they clash with. Wide screens show where each date comes from (EXIF, XMP or Archivo).
+
+### Fixed
+- Destination names longer than 255 characters are flagged as conflicts in the preview instead of failing during the rename.
+- Unreadable images and OS errors show a readable message instead of a raw exception with escaped paths.
+- On Windows the local server no longer binds to a port another process is already using.
+- The interface no longer overflows horizontally on narrow windows.
+
 ## [0.5.0] - 2026-10-29
 
 ### Security

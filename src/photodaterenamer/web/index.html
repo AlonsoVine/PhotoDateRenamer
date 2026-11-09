@@ -3,134 +3,272 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f4efe6">
-  <title>PhotoDateRenamer — orden sereno para tus recuerdos</title>
+  <meta name="theme-color" content="#0e0b09">
+  <meta name="color-scheme" content="dark">
+  <title>PhotoDateRenamer — pon fecha a tus fotos</title>
   <link rel="icon" type="image/png" href="/images/app-icon.png">
+  <link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
   <script nonce="__APP_TOKEN__">window.PDR_TOKEN = "__APP_TOKEN__";</script>
+  <script src="/helpers.js" defer></script>
   <script src="/app.js" defer></script>
 </head>
-<body>
-  <div class="page-shell">
-    <header class="topbar">
-      <a class="wordmark" href="/" aria-label="PhotoDateRenamer, inicio">
-        <img class="wordmark-mark" src="/images/app-icon.png" alt="" aria-hidden="true">
-        <span>photo <b>date</b> renamer</span>
-      </a>
-      <span class="local-badge"><span aria-hidden="true"></span> Solo en este equipo</span>
-    </header>
+<body data-mode="idle" data-view="idle">
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="safelight" aria-hidden="true"></div>
 
-    <main>
-      <section class="intro">
-        <p class="eyebrow">Un pequeño ritual de orden</p>
-        <h1>Tus recuerdos,<br><em>en su lugar.</em></h1>
-        <p class="intro-copy">Dales un nombre que cuente cuándo ocurrieron. Tus fotografías permanecen en tu equipo y siempre podrás revisar el resultado antes de cambiar nada.</p>
-        <div class="intro-art">
-          <img src="/images/hero-illustration.png" alt="Ilustración de un paisaje cálido de colinas al atardecer">
-        </div>
-      </section>
+  <header class="topbar">
+    <a class="wordmark" href="/">
+      <span class="wordmark-stamp" aria-hidden="true">'26</span>
+      <span class="wordmark-name">Photo<i>Date</i>Renamer<span class="sr-only">, inicio</span></span>
+    </a>
+    <p class="local-badge"><span class="dot" aria-hidden="true"></span> <span class="badge-long">Todo ocurre en este equipo</span><span class="badge-short" aria-hidden="true">Solo en tu equipo</span></p>
+  </header>
 
-      <section class="workbench" aria-label="Renombrar fotografías">
-        <div class="step-heading">
-          <span class="step-number">01</span>
-          <div><p class="eyebrow">Empezamos por el origen</p><h2>Elige tu carpeta</h2></div>
-        </div>
-        <div class="folder-row">
-          <label class="sr-only" for="folder-path">Ruta de la carpeta de fotografías</label>
-          <input id="folder-path" type="text" placeholder="Selecciona o escribe la ruta de una carpeta" autocomplete="off">
-          <button id="browse-button" class="button button-outline" type="button">Explorar</button>
-        </div>
-        <label class="recursive-option"><input id="recursive" type="checkbox"> Incluir también las fotografías de las subcarpetas</label>
-
-        <div class="step-heading format-heading">
-          <span class="step-number">02</span>
-          <div><p class="eyebrow">Una forma de nombrar</p><h2>Compón tu formato</h2></div>
-        </div>
-        <p class="section-copy">Elige una receta o crea la tuya combinando piezas. La vista previa te enseñará exactamente cómo quedará cada archivo.</p>
-        <div class="preset-row" role="group" aria-label="Formatos predeterminados">
-          <button class="preset active" data-preset="date_original" type="button">Fecha + nombre</button>
-          <button class="preset" data-preset="date_stem" type="button">Fecha + título</button>
-          <button class="preset" data-preset="original_date" type="button">Nombre + fecha</button>
-          <button class="preset" data-preset="custom" type="button">Personalizado</button>
-        </div>
-        <div class="builder">
-          <div class="builder-label">ELEMENTOS DEL NOMBRE</div>
-          <div id="tokens" class="tokens" aria-live="polite"></div>
-          <div class="builder-controls">
-            <label for="add-element">Añadir una pieza</label>
-            <select id="add-element">
-              <option value="" selected disabled>Elige una pieza</option>
-              <option value="date">Fecha de captura</option>
-              <option value="original_name">Nombre original con extensión</option>
-              <option value="original_stem">Nombre original sin extensión</option>
-              <option value="extension">Extensión</option>
-              <option value="text">Texto fijo…</option>
-            </select>
-            <label for="date-format">Formato de fecha</label>
-            <select id="date-format">
-              <option value="yyyy_mm_dd">2025_04_12</option>
-              <option value="yyyy-mm-dd">2025-04-12</option>
-              <option value="yyyymmdd">20250412</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="preview-heading">
-          <div class="step-heading compact-heading">
-            <span class="step-number">03</span>
-            <div><p class="eyebrow">Antes de hacer cambios</p><h2>Revisa la vista previa</h2></div>
-          </div>
-          <button id="preview-button" class="button button-dark" type="button">Preparar vista previa <span aria-hidden="true">↗</span></button>
-        </div>
-        <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
-        <div id="operation-progress" class="operation-progress" role="status" aria-live="polite" hidden>
-          <progress id="operation-progress-bar" max="100"></progress>
-          <span id="operation-progress-label"></span>
-          <button id="cancel-operation" class="button button-outline" type="button" disabled>Cancelar</button>
-        </div>
-        <div id="undo-control" class="undo-control" hidden>
-          <span>El último lote se puede restaurar mientras la aplicación siga abierta.</span>
-          <button id="undo-button" class="button button-outline" type="button">Deshacer</button>
-        </div>
-        <div id="preview-wrap" class="preview-wrap" hidden>
-          <div id="preview-summary" class="preview-summary"></div>
-          <div class="table-scroll">
-            <table>
-              <thead><tr><th>Ubicación y nombre actual</th><th>Fecha usada</th><th aria-label="Estado"></th><th>Nombre propuesto</th></tr></thead>
-              <tbody id="preview-rows"></tbody>
-            </table>
-          </div>
-          <nav id="preview-pagination" class="preview-pagination" aria-label="Páginas de la vista previa" hidden>
-            <span id="preview-page-label"></span>
-            <button id="previous-page" class="button button-outline" type="button">Anterior</button>
-            <button id="next-page" class="button button-outline" type="button">Siguiente</button>
-          </nav>
-          <div class="confirm-row">
-            <p>Los cambios se aplicarán a los archivos de la carpeta seleccionada y, si lo activas, sus subcarpetas.</p>
-            <button id="confirm-button" class="button button-accent" type="button">Confirmar renombrado</button>
-          </div>
-        </div>
-        <div class="privacy-note"><span aria-hidden="true">✳</span> Tus fotos se quedan en tu equipo; solo leemos sus metadatos.</div>
-      </section>
-    </main>
-    <footer>
-      <span>Hecho para mirar las cosas con calma.</span>
-      <a class="footer-author" href="https://alonsovine.github.io/portfolioR/" target="_blank" rel="noopener noreferrer">Creado por Alonso Viñé</a>
-      <nav class="footer-links" aria-label="Enlaces de Alonso Viñé">
-        <a href="https://alonsovine.github.io/portfolioR/" target="_blank" rel="noopener noreferrer">Portfolio</a>
-        <a href="https://github.com/AlonsoVine" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://www.linkedin.com/in/alonso-vi%C3%B1%C3%A9-barrancos/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-      </nav>
-      <span>PhotoDateRenamer <b>·</b> 0.5</span>
-    </footer>
+  <div id="last-run" class="last-run" role="region" aria-labelledby="last-run-text" hidden>
+    <p class="last-run-text"><span class="last-run-icon" aria-hidden="true">↺</span> <span id="last-run-text"></span></p>
+    <button id="last-run-undo" class="btn btn-ghost btn-sm" type="button">Deshacer</button>
   </div>
-  <dialog id="text-dialog" class="text-dialog">
+
+  <main id="main" tabindex="-1">
+    <!-- ============ IDLE: hero + first step ============ -->
+    <section id="hero" class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="kicker"><span class="kicker-num">01</span> Cuarto oscuro para tus archivos</p>
+        <h1 id="hero-title" class="hero-title">Pon fecha<br><em>a tus fotos.</em></h1>
+        <p class="hero-lede">Renombra las imágenes de una carpeta con el día en que se tomaron. Si la cámara no guardó la fecha, se usa la del archivo y te lo marcamos. Verás cada nombre nuevo antes de aplicar nada y podrás deshacerlo.</p>
+
+        <form id="hero-form" class="hero-form" novalidate>
+          <button id="hero-browse" class="btn btn-stamp btn-xl" type="button" aria-keyshortcuts="Alt+O">
+            <span>Elegir carpeta</span>
+            <span class="kbd-combo" aria-hidden="true"><kbd>Alt</kbd><kbd>O</kbd></span>
+          </button>
+          <div class="path-field">
+            <label for="hero-path">o pega la ruta de una carpeta</label>
+            <div class="path-row">
+              <input id="hero-path" type="text" spellcheck="false" autocomplete="off" placeholder="C:\Users\tú\Imágenes\Viaje">
+              <button class="btn btn-ghost" type="submit">Revisar</button>
+            </div>
+          </div>
+          <label class="check">
+            <input id="hero-recursive" type="checkbox" data-recursive>
+            <span class="check-box" aria-hidden="true"></span>
+            Incluir también las subcarpetas
+          </label>
+          <p id="hero-message" class="hero-message" role="status" aria-live="polite" hidden></p>
+        </form>
+
+        <ol class="steps" aria-label="Cómo funciona">
+          <li><span class="steps-num">01</span><b>Elige</b> una carpeta</li>
+          <li><span class="steps-num">02</span><b>Revisa</b> cada nombre nuevo</li>
+          <li><span class="steps-num">03</span><b>Confirma</b> — y deshaz si quieres</li>
+        </ol>
+      </div>
+
+      <figure class="tray" aria-hidden="true">
+        <div class="print">
+          <img src="/images/hero-print.webp" alt="" width="880" height="587" fetchpriority="high">
+          <span id="hero-stamp" class="print-stamp">'24 08 14</span>
+        </div>
+        <figcaption class="tray-caption"><span class="tray-old">IMG_0412.jpg</span><span class="tray-new"><mark class="stamp">2024_08_14</mark>_IMG_0412.jpg</span></figcaption>
+      </figure>
+    </section>
+
+    <!-- ============ WORKBENCH ============ -->
+    <div id="workbench" class="workbench" hidden>
+      <aside class="controls" aria-label="Ajustes del renombrado">
+        <section class="sleeve folder-panel" aria-labelledby="folder-title">
+          <p class="panel-label"><span class="kicker-num">01</span> Carpeta</p>
+          <h2 id="folder-title" class="folder-name">—</h2>
+          <p id="folder-path-display" class="folder-path mono"></p>
+          <div class="folder-actions">
+            <button id="change-folder" class="btn btn-ghost btn-sm" type="button" aria-keyshortcuts="Alt+O">Cambiar carpeta</button>
+            <label class="check check-sm">
+              <input id="bench-recursive" type="checkbox" data-recursive>
+              <span class="check-box" aria-hidden="true"></span>
+              Subcarpetas
+            </label>
+          </div>
+        </section>
+
+        <details id="format-details" class="sleeve format-panel" open>
+          <summary class="format-summary">
+            <span class="panel-label"><span class="kicker-num">02</span> Formato del nombre</span>
+            <span id="format-summary-value" class="format-summary-value"></span>
+          </summary>
+          <div class="format-body">
+            <p id="format-lock" class="format-lock" hidden>Pulsa <b>Volver a analizar</b> para cambiar el formato.</p>
+            <div class="example" aria-live="polite">
+              <span class="sr-only">Ejemplo:</span>
+              <span id="example-old" class="mono example-old"></span>
+              <span id="example-new" class="mono example-new"></span>
+            </div>
+            <fieldset class="presets">
+              <legend class="field-label">Receta</legend>
+              <div class="seg-group">
+                <button class="preset" data-preset="date_original" type="button" aria-pressed="true">Fecha + nombre</button>
+                <button class="preset" data-preset="date_stem" type="button" aria-pressed="false">Fecha, sin extensión</button>
+                <button class="preset" data-preset="original_date" type="button" aria-pressed="false">Nombre + fecha</button>
+                <button class="preset" data-preset="custom" type="button" aria-pressed="false">A medida</button>
+              </div>
+            </fieldset>
+            <div class="field-label" id="tokens-label">Piezas, en orden</div>
+            <ol id="tokens" class="tokens" aria-labelledby="tokens-label"></ol>
+            <div class="add-pieces" role="group" aria-label="Añadir pieza al final">
+              <button type="button" class="add-piece" data-piece="date">+ Fecha</button>
+              <button type="button" class="add-piece" data-piece="original_name">+ Nombre</button>
+              <button type="button" class="add-piece" data-piece="original_stem">+ Sin extensión</button>
+              <button type="button" class="add-piece" data-piece="extension">+ Extensión</button>
+              <button type="button" class="add-piece" data-piece="text">+ Texto…</button>
+            </div>
+            <fieldset class="date-formats">
+              <legend class="field-label">Formato de fecha</legend>
+              <div class="seg-group seg-dates">
+                <label class="seg-option"><input type="radio" name="date-format" value="yyyy_mm_dd" checked><span>2024_08_14</span></label>
+                <label class="seg-option"><input type="radio" name="date-format" value="yyyy-mm-dd"><span>2024-08-14</span></label>
+                <label class="seg-option"><input type="radio" name="date-format" value="yyyymmdd"><span>20240814</span></label>
+              </div>
+            </fieldset>
+          </div>
+        </details>
+      </aside>
+
+      <section id="sheet" class="sheet" aria-labelledby="sheet-title">
+        <header class="sheet-head">
+          <div class="sheet-heading">
+            <p id="sheet-kicker" class="kicker">Hoja de contactos</p>
+            <h1 id="sheet-title" class="sheet-title" tabindex="-1">Vista previa</h1>
+          </div>
+          <div id="sheet-tools" class="sheet-tools" hidden>
+            <label class="search">
+              <span class="sr-only">Buscar por nombre</span>
+              <input id="search" type="search" placeholder="Buscar nombre" autocomplete="off" spellcheck="false" aria-keyshortcuts="Alt+B">
+              <span class="kbd-combo" aria-hidden="true"><kbd>Alt</kbd><kbd>B</kbd></span>
+            </label>
+          </div>
+        </header>
+
+        <div id="filters" class="filters" role="group" aria-label="Filtrar por estado" hidden></div>
+
+        <!-- scanning / applying -->
+        <div id="progress-view" class="state progress-view" hidden>
+          <div class="scene scene-progress" aria-hidden="true">
+            <div class="film-progress"><div id="progress-bar" class="film-progress-bar"></div></div>
+          </div>
+          <p class="counter" aria-hidden="true"><span id="progress-count" class="seg" data-ghost="8">0</span><span class="counter-of">de</span><span id="progress-total" class="seg seg-dim" data-ghost="8">0</span></p>
+          <p id="progress-label" class="state-text" role="status" aria-live="polite">Preparando el análisis…</p>
+          <button id="cancel-scan" class="btn btn-ghost" type="button">Cancelar análisis</button>
+          <p id="apply-warning" class="state-note" hidden>No cierres la aplicación hasta que termine.</p>
+        </div>
+
+        <!-- empty / no photos / cancelled / generic error / restored -->
+        <div id="message-view" class="state message-view" hidden>
+          <div id="message-art" class="scene" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          <p id="message-text" class="state-text"></p>
+          <div class="state-actions">
+            <button id="message-primary" class="btn btn-stamp" type="button"></button>
+            <button id="message-secondary" class="btn btn-ghost" type="button" hidden></button>
+          </div>
+        </div>
+
+        <!-- results summary (success / partial / total / undo-partial) -->
+        <div id="result-view" class="result-view" hidden>
+          <div class="result-head">
+            <p class="counter counter-lg" aria-hidden="true"><span id="result-count" class="seg" data-ghost="8">0</span><span id="result-of" class="result-of"><span class="counter-of">de</span><span id="result-total" class="seg seg-dim" data-ghost="8">0</span></span></p>
+            <p id="result-text" class="state-text"></p>
+          </div>
+          <div class="state-actions">
+            <button id="result-primary" class="btn btn-stamp" type="button"></button>
+            <button id="undo-button" class="btn btn-ghost" type="button" hidden>Deshacer este lote</button>
+            <button id="result-back" class="btn btn-ghost" type="button">Volver a analizar</button>
+          </div>
+        </div>
+
+        <!-- contact sheet (virtualised) -->
+        <div id="list-view" class="list-view" hidden>
+          <div class="strip">
+            <div id="list-scroller" class="list-scroller" role="listbox" tabindex="0" aria-label="Archivos" aria-describedby="list-help"></div>
+            <p id="list-help" class="sr-only">Usa las flechas para recorrer los archivos e Intro para ver el detalle.</p>
+            <p id="list-empty" class="list-empty" hidden>Ningún archivo coincide con el filtro.</p>
+          </div>
+          <div class="bench-foot">
+            <div id="loupe" class="loupe">
+              <div class="loupe-frame" aria-hidden="true">
+                <img id="loupe-image" class="loupe-image" alt="" hidden>
+                <span id="loupe-stamp" class="loupe-stamp"></span>
+              </div>
+              <div id="loupe-body" class="loupe-body"></div>
+            </div>
+            <section id="apply-box" class="apply-box" aria-labelledby="apply-title" hidden>
+              <h2 id="apply-title" class="panel-label"><span class="kicker-num">03</span> Aplicar</h2>
+              <p id="apply-hint" class="apply-hint">Prepara la vista previa para ver qué cambiará.</p>
+              <button id="apply-button" class="btn btn-stamp btn-block" type="button" disabled>Renombrar</button>
+            </section>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p class="shortcuts"><span class="sr-only">Atajos de teclado:</span><span><span class="kbd-combo"><kbd>Alt</kbd><kbd>O</kbd></span> elegir carpeta</span><span><span class="kbd-combo"><kbd>Alt</kbd><kbd>B</kbd></span> buscar</span><span><span class="kbd-combo"><kbd>↑</kbd><kbd>↓</kbd></span> recorrer la hoja</span><span><span class="kbd-combo"><kbd>Intro</kbd></span> detalle</span></p>
+    <p class="credits"><a href="https://alonsovine.github.io/portfolioR/" target="_blank" rel="noopener noreferrer">Creado por Alonso Viñé</a>
+      <span class="footer-links"><a href="https://github.com/AlonsoVine" target="_blank" rel="noopener noreferrer">GitHub</a> <a href="https://www.linkedin.com/in/alonso-vi%C3%B1%C3%A9-barrancos/" target="_blank" rel="noopener noreferrer">LinkedIn</a></span>
+</p>
+  </footer>
+
+  <div id="announcer" class="sr-only" role="status" aria-live="polite"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <dialog id="text-dialog" class="dialog" aria-labelledby="text-dialog-title">
     <form method="dialog">
-      <p class="eyebrow">Pieza personalizada</p>
-      <h2>Añade un texto</h2>
-      <label for="literal-text">Texto que formará parte del nombre</label>
-      <input id="literal-text" maxlength="64" placeholder="por ejemplo, vacaciones">
-      <div class="dialog-actions"><button class="button button-outline" value="cancel">Cancelar</button><button id="add-text-button" class="button button-dark" value="add">Añadir</button></div>
+      <p class="kicker">Pieza a medida</p>
+      <h2 id="text-dialog-title" class="dialog-title">Añade un texto</h2>
+      <label class="field-label field-block" for="literal-text">Texto que formará parte del nombre</label>
+      <input id="literal-text" maxlength="64" placeholder="por ejemplo, vacaciones" autocomplete="off" aria-describedby="literal-error">
+      <p id="literal-error" class="field-error" hidden></p>
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" value="cancel" type="submit" formnovalidate>Cancelar</button>
+        <button id="add-text-button" class="btn btn-stamp" value="add" type="submit">Añadir</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="detail-dialog" class="dialog" aria-labelledby="detail-title">
+    <form method="dialog">
+      <p class="kicker">Lupa</p>
+      <h2 id="detail-title" class="dialog-title">Detalle del archivo</h2>
+      <div class="loupe-frame loupe-frame-lg" aria-hidden="true">
+        <img id="detail-image" class="loupe-image" alt="" hidden>
+        <span id="detail-stamp" class="loupe-stamp"></span>
+      </div>
+      <div id="detail-body" class="loupe-body detail-body"></div>
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" value="close" type="submit" autofocus>Cerrar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirm-dialog" class="dialog dialog-confirm" aria-labelledby="confirm-title" aria-describedby="confirm-text">
+    <form method="dialog">
+      <div class="confirm-strip" aria-hidden="true"></div>
+      <p class="kicker">Último paso · fijar</p>
+      <h2 id="confirm-title" class="dialog-title">¿Renombrar?</h2>
+      <p class="counter counter-confirm" aria-hidden="true"><span id="confirm-count" class="seg" data-ghost="8">0</span></p>
+      <p id="confirm-text" class="dialog-text"></p>
+      <p id="confirm-example" class="confirm-example mono"></p>
+      <p id="confirm-dated" class="confirm-dated" hidden></p>
+      <ul class="promise">
+        <li>Ningún archivo se sobrescribe ni se borra.</li>
+        <li>Si alguno falla, el resto continúa y verás el motivo.</li>
+        <li>Puedes deshacer el lote mientras la aplicación siga abierta, aunque cambies de carpeta.</li>
+      </ul>
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" value="cancel" type="submit" autofocus>Cancelar</button>
+        <button id="confirm-apply" class="btn btn-stamp" value="apply" type="submit">Renombrar</button>
+      </div>
     </form>
   </dialog>
 </body>

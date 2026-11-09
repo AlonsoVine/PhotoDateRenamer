@@ -14,13 +14,14 @@ from typing import Any
 from urllib.parse import urlparse
 
 from .folder_picker import select_windows_folder
+from .thumbnails import make_thumbnail
 from .renamer import (
     RenameExecutionError,
     RenamePlan,
     RenamePlanError,
+    apply_plan,
     create_preview,
-    execute_plan,
-    undo_renames,
+    undo_each,
 )
 
 
@@ -28,20 +29,33 @@ WEB_ROOT = Path(__file__).with_name("web")
 MAX_REQUEST_SIZE = 64 * 1024
 STATIC_IMAGES = {
     "/images/app-icon.png": "image/png",
-    "/images/hero-illustration.png": "image/png",
+    "/images/grain.png": "image/png",
+    "/images/hero-print.webp": "image/webp",
+    "/fonts/fraunces.woff2": "font/woff2",
+    "/fonts/fraunces-italic.woff2": "font/woff2",
+    "/fonts/instrument-sans.woff2": "font/woff2",
+    "/fonts/jetbrains-mono.woff2": "font/woff2",
+    "/fonts/dseg7.woff2": "font/woff2",
 }
 
 
 class AppServer(ThreadingHTTPServer):
-    def __init__(self) -> None:
+    # On Windows SO_REUSEADDR lets a second process bind an occupied port; refuse instead.
+    allow_reuse_address = sys.platform != "win32"
+
+    def __init__(self, port: int = 0) -> None:
         self.state_lock = Lock()
         self.state: dict[str, Any] = {
             "token": secrets.token_urlsafe(32),
             "plans": {},
             "runs": {},
             "scan": None,
+            "apply": None,
+            "gallery": {"root": None, "paths": set()},
+            # Dates already read, per folder, so a format change does not re-read metadata.
+            "date_cache": {"root": None, "dates": {}},
         }
-        super().__init__(("127.0.0.1", 0), AppRequestHandler)
+        super().__init__(("127.0.0.1", port), AppRequestHandler)
 
 
 class AppRequestHandler(BaseHTTPRequestHandler):
@@ -88,7 +102,7 @@ class AppRequestHandler(BaseHTTPRequestHandler):
                 "Content-Security-Policy",
                 "default-src 'none'; "
                 f"script-src 'self' 'nonce-{csp_nonce}'; "
-                "style-src 'self'; img-src 'self'; connect-src 'self'; "
+                "style-src 'self'; img-src 'self' blob:; font-src 'self'; connect-src 'self'; "
                 "form-action 'self'; base-uri 'none'; frame-ancestors 'none'; object-src 'none'",
             )
         self.end_headers()
@@ -134,7 +148,7 @@ class AppRequestHandler(BaseHTTPRequestHandler):
                 csp_nonce=self.server.state["token"],
             )
             return
-        if path in {"/app.js", "/styles.css"}:
+        if path in {"/app.js", "/helpers.js", "/styles.css"}:
             content_type = "text/javascript; charset=utf-8" if path.endswith(".js") else "text/css; charset=utf-8"
             self._send_text(200, (WEB_ROOT / path.lstrip("/")).read_text(encoding="utf-8"), content_type)
             return
@@ -161,16 +175,24 @@ class AppRequestHandler(BaseHTTPRequestHandler):
             path = urlparse(self.path).path
             if path == "/api/select-folder":
                 self._send_json(200, self._select_folder())
+            elif path == "/api/thumbnail":
+                self._thumbnail(payload)
+            elif path == "/api/check-folder":
+                self._check_folder(payload)
             elif path == "/api/preview":
                 self._preview(payload)
             elif path == "/api/progress":
                 self._progress(payload)
             elif path == "/api/cancel":
                 self._cancel(payload)
+            elif path == "/api/apply-progress":
+                self._apply_progress(payload)
             elif path == "/api/confirm":
                 self._confirm(payload)
             elif path == "/api/undo":
                 self._undo(payload)
+            elif path == "/api/last-run":
+                self._last_run()
             else:
                 self.send_error(404)
         except RenamePlanError as error:
@@ -179,6 +201,8 @@ class AppRequestHandler(BaseHTTPRequestHandler):
             self._send_json(400, {"error": str(error)})
         except RenameExecutionError as error:
             self._send_json(500, {"error": str(error)})
+        except Exception as error:  # noqa: BLE001 - an explicit answer beats a dropped connection
+            self._send_json(500, {"error": f"Error interno de la aplicación: {error}"})
 
     def _select_folder(self) -> dict[str, str]:
         if platform.system() == "Windows":
@@ -201,6 +225,48 @@ class AppRequestHandler(BaseHTTPRequestHandler):
             detail = result.stderr.strip() or "el selector terminó con un error."
             raise ValueError(f"No se pudo abrir el selector de carpetas: {detail}")
         return {"folder": result.stdout.strip()}
+
+    def _thumbnail(self, payload: dict[str, Any]) -> None:
+        relative = payload.get("path")
+        size = payload.get("size", 96)
+        if not isinstance(relative, str) or not isinstance(size, int):
+            raise ValueError("La petición de miniatura no es válida.")
+        with self.server.state_lock:
+            gallery = self.server.state["gallery"]
+            root = gallery["root"]
+            allowed = root is not None and relative in gallery["paths"]
+        if not allowed:
+            raise ValueError("Esa imagen no forma parte de la carpeta analizada.")
+        data = make_thumbnail(root / Path(relative), size)
+        if data is None:
+            self.send_response(204)
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            return
+        self.send_response(200)
+        self.send_header("Content-Type", "image/jpeg")
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(data)
+
+    def _check_folder(self, payload: dict[str, Any]) -> None:
+        folder = payload.get("folder")
+        if not isinstance(folder, str) or not folder.strip():
+            self._send_json(200, {"ok": False, "error": "Escribe la ruta de una carpeta."})
+            return
+        try:
+            resolved = Path(folder.strip()).expanduser().resolve()
+            exists = resolved.is_dir()
+        except (OSError, RuntimeError, ValueError):
+            exists = False
+        if not exists:
+            self._send_json(
+                200,
+                {"ok": False, "error": "La carpeta seleccionada no existe o no es una carpeta."},
+            )
+            return
+        self._send_json(200, {"ok": True, "folder": str(resolved)})
 
     def _preview(self, payload: dict[str, Any]) -> None:
         folder = payload.get("folder")
@@ -245,6 +311,12 @@ class AppRequestHandler(BaseHTTPRequestHandler):
                 if active_scan is not None and active_scan["scan_id"] == scan_id:
                     active_scan.update(phase=phase, scanned=scanned, total=total)
 
+        resolved_folder = Path(folder.strip()).expanduser().resolve()
+        with self.server.state_lock:
+            cache = self.server.state["date_cache"]
+            if cache["root"] != resolved_folder or len(cache["dates"]) > 200_000:
+                cache = {"root": resolved_folder, "dates": {}}
+                self.server.state["date_cache"] = cache
         try:
             plan = create_preview(
                 folder,
@@ -253,7 +325,13 @@ class AppRequestHandler(BaseHTTPRequestHandler):
                 recursive,
                 progress_callback=update_progress,
                 cancellation_event=cancellation_event,
+                date_cache=cache["dates"],
             )
+        except RenamePlanError:
+            if not cancellation_event.is_set():
+                raise
+            self._send_json(200, {"cancelled": True, "scan_id": scan_id})
+            return
         finally:
             with self.server.state_lock:
                 active_scan = self.server.state["scan"]
@@ -263,12 +341,19 @@ class AppRequestHandler(BaseHTTPRequestHandler):
 
         self.server.state["plans"].clear()
         self.server.state["plans"][plan.plan_id] = plan
+        with self.server.state_lock:
+            self.server.state["gallery"] = {
+                "root": plan.directory,
+                "paths": {item.original_name for item in plan.items},
+            }
         self._send_json(
             200,
             {
                 "plan_id": plan.plan_id,
                 "folder": str(plan.directory),
+                "folder_name": plan.directory.name or str(plan.directory),
                 "scan_id": scan_id,
+                "entry_count": plan.entry_count,
                 "rename_count": plan.rename_count,
                 "items": [
                     {
@@ -277,6 +362,7 @@ class AppRequestHandler(BaseHTTPRequestHandler):
                         "status": item.status,
                         "reason": item.reason,
                         "date_source": item.date_source,
+                        "date_text": item.date_text,
                     }
                     for item in plan.items
                 ],
@@ -315,7 +401,7 @@ class AppRequestHandler(BaseHTTPRequestHandler):
         if cancelled:
             self._send_json(200, {"cancelled": True})
         else:
-            self._send_json(409, {"error": "El análisis ya terminó o no existe."})
+            self._send_json(200, {"cancelled": False, "reason": "El análisis ya terminó o no existe."})
 
     def _confirm(self, payload: dict[str, Any]) -> None:
         plan_id = payload.get("plan_id")
@@ -324,26 +410,141 @@ class AppRequestHandler(BaseHTTPRequestHandler):
         plan = self.server.state["plans"].get(plan_id)
         if not isinstance(plan, RenamePlan):
             raise ValueError("La vista previa ha caducado. Genera una nueva antes de continuar.")
-        renamed = execute_plan(plan)
-        self.server.state["plans"].pop(plan_id, None)
-        self.server.state["runs"].clear()
-        self.server.state["runs"][plan_id] = renamed
+        with self.server.state_lock:
+            current_apply = self.server.state["apply"]
+            if current_apply is not None and not current_apply["completed"]:
+                raise ValueError("Ya se están aplicando cambios.")
+            if self.server.state["plans"].pop(plan_id, None) is None:
+                raise ValueError("La vista previa ya se aplicó o ha caducado.")
+            self.server.state["apply"] = {
+                "plan_id": plan_id,
+                "completed": False,
+                "done": 0,
+                "total": plan.rename_count,
+            }
+
+        def update_progress(_phase: str, done: int, total: int | None) -> None:
+            with self.server.state_lock:
+                self.server.state["apply"].update(done=done, total=total)
+
+        # The undo record is kept as files move, so even an interrupted batch can be undone.
+        # The previous batch stays undoable until this one actually renames a file.
+        run = {"root": plan.directory, "pairs": []}
+
+        def remember(source: Path, destination: Path) -> None:
+            with self.server.state_lock:
+                if not run["pairs"]:
+                    self.server.state["runs"].clear()
+                run["pairs"].append((source, destination))
+                self.server.state["runs"][plan_id] = run
+
+        try:
+            result = apply_plan(plan, progress_callback=update_progress, on_renamed=remember)
+        finally:
+            with self.server.state_lock:
+                self.server.state["apply"]["completed"] = True
+        renamed = list(result.renamed)
+        with self.server.state_lock:
+            gallery = self.server.state["gallery"]
+            if gallery["root"] == plan.directory:
+                gallery["paths"].update(
+                    new.relative_to(plan.directory).as_posix() for _, new in renamed
+                )
         self._send_json(
             200,
             {
-                "run_id": plan_id,
+                "run_id": plan_id if renamed else None,
                 "renamed_count": len(renamed),
-                "renamed": [{"old_name": old.name, "new_name": new.name} for old, new in renamed],
+                "failed_count": len(result.failures),
+                "renamed": [
+                    {
+                        "old_name": old.relative_to(plan.directory).as_posix(),
+                        "new_name": new.relative_to(plan.directory).as_posix(),
+                    }
+                    for old, new in renamed
+                ],
+                "failures": [
+                    {
+                        "original_name": failure.original_name,
+                        "new_name": failure.new_name,
+                        "reason": failure.reason,
+                    }
+                    for failure in result.failures
+                ],
             },
         )
+
+    def _last_run(self) -> None:
+        """The batch that can still be undone, so the interface never loses it."""
+        with self.server.state_lock:
+            run_id, run = next(iter(self.server.state["runs"].items()), (None, None))
+            count = len(run["pairs"]) if run is not None else 0
+            root = run["root"] if run is not None else None
+        if not count or root is None:
+            self._send_json(200, {"run_id": None})
+            return
+        self._send_json(
+            200,
+            {
+                "run_id": run_id,
+                "count": count,
+                "folder": str(root),
+                "folder_name": root.name or str(root),
+            },
+        )
+
+    def _apply_progress(self, payload: dict[str, Any]) -> None:
+        plan_id = payload.get("plan_id")
+        with self.server.state_lock:
+            current = self.server.state["apply"]
+            if current is None or current["plan_id"] != plan_id:
+                progress = {"plan_id": plan_id, "completed": False, "done": 0, "total": None}
+            else:
+                progress = dict(current)
+        self._send_json(200, progress)
 
     def _undo(self, payload: dict[str, Any]) -> None:
         run_id = payload.get("run_id")
         if not isinstance(run_id, str):
             raise ValueError("El identificador del renombrado no es válido.")
-        renamed = self.server.state["runs"].get(run_id)
-        if renamed is None:
+        with self.server.state_lock:
+            run = self.server.state["runs"].get(run_id)
+            current_apply = self.server.state["apply"]
+            if current_apply is not None and not current_apply["completed"]:
+                raise ValueError("Espera a que terminen de aplicarse los cambios.")
+        if run is None:
             raise ValueError("No hay un renombrado disponible para deshacer.")
-        undo_renames(renamed)
-        self.server.state["runs"].pop(run_id, None)
-        self._send_json(200, {"restored_count": len(renamed)})
+        root = run["root"]
+        result = undo_each(list(run["pairs"]))
+        pending = [(failure.original, failure.current) for failure in result.failures]
+        with self.server.state_lock:
+            if pending:
+                run["pairs"] = pending
+            else:
+                self.server.state["runs"].pop(run_id, None)
+
+        def relative(path: Path) -> str:
+            if root is not None:
+                try:
+                    return path.relative_to(root).as_posix()
+                except ValueError:
+                    pass
+            return path.name
+
+        self._send_json(
+            200,
+            {
+                "run_id": run_id if pending else None,
+                "folder": str(root),
+                "restored_count": len(result.restored),
+                "failed_count": len(result.failures),
+                "failures": [
+                    {
+                        "original_name": relative(failure.original),
+                        "current_name": relative(failure.current),
+                        "reason": failure.reason,
+                    }
+                    for failure in result.failures
+                ],
+            },
+        )
