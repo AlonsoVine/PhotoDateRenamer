@@ -17,6 +17,8 @@ Notable changes to PhotoDateRenamer are documented here.
 - Local thumbnails of each photo in the contact sheet and in the detail loupe. They are generated in memory and served only to the local window.
 - A «ya fechada» tag, filter, and confirmation warning for photos whose name already starts with a date.
 - A persistent «Deshacer incompleto» view that lists files that could not be restored and offers to retry.
+- A «Último lote» bar that keeps the last batch undoable from any view, even after choosing another folder or after an interrupted apply.
+- A «MOD»/«CREA» sticker, a «Fecha del archivo» filter and a confirmation warning when a photo has no capture date and the file date is used.
 - Optional fixed port through `PHOTODATERENAMER_PORT`, still bound to `127.0.0.1`.
 - Regression tests that pin the proposed names of 0.5.0, plus data-safety tests on generated folders. They cover:
   - empty folders;
@@ -33,6 +35,9 @@ Notable changes to PhotoDateRenamer are documented here.
 - Undo restores file by file and never overwrites; a locked file no longer blocks the rest.
 - If the apply request itself fails, the interface says the result is unknown and asks to re-scan, instead of claiming nothing changed.
 - On narrow windows the contact sheet comes first and the format panel collapses into a summary.
+- Changing the format updates the preview in place, keeps the filter, search and selection, and reuses dates already read instead of reading every photo again.
+- The loupe follows the selected row, not the pointer. On narrow windows, statuses use short text labels instead of colour alone.
+- The «Fecha + título» recipe is now called «Fecha, sin extensión»; it produces the same names.
 
 ### Fixed
 - Destination names longer than 255 characters are flagged as conflicts in the preview instead of failing during the rename.

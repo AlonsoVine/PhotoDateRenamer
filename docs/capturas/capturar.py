@@ -192,7 +192,7 @@ def run_size(browser, scratch, out, size_name, suffix, width, height, motion, ax
         if heading and not page.evaluate("() => Boolean(document.querySelector('dialog[open]'))"):
             report["heading"][f"{state}-{suffix}"] = page.evaluate(HEADING_SCRIPT)
         report["states"].append(f"{state}-{suffix}")
-        if axe_source and motion == "no-preference" and size_name != "grande":
+        if axe_source:
             if not page.evaluate("() => typeof window.axe === 'object'"):
                 page.evaluate(axe_source + "\n;0")
             result = page.evaluate(
@@ -282,8 +282,13 @@ def run_size(browser, scratch, out, size_name, suffix, width, height, motion, ax
     wait_view("preview")
     page.wait_for_selector("#apply-button:not([disabled])")
     shot("11-formato-cambiado", heading=False)  # the user is editing the format panel
+    # Remove every piece: the empty-format state, then recover with its own button.
+    while page.query_selector("#tokens .token"):
+        page.click("#tokens .token button:last-child")
+    wait_view("error")
+    shot("11b-formato-vacio", heading=False)  # the format panel shows its own «Añade al menos una pieza» note
     page.evaluate("() => { document.body.dataset.view = '__capture__'; }")
-    page.click('.preset[data-preset="date_original"]')
+    page.click("#message-primary")
     wait_view("preview")
     page.wait_for_selector("#apply-button:not([disabled])")
 
@@ -294,7 +299,13 @@ def run_size(browser, scratch, out, size_name, suffix, width, height, motion, ax
     wait_view("success", "partial", "total")
     shot("13-exito")
 
-    page.click("#undo-button")
+    # Leaving the result keeps the batch undoable from the «Último lote» bar.
+    pick(folders["vacia"])
+    wait_view("empty")
+    page.wait_for_selector("#last-run:not([hidden])")
+    shot("13b-ultimo-lote")
+    page.evaluate("() => { document.body.dataset.view = '__capture__'; }")
+    page.click("#last-run-undo")
     wait_view("restored")
     shot("14-deshecho")
 
@@ -312,6 +323,11 @@ def run_size(browser, scratch, out, size_name, suffix, width, height, motion, ax
     wait_view("success", "partial", "total")
     shot("16-exito-miles")
     page.click("#undo-button")
+    try:
+        wait_view("undoing", timeout=3000)
+        shot("16b-deshaciendo", settle=False)
+    except Exception:
+        report["states"].append(f"16b-deshaciendo-{suffix} (demasiado rápido para capturar)")
     wait_view("restored")
 
     pick(folders["parcial"])

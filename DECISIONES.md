@@ -97,6 +97,12 @@ El arte no estorba:
 20. **Tras un éxito, la acción principal es «Elegir otra carpeta»** (vuelta 2). «Deshacer» pasa a secundaria: es una red de seguridad, no el siguiente paso esperado.
 21. **Ejemplo fijo `2024_08_14`** (vuelta 2), en lugar de la fecha de hoy. Así el ejemplo del formato y el del héroe coinciden. En cuanto hay vista previa, el ejemplo usa una foto real de la carpeta.
 22. **Sin halo que sigue al puntero** (vuelta 2). Era decorativo, costaba repintados y no aportaba a la tarea. La luz de seguridad es ahora estática.
+23. **«Último lote» siempre a mano** (vuelta 3). Elegir otra carpeta o volver a analizar ya no hace perder el deshacer: una barra bajo la cabecera muestra el último lote renombrado («8 fotos en *mixta* · Deshacer») en cualquier vista, hasta que se aplica otro lote. El servidor guarda cada movimiento en cuanto ocurre (`apply_plan(on_renamed=…)`), así que incluso un lote interrumpido por un fallo inesperado se puede deshacer. `/api/last-run` permite recuperarlo tras un «resultado desconocido».
+24. **Caché de fechas al cambiar el formato** (vuelta 3). Las fechas no dependen del formato. `create_preview` acepta una caché indexada por ruta y huella del archivo (dispositivo, inodo, tamaño, mtime, ctime): si el archivo cambió, se vuelve a leer. Los nombres propuestos son idénticos con y sin caché (test). La hoja se actualiza en su sitio, atenuada, sin perder filtro, búsqueda, desplazamiento ni fila seleccionada. La caché se descarta al cambiar de carpeta y tiene un tope de 200.000 entradas.
+25. **Fecha del archivo marcada** (vuelta 3). Cuando la foto no guarda fecha de captura y se usa la del archivo, la miniatura lleva un sello «MOD» o «CREA» con borde discontinuo, hay un filtro «Fecha del archivo», la lupa lo explica y la confirmación lo advierte. El héroe lo anticipa en una frase.
+26. **Estado nunca solo por color** (vuelta 3). En pantallas estrechas las etiquetas se abrevian con texto (Cambia, Choque, Omitida…) en lugar de quedarse en un punto de color (WCAG 1.4.1).
+27. **Receta «Fecha, sin extensión»** (vuelta 3). Sustituye a «Fecha + título», que no decía qué hacía. Es la misma receta: los nombres no cambian.
+28. **Errores de deshacer y aplicar, sin afirmaciones falsas** (vuelta 3). Un rechazo del servidor (4xx) ocurre antes de tocar archivos, y la interfaz lo dice. Un fallo de red o de servidor lleva a «Resultado desconocido», con el lote recuperable. Mientras se deshace, una vista «Deshaciendo» bloquea las acciones que podrían cruzarse.
 
 ## 4. Dependencias
 
@@ -117,3 +123,4 @@ Herramientas de desarrollo, que no se empaquetan ni se versionan: Playwright 1.6
 2. **Deshacer persistente.** Deshacer solo vale mientras la app sigue abierta; no hay diario en disco. ¿Quieres un registro persistente que permita deshacer tras reiniciar?
 3. **Política ante fallos.** Ahora un fallo no detiene el lote y el resto se aplica, con «Deshacer» disponible. ¿Prefieres ofrecer también el modo «todo o nada» de 0.5.0 como opción?
 4. **Versión web estática (`site/`).** No se ha rediseñado en esta rama. ¿Quieres llevar «Revelado» también a la versión de GitHub Pages?
+5. **Tests de interfaz en el proyecto.** Los estados de la interfaz se recorren con Playwright en el script de capturas, que no forma parte de `unittest`. ¿Quieres añadir Playwright como dependencia de desarrollo y convertir ese recorrido en tests?
