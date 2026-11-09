@@ -2,11 +2,11 @@
    A darkroom for filenames: ink-black room, red safelight, film grain, and the orange
    seven-segment date imprint of a compact camera. See DECISIONES.md for the concept. */
 
-@font-face { font-family: "Fraunces"; src: url("/fonts/fraunces.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
-@font-face { font-family: "Fraunces"; src: url("/fonts/fraunces-italic.woff2") format("woff2"); font-weight: 100 900; font-style: italic; font-display: swap; }
-@font-face { font-family: "Instrument Sans"; src: url("/fonts/instrument-sans.woff2") format("woff2"); font-weight: 400 700; font-display: swap; }
-@font-face { font-family: "JetBrains Mono"; src: url("/fonts/jetbrains-mono.woff2") format("woff2"); font-weight: 100 800; font-display: swap; }
-@font-face { font-family: "DSEG7"; src: url("/fonts/dseg7.woff2") format("woff2"); font-weight: 700; font-display: block; }
+@font-face { font-family: "Fraunces"; src: url("fonts/fraunces.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "Fraunces"; src: url("fonts/fraunces-italic.woff2") format("woff2"); font-weight: 100 900; font-style: italic; font-display: swap; }
+@font-face { font-family: "Instrument Sans"; src: url("fonts/instrument-sans.woff2") format("woff2"); font-weight: 400 700; font-display: swap; }
+@font-face { font-family: "JetBrains Mono"; src: url("fonts/jetbrains-mono.woff2") format("woff2"); font-weight: 100 800; font-display: swap; }
+@font-face { font-family: "DSEG7"; src: url("fonts/dseg7.woff2") format("woff2"); font-weight: 700; font-display: block; }
 
 :root {
   color-scheme: dark;
@@ -66,7 +66,7 @@ legend + * { clear: both; }
 /* ---------- atmosphere ---------- */
 .grain {
   position: fixed; inset: -12%; z-index: 40; pointer-events: none;
-  background-image: url("/images/grain.png");
+  background-image: url("images/grain.png");
   opacity: .07;
   will-change: transform;
   animation: grain 1s steps(6) infinite;
@@ -450,6 +450,9 @@ body.is-refreshing #sheet-kicker::after { content: ""; display: inline-block; wi
 .badge-dated { padding: 3px 7px; color: var(--stamp-hot); background: transparent; box-shadow: inset 0 0 0 1px rgba(255, 154, 60, .4); font-size: 10px; }
 .badge-dated::before { background: transparent; box-shadow: inset 0 0 0 1.5px currentColor; }
 .badge-abbr { display: none; }
+/* Published web version: no path field (a page cannot open a typed path) and a link to the Windows app. */
+html[data-platform="web"] .path-field { display: none; }
+.get-windows { margin-left: 14px; color: var(--stamp); text-underline-offset: 3px; }
 .row-origin { color: var(--faint); font: 600 10px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
 .row-origin.is-file { color: var(--paper); outline: 1px dashed var(--muted); outline-offset: 2px; border-radius: 1px; }
 .list-empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 14px; pointer-events: none; }

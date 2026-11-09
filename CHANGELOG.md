@@ -4,6 +4,15 @@ Notable changes to PhotoDateRenamer are documented here.
 
 ## Unreleased
 
+### Changed
+- The published web version (GitHub Pages) now uses the «Revelado» interface of the application. A browser backend answers the same requests as the local server, applies each photo separately, keeps the last batch undoable and shows local thumbnails. It uses a real move when the browser offers one, so file dates are kept.
+- The web page declares a Content Security Policy with `connect-src 'none'`, so it cannot send anything over the network.
+- Files that are not really JPEG, PNG or TIFF images are skipped on the web, as in the application, instead of being renamed with the file date.
+- Interface assets use relative paths, so the same files work under the local server and under the Pages sub-path.
+
+### Removed
+- The previous standalone web interface (`site/index.html`, `site/app.js`, `site/styles.css`).
+
 ## [0.6.0] - 2026-11-09
 
 ### Added

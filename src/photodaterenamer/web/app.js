@@ -240,7 +240,12 @@ class RequestError extends Error {
   }
 }
 
+/* The published web version answers the same requests inside the page (site/backend.js). */
+const WEB = Boolean(window.PDR_BACKEND);
+const HOST = WEB ? "la página" : "la aplicación";
+
 async function post(path, data = {}, signal = undefined) {
+  if (WEB) return window.PDR_BACKEND.post(path, data, signal);
   try {
     return await fetch(path, {
       method: "POST",
@@ -543,7 +548,7 @@ function renderLastRun() {
   ui.lastRunUndo.disabled = isBusy();
   if (!run) return;
   ui.lastRunText.replaceChildren(...strong(
-    `Último lote: **${plural(run.count, "foto renombrada", "fotos renombradas")}** en ${quoted(run.folder_name)}. Puedes deshacerlo mientras la aplicación siga abierta.`
+    `Último lote: **${plural(run.count, "foto renombrada", "fotos renombradas")}** en ${quoted(run.folder_name)}. Puedes deshacerlo mientras ${HOST} siga abierta.`
   ));
   ui.lastRunUndo.textContent = run.count === 1 ? "Deshacer" : `Deshacer ${count(run.count)}`;
 }
@@ -780,7 +785,7 @@ async function startPreview({ origin }) {
   if (generation !== scanGeneration) return;
   if (!state.folder.trim()) {
     setMode("idle");
-    showHeroMessage("Elige una carpeta o pega su ruta para empezar.", true);
+    showHeroMessage(WEB ? "Elige una carpeta para empezar." : "Elige una carpeta o pega su ruta para empezar.", true);
     ui.heroPath.focus();
     return;
   }
@@ -1568,7 +1573,7 @@ function showUnknown(message) {
   showMessage({
     view: "unknown",
     art: "fogged",
-    text: `La aplicación no pudo confirmar el resultado: ${message.replace(/[.?!]?$/, ".")} Algunos archivos pueden haber cambiado de nombre. **Vuelve a analizar la carpeta** para ver su estado real; si se renombró alguno y la aplicación sigue abierta, podrás deshacerlo desde «Último lote». Si la aplicación se cerró, ese deshacer se ha perdido y habría que devolver los nombres a mano.`,
+    text: `La aplicación no pudo confirmar el resultado: ${message.replace(/[.?!]?$/, ".")} Algunos archivos pueden haber cambiado de nombre. **Vuelve a analizar la carpeta** para ver su estado real; si se renombró alguno y ${HOST} sigue abierta, podrás deshacerlo desde «Último lote». Si ${HOST} se cerró, ese deshacer se ha perdido y habría que devolver los nombres a mano.`,
     primary: { label: "Volver a analizar", action: () => startPreview({ origin: "retry" }) }
   });
   announce("Resultado desconocido. Vuelve a analizar la carpeta para comprobar su estado.");
@@ -1608,7 +1613,7 @@ function showResult(plan, result) {
     ui.resultText.replaceChildren(...strong(
       "Todos los cambios previstos se aplicaron y **ningún archivo se ha sobrescrito**." +
       (untouched ? ` ${plural(untouched, "archivo con conflicto u omitido sigue", "archivos con conflicto u omitidos siguen")} como ${untouched === 1 ? "estaba" : "estaban"}.` : "") +
-      " Si algo no te convence, puedes deshacer el lote mientras la aplicación siga abierta."
+      ` Si algo no te convence, puedes deshacer el lote mientras ${HOST} siga abierta.`
     ));
   } else if (renamedCount) {
     view = "partial";
@@ -1865,6 +1870,14 @@ ui.formatDetails.addEventListener("toggle", () => {
   if (!narrowScreen.matches && !ui.formatDetails.open) ui.formatDetails.open = true;
 });
 
+if (WEB) {
+  document.documentElement.dataset.platform = "web";
+  for (const node of document.querySelectorAll("[data-host]")) node.textContent = HOST;
+  $("#get-windows").hidden = false;
+  if (!window.PDR_BACKEND.supported()) {
+    showHeroMessage("Este navegador no permite elegir carpetas. Usa **Chrome o Edge** en un ordenador, o descarga la aplicación para Windows.", true);
+  }
+}
 syncFormatDisclosure();
 renderTokens();
 renderLoupe(null);

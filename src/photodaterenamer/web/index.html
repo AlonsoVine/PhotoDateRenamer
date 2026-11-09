@@ -6,13 +6,13 @@
   <meta name="theme-color" content="#0e0b09">
   <meta name="color-scheme" content="dark">
   <title>PhotoDateRenamer — pon fecha a tus fotos</title>
-  <link rel="icon" type="image/png" href="/images/app-icon.png">
-  <link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/fonts/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="icon" type="image/png" href="images/app-icon.png">
+  <link rel="preload" href="fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
   <script nonce="__APP_TOKEN__">window.PDR_TOKEN = "__APP_TOKEN__";</script>
-  <script src="/helpers.js" defer></script>
-  <script src="/app.js" defer></script>
+  <script src="helpers.js" defer></script>
+  <script src="app.js" defer></script>
 </head>
 <body data-mode="idle" data-view="idle">
   <a class="skip-link" href="#main">Saltar al contenido</a>
@@ -20,7 +20,7 @@
   <div class="safelight" aria-hidden="true"></div>
 
   <header class="topbar">
-    <a class="wordmark" href="/">
+    <a class="wordmark" href="./">
       <span class="wordmark-stamp" aria-hidden="true">'26</span>
       <span class="wordmark-name">Photo<i>Date</i>Renamer<span class="sr-only">, inicio</span></span>
     </a>
@@ -69,7 +69,7 @@
 
       <figure class="tray" aria-hidden="true">
         <div class="print">
-          <img src="/images/hero-print.webp" alt="" width="880" height="587" fetchpriority="high">
+          <img src="images/hero-print.webp" alt="" width="880" height="587" fetchpriority="high">
           <span id="hero-stamp" class="print-stamp">'24 08 14</span>
         </div>
         <figcaption class="tray-caption"><span class="tray-old">IMG_0412.jpg</span><span class="tray-new"><mark class="stamp">2024_08_14</mark>_IMG_0412.jpg</span></figcaption>
@@ -160,7 +160,7 @@
           <p class="counter" aria-hidden="true"><span id="progress-count" class="seg" data-ghost="8">0</span><span class="counter-of">de</span><span id="progress-total" class="seg seg-dim" data-ghost="8">0</span></p>
           <p id="progress-label" class="state-text" role="status" aria-live="polite">Preparando el análisis…</p>
           <button id="cancel-scan" class="btn btn-ghost" type="button">Cancelar análisis</button>
-          <p id="apply-warning" class="state-note" hidden>No cierres la aplicación hasta que termine.</p>
+          <p id="apply-warning" class="state-note" hidden>No cierres <span data-host>la aplicación</span> hasta que termine.</p>
         </div>
 
         <!-- empty / no photos / cancelled / generic error / restored -->
@@ -216,7 +216,7 @@
     <p class="shortcuts"><span class="sr-only">Atajos de teclado:</span><span><span class="kbd-combo"><kbd>Alt</kbd><kbd>O</kbd></span> elegir carpeta</span><span><span class="kbd-combo"><kbd>Alt</kbd><kbd>B</kbd></span> buscar</span><span><span class="kbd-combo"><kbd>↑</kbd><kbd>↓</kbd></span> recorrer la hoja</span><span><span class="kbd-combo"><kbd>Intro</kbd></span> detalle</span></p>
     <p class="credits"><a href="https://alonsovine.github.io/portfolioR/" target="_blank" rel="noopener noreferrer">Creado por Alonso Viñé</a>
       <span class="footer-links"><a href="https://github.com/AlonsoVine" target="_blank" rel="noopener noreferrer">GitHub</a> <a href="https://www.linkedin.com/in/alonso-vi%C3%B1%C3%A9-barrancos/" target="_blank" rel="noopener noreferrer">LinkedIn</a></span>
-</p>
+      <a id="get-windows" class="get-windows" href="https://github.com/AlonsoVine/PhotoDateRenamer/releases/latest/download/PhotoDateRenamer.exe" hidden>Descargar para Windows</a></p>
   </footer>
 
   <div id="announcer" class="sr-only" role="status" aria-live="polite"></div>
@@ -263,7 +263,7 @@
       <ul class="promise">
         <li>Ningún archivo se sobrescribe ni se borra.</li>
         <li>Si alguno falla, el resto continúa y verás el motivo.</li>
-        <li>Puedes deshacer el lote mientras la aplicación siga abierta, aunque cambies de carpeta.</li>
+        <li>Puedes deshacer el lote mientras <span data-host>la aplicación</span> siga abierta, aunque cambies de carpeta.</li>
       </ul>
       <div class="dialog-actions">
         <button class="btn btn-ghost" value="cancel" type="submit" autofocus>Cancelar</button>
