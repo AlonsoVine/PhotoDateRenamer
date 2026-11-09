@@ -1,6 +1,6 @@
 # Decisiones del rediseño «Revelado»
 
-Rama de trabajo: `mejora-ui`, creada desde `main` en el commit `5d2713d` («chore: prepare 0.5.0 release»). No se ha fusionado con `main`.
+Rama de trabajo: `mejora-ui`, creada desde `main` en el commit `5d2713d` («chore: prepare 0.5.0 release»). Fusionada con `main` el 2026-11-09 tras el visto bueno explícito, y publicada como 0.6.0.
 
 ## 1. Inspección inicial (antes de tocar nada)
 

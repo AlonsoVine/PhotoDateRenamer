@@ -4,6 +4,8 @@ Notable changes to PhotoDateRenamer are documented here.
 
 ## Unreleased
 
+## [0.6.0] - 2026-11-09
+
 ### Added
 - «Revelado», a redesigned darkroom-themed interface for the local application, with:
   - a single first step;
