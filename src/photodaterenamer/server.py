@@ -426,12 +426,13 @@ class AppRequestHandler(BaseHTTPRequestHandler):
                 self.server.state["apply"].update(done=done, total=total)
 
         # The undo record is kept as files move, so even an interrupted batch can be undone.
+        # The previous batch stays undoable until this one actually renames a file.
         run = {"root": plan.directory, "pairs": []}
-        with self.server.state_lock:
-            self.server.state["runs"].clear()
 
         def remember(source: Path, destination: Path) -> None:
             with self.server.state_lock:
+                if not run["pairs"]:
+                    self.server.state["runs"].clear()
                 run["pairs"].append((source, destination))
                 self.server.state["runs"][plan_id] = run
 

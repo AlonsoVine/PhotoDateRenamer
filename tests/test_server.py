@@ -179,6 +179,23 @@ class LocalServerTests(unittest.TestCase):
         self.assertTrue((self.folder / "a.jpg").exists())
         self.assertEqual(self.post("/api/last-run", {}), {"run_id": None})
 
+    def test_a_batch_that_renames_nothing_keeps_the_previous_batch_undoable(self) -> None:
+        self.write_photo("a.jpg")
+        first = self.post("/api/confirm", {"plan_id": self.post("/api/preview", {"folder": str(self.folder)})["plan_id"]})
+        other = self.folder / "otra"
+        other.mkdir()
+        (other / "b.jpg").write_bytes((self.folder / "2024_05_06_a.jpg").read_bytes())
+        preview = self.post("/api/preview", {"folder": str(other)})
+        (other / "2024_05_06_b.jpg").write_bytes(b"intruso")
+
+        failed = self.post("/api/confirm", {"plan_id": preview["plan_id"]})
+
+        self.assertEqual(failed["renamed_count"], 0)
+        self.assertEqual(self.post("/api/last-run", {})["run_id"], first["run_id"])
+        undo = self.post("/api/undo", {"run_id": first["run_id"]})
+        self.assertEqual(undo["restored_count"], 1)
+        self.assertTrue((self.folder / "a.jpg").exists())
+
     def test_an_interrupted_apply_keeps_the_files_already_renamed_undoable(self) -> None:
         for name in ("a.jpg", "b.jpg"):
             self.write_photo(name)

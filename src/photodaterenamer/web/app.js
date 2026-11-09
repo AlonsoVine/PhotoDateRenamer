@@ -46,8 +46,8 @@ const STATUS_LABELS = {
 };
 /* Short visible labels for narrow screens: state is never conveyed by colour alone. */
 const STATUS_SHORT = {
-  ready: "Cambia",
-  conflict: "Choque",
+  ready: "Renombra",
+  conflict: "Conflicto",
   skipped: "Omitida",
   unchanged: "Igual",
   renamed: "Hecho",
@@ -172,6 +172,8 @@ let scanGeneration = 0;
 let activeScan = null;
 let refreshTimer = null;
 let toastTimer = null;
+/* Lines the new name may use in a row (2 below 1280 px, set by CSS --name-lines). */
+let nameLines = 1;
 
 /* ---------------------------------------------------------------- helpers */
 
@@ -271,6 +273,11 @@ async function request(path, data = {}) {
 function splitPath(path) {
   const slash = path.lastIndexOf("/");
   return slash === -1 ? ["", path] : [path.slice(0, slash + 1), path.slice(slash + 1)];
+}
+
+/** «name» in italics for titles and sentences, so a folder never reads as an ordinary word. */
+function quoted(name) {
+  return `*«${name}»*`;
 }
 
 function folderNameOf(path) {
@@ -447,6 +454,7 @@ function setMode(mode) {
     ui.hero.hidden = mode !== "idle";
     ui.workbench.hidden = mode === "idle";
   });
+  renderLastRun();
 }
 
 const VIEW_PANELS = {
@@ -529,12 +537,12 @@ function updateControlsLock() {
 /** The last renamed batch stays undoable from anywhere until another batch is applied. */
 function renderLastRun() {
   const run = state.lastRun;
-  const ownUndo = ["success", "partial", "undo-partial", "undoing"].includes(state.view);
+  const ownUndo = state.mode !== "idle" && ["success", "partial", "undo-partial", "undoing"].includes(state.view);
   ui.lastRun.hidden = !run || ownUndo;
   ui.lastRunUndo.disabled = isBusy();
   if (!run) return;
   ui.lastRunText.replaceChildren(...strong(
-    `Último lote: **${plural(run.count, "foto renombrada", "fotos renombradas")}** en *${run.folder_name}*. Puedes deshacerlo mientras la aplicación siga abierta.`
+    `Último lote: **${plural(run.count, "foto renombrada", "fotos renombradas")}** en ${quoted(run.folder_name)}. Puedes deshacerlo mientras la aplicación siga abierta.`
   ));
   ui.lastRunUndo.textContent = run.count === 1 ? "Deshacer" : `Deshacer ${count(run.count)}`;
 }
@@ -679,7 +687,9 @@ function scheduleRefresh() {
   if (state.mode === "idle" || !state.folder || isBusy() || RESULT_VIEWS.includes(state.view)) return;
   window.clearTimeout(refreshTimer);
   if (!state.components.length) {
+    scanGeneration += 1;
     cancelActiveScan();
+    ui.body.classList.remove("is-refreshing");
     showEmptyFormat();
     return;
   }
@@ -752,7 +762,7 @@ function resetProgress(total) {
 }
 
 function showScanning() {
-  setSheetHeading("Revelando", `Leyendo *${folderNameOf(state.folder)}*`);
+  setSheetHeading("Analizando la carpeta", `Revelando ${quoted(folderNameOf(state.folder))}`);
   resetProgress(0);
   ui.progressBar.parentElement.classList.add("is-indeterminate");
   ui.progressLabel.textContent = "Preparando el análisis…";
@@ -871,7 +881,7 @@ async function startPreview({ origin }) {
 
 function showCancelled() {
   state.plan = null;
-  setSheetHeading("Análisis detenido", "Revelado *interrumpido*");
+  setSheetHeading("Análisis cancelado", "Revelado *interrumpido*");
   showMessage({
     view: "cancelled",
     art: "cancelled",
@@ -936,7 +946,9 @@ function annotate(items) {
       byDestination.get(key).push(item.original_name);
     }
   }
-  for (const item of items) {
+  const frames = new Map(items.map((item, position) => [item.original_name, position + 1]));
+  for (const [position, item] of items.entries()) {
+    item.frame = position + 1;
     item.dated = item.status === "ready" && H.looksDated(item.original_name);
     item.fileDate = item.status !== "skipped" && isFileDate(item.date_source);
     if (item.status === "conflict" && item.new_name) {
@@ -944,6 +956,8 @@ function annotate(items) {
       const others = (byDestination.get(key) || []).filter((name) => name !== item.original_name);
       const existing = originals.get(key);
       item.clashWith = existing && existing !== item.original_name ? [existing, ...others.filter((name) => name !== existing)] : others;
+      item.clashExists = Boolean(existing && existing !== item.original_name);
+      item.clashFrame = item.clashWith.length ? frames.get(item.clashWith[0]) : undefined;
     }
   }
 }
@@ -953,7 +967,7 @@ function showPlan(plan, origin) {
   if (!plan.items.length) {
     state.plan = null;
     if (plan.entry_count === 0) {
-      setSheetHeading("Carrete vacío", `La carpeta *${folderName}* está vacía`);
+      setSheetHeading("Carpeta vacía", `Carrete vacío en ${quoted(folderName)}`);
       showMessage({
         view: "empty",
         art: "empty",
@@ -963,11 +977,11 @@ function showPlan(plan, origin) {
       announce("La carpeta está vacía.");
     } else {
       const found = plan.entry_count === 1 ? "**1 elemento**" : `**${count(plan.entry_count)} elementos**`;
-      setSheetHeading("Sin fotografías", "Hay archivos, pero *ninguna foto*");
+      setSheetHeading("Ninguna foto compatible", "Hay archivos, pero *ninguna foto*");
       showMessage({
         view: "nophotos",
         art: "nophotos",
-        text: `En *${folderName}* hay ${found}, pero ninguno es JPG, PNG o TIFF.` +
+        text: `En ${quoted(folderName)} hay ${found}, pero ninguno es JPG, PNG o TIFF.` +
           (state.recursive ? "" : " Si tus fotos están dentro de subcarpetas, inclúyelas."),
         primary: state.recursive
           ? { label: "Elegir otra carpeta", action: pickFolder }
@@ -1082,16 +1096,17 @@ function shortReason(item) {
 function renderRow(item, index, chars) {
   const thumb = h("span", { class: "row-thumb", "aria-hidden": "true" },
     h("img", { alt: "", hidden: true, decoding: "async" }),
-    h("span", { class: "row-frame" }, String(index + 1).padStart(4, "0")),
+    h("span", { class: "row-frame" }, String(item.frame || index + 1).padStart(4, "0")),
     item.fileDate ? h("span", { class: "row-src" }, item.date_source.includes("creación") ? "CREA" : "MOD") : null);
   let second;
   if (item.status === "ready" || item.status === "renamed") {
     second = h("span", { class: "row-new" },
       h("span", { class: "arrow", "aria-hidden": "true" }, "→ "),
       h("span", { class: "sr-only" }, item.status === "renamed" ? "ahora se llama " : "pasará a llamarse "),
-      ...nameWithStamp(item.new_name, item.date_text, chars - 2));
+      ...nameWithStamp(item.new_name, item.date_text, chars * nameLines - 3));
   } else if (item.status === "conflict" && item.new_name) {
-    const clash = item.clashWith?.length ? ` · como ${splitPath(item.clashWith[0])[1]}` : " · ya existe";
+    const where = item.clashFrame ? ` (fotograma ${String(item.clashFrame).padStart(4, "0")})` : "";
+    const clash = item.clashExists ? ` · ya existe${where}` : item.clashWith?.length ? ` · también lo pide el ${String(item.clashFrame).padStart(4, "0")}` : " · ya existe";
     const wide = chars > 48;
     const room = Math.max(14, chars - 2 - (wide ? Math.min(clash.length, 26) : 0));
     second = h("span", { class: "row-new row-clash" },
@@ -1114,6 +1129,10 @@ function renderRow(item, index, chars) {
     h("span", { class: "badge-text" }, STATUS_LABELS[item.status]),
     h("span", { class: "badge-abbr", "aria-hidden": "true" }, STATUS_SHORT[item.status]))];
   if (item.fileDate) tags.push(h("span", { class: "sr-only" }, ", fecha tomada del archivo"));
+  if (item.date_source && item.status !== "skipped") {
+    tags.push(h("span", { class: `row-origin${item.fileDate ? " is-file" : ""}`, "aria-hidden": "true" },
+      item.fileDate ? "Archivo" : item.date_source.split(" ·")[0]));
+  }
   if (item.dated) {
     tags.push(h("span", { class: "badge badge-dated" },
       h("span", { class: "sr-only" }, ", "),
@@ -1143,7 +1162,13 @@ function loupeContent(item) {
       rows.push(["Destino previsto", h("span", { class: "mono loupe-strike" }, item.new_name, h("span", { class: "sr-only" }, " (no aplicado)"))]);
     } else if (item.status === "conflict" && item.new_name) {
       rows.push(["Nombre propuesto", mono(item.new_name)]);
-      if (item.clashWith?.length) rows.push(["Choca con", mono(item.clashWith.join(", "))]);
+      if (item.clashWith?.length) {
+        const first = item.clashWith[0];
+        const frame = item.clashFrame ? ` (fotograma ${String(item.clashFrame).padStart(4, "0")})` : "";
+        rows.push(["Choca con", h("span", {}, h("span", { class: "mono" }, first), item.clashExists
+          ? `${frame}, que ya se llama así.`
+          : `${frame}, que pediría el mismo nombre.`)]);
+      }
     }
   }
   if (item.date_source) rows.push(["Origen de la fecha", item.date_source]);
@@ -1210,6 +1235,11 @@ class VirtualList {
 
   measure() {
     const value = parseFloat(getComputedStyle(this.scroller).getPropertyValue("--row-h"));
+    const lines = parseInt(getComputedStyle(this.scroller).getPropertyValue("--name-lines"), 10) || 1;
+    if (lines !== nameLines) {
+      nameLines = lines;
+      this.redraw();
+    }
     if (value && value !== this.rowHeight) {
       this.rowHeight = value;
       this.spacer.style.height = `${this.items.length * this.rowHeight}px`;
@@ -1231,7 +1261,14 @@ class VirtualList {
     this.schedule();
   }
 
+  /** Let the film strip shrink to its rows, so a short result leaves no black void. */
+  fitHeight() {
+    const height = Math.max(this.items.length * this.rowHeight + 2, 140);
+    (this.scroller.closest(".list-view") || this.scroller.parentElement).style.setProperty("--content-h", `${height}px`);
+  }
+
   redraw() {
+    this.fitHeight();
     for (const row of this.rows.values()) row.remove();
     this.rows.clear();
     this.render();
@@ -1288,6 +1325,7 @@ class VirtualList {
         ...renderRow(item, index, this.chars)
       );
       row.style.transform = `translateY(${index * this.rowHeight}px)`;
+      row.style.setProperty("--order", String(Math.min(index, 14)));
       this.spacer.append(row);
       this.rows.set(index, row);
       this.loadThumb(row, item, index);
@@ -1364,6 +1402,15 @@ class VirtualList {
     this.setActive(target, true);
   }
 
+  /** Renamed frames turn from negative to positive and receive their date stamp. */
+  fix() {
+    if (reduceMotion.matches) return;
+    this.scroller.classList.remove("is-fixing");
+    void this.scroller.offsetWidth;
+    this.scroller.classList.add("is-fixing");
+    window.setTimeout(() => this.scroller.classList.remove("is-fixing"), 2200);
+  }
+
   develop() {
     if (reduceMotion.matches || typeof Element.prototype.animate !== "function") return;
     const visible = [...this.rows.entries()].sort(([a], [b]) => a - b).slice(0, 14);
@@ -1438,18 +1485,22 @@ function openConfirm() {
   if (readyFileDates) {
     warnings.push(`**${plural(readyFileDates, "foto usa", "fotos usan")}** la fecha del archivo porque no guarda la de captura (filtro «Fecha del archivo»).`);
   }
+  if (state.lastRun) {
+    warnings.push(`El lote anterior (**${plural(state.lastRun.count, "foto", "fotos")}** en ${quoted(state.lastRun.folder_name)}) dejará de poder deshacerse en cuanto este renombre una foto.`);
+  }
   ui.confirmDated.hidden = !warnings.length;
   if (warnings.length) ui.confirmDated.replaceChildren(...strong(`Revisa antes: ${warnings.join(" ")}`));
   ui.confirmApply.textContent = `Renombrar ${count(ready)}`;
   ui.confirmDialog.returnValue = "";
   ui.confirmDialog.showModal();
+  ui.confirmDialog.scrollTop = 0;
 }
 
 async function applyPlan() {
   const plan = state.plan;
   if (!plan || !sameSettings(state.planSettings, currentSettings())) return;
   const total = plan.rename_count;
-  setSheetHeading("Fijando", `Renombrando *${folderNameOf(plan.folder)}*`);
+  setSheetHeading("Renombrando", `Fijando los nombres de ${quoted(folderNameOf(plan.folder))}`);
   resetProgress(total);
   ui.progressBar.parentElement.classList.remove("is-indeterminate");
   ui.progressLabel.textContent = `Renombrando 0 de ${count(total)}…`;
@@ -1498,7 +1549,7 @@ async function applyPlan() {
 
 /** The apply request failed: some files may have been renamed. Never claim otherwise. */
 function showUnknown(message) {
-  setSheetHeading("Resultado desconocido", "No sé si se *renombró* todo");
+  setSheetHeading("Resultado sin confirmar", "Revisa la carpeta *antes de seguir*");
   showMessage({
     view: "unknown",
     art: "fogged",
@@ -1527,29 +1578,36 @@ function showResult(plan, result) {
     date_source: byOriginal.get(entry.old_name)?.date_source
   }));
   state.result = { items: [...failures, ...renamed] };
-  state.lastRun = result.run_id
-    ? { run_id: result.run_id, count: result.renamed_count, folder: plan.folder, folder_name: folderNameOf(plan.folder) }
-    : null;
+  if (result.run_id) {
+    state.lastRun = { run_id: result.run_id, count: result.renamed_count, folder: plan.folder, folder_name: folderNameOf(plan.folder) };
+  } else {
+    refreshLastRun();
+  }
   const renamedCount = result.renamed_count;
   const failedCount = result.failed_count;
   let view;
   if (!failedCount) {
     view = "success";
-    setSheetHeading("Revelado completo", renamedCount === 1 ? "*1 foto*, en su sitio" : `*${count(renamedCount)} fotos*, en su sitio`);
-    ui.resultText.replaceChildren(...strong("Todos los nombres se aplicaron y **ningún archivo se ha sobrescrito**. Si algo no te convence, puedes deshacer el lote mientras la aplicación siga abierta."));
+    setSheetHeading("Renombrado completo", renamedCount === 1 ? "*1 foto*, en su sitio" : `*${count(renamedCount)} fotos*, en su sitio`);
+    const untouched = plan.items.length - renamedCount;
+    ui.resultText.replaceChildren(...strong(
+      "Todos los cambios previstos se aplicaron y **ningún archivo se ha sobrescrito**." +
+      (untouched ? ` ${plural(untouched, "archivo con conflicto u omitido sigue", "archivos con conflicto u omitidos siguen")} como ${untouched === 1 ? "estaba" : "estaban"}.` : "") +
+      " Si algo no te convence, puedes deshacer el lote mientras la aplicación siga abierta."
+    ));
   } else if (renamedCount) {
     view = "partial";
-    setSheetHeading("Revelado con velos", `*${count(renamedCount)}* renombradas · *${count(failedCount)}* sin cambiar`);
+    setSheetHeading(`Resultado: ${plural(failedCount, "fallo", "fallos")}`, `Revelado con velos: *${count(renamedCount)}* renombradas, *${count(failedCount)}* sin cambiar`);
     ui.resultText.replaceChildren(...strong(`${failedCount === 1 ? "**1 archivo** no se pudo renombrar y conserva" : `**${count(failedCount)} archivos** no se pudieron renombrar y conservan`} su nombre original; el motivo está en la lista. El resto se aplicó correctamente.`));
   } else {
     view = "total";
-    setSheetHeading("Película velada", "Ningún archivo ha *cambiado*");
-    ui.resultText.replaceChildren(...strong(`${failedCount === 1 ? "El archivo falló y conserva" : `Los **${count(failedCount)} archivos** fallaron y conservan`} su nombre original. Suele deberse a un archivo abierto en otro programa o de solo lectura: ciérralo y vuelve a analizar.`));
+    setSheetHeading("Ningún archivo cambió", "Película *velada*");
+    ui.resultText.replaceChildren(...strong(`${failedCount === 1 ? "El archivo falló y conserva" : `Los **${count(failedCount)} archivos** fallaron y conservan`} su nombre original; el motivo de cada uno está en la lista. Suele deberse a un archivo abierto en otro programa o a una carpeta sin permiso de escritura: corrígelo y vuelve a analizar.`));
   }
   setSeg(ui.resultCount, renamedCount);
   ui.resultOf.hidden = view === "success";
   setSeg(ui.resultTotal, renamedCount + failedCount);
-  ui.undoButton.hidden = !state.lastRun;
+  ui.undoButton.hidden = !result.run_id;
   ui.undoButton.textContent = renamedCount === 1 ? "Deshacer este cambio" : `Deshacer ${count(renamedCount)} cambios`;
   configureResultPrimary(view === "success"
     ? { label: "Elegir otra carpeta", action: pickFolder, back: true }
@@ -1560,6 +1618,7 @@ function showResult(plan, result) {
   setView(view);
   renderFilters({ renamed: renamedCount, failed: failedCount }, ["all", "failed", "renamed"]);
   list.setItems(filteredItems(), { develop: true });
+  list.fix();
   focusHeading();
   announce(
     view === "success"
@@ -1582,7 +1641,7 @@ async function undoLastRun() {
   scanGeneration += 1;
   ui.body.classList.remove("is-refreshing");
   if (state.mode === "idle") setMode("workbench");
-  setSheetHeading("Deshaciendo", `Devolviendo sus nombres en *${run.folder_name}*`);
+  setSheetHeading("Deshaciendo el lote", `Devolviendo sus nombres en ${quoted(run.folder_name)}`);
   resetProgress(run.count);
   ui.progressBar.parentElement.classList.add("is-indeterminate");
   ui.progressLabel.textContent = `Restaurando ${plural(run.count, "archivo", "archivos")}…`;
@@ -1598,6 +1657,9 @@ async function undoLastRun() {
   try {
     const result = await request("/api/undo", { run_id: run.run_id });
     state.lastRun = result.run_id ? { ...run, count: result.failed_count } : null;
+    state.folder = run.folder;
+    ui.heroPath.value = run.folder;
+    renderFolder();
     if (!result.failed_count) {
       state.result = null;
       thumbnails.clear();
@@ -1607,7 +1669,7 @@ async function undoLastRun() {
       showMessage({
         view: "restored",
         art: "restored",
-        text: `La carpeta *${run.folder_name}* está como antes de renombrar. Puedes preparar otra vista previa o elegir otra carpeta.`,
+        text: `La carpeta ${quoted(run.folder_name)} está como antes de renombrar. Puedes preparar otra vista previa o elegir otra carpeta.`,
         primary: { label: "Volver a analizar", action: backToFolder },
         secondary: { label: "Elegir otra carpeta", action: pickFolder }
       });
@@ -1620,7 +1682,7 @@ async function undoLastRun() {
       state.lastRun = null;
       showError("No se pudo *deshacer*", `${error.message} Ningún archivo se ha modificado.`, backToFolder);
     } else {
-      setSheetHeading("Resultado desconocido", "No sé si se *restauró* todo");
+      setSheetHeading("Resultado sin confirmar", "Revisa la carpeta *antes de seguir*");
       showMessage({
         view: "unknown",
         art: "fogged",
