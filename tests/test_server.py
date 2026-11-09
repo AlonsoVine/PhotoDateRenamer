@@ -69,7 +69,7 @@ class LocalServerTests(unittest.TestCase):
         self.assertIn('id="confirm-dialog"', page)
         self.assertIn("font-src 'self'", policy)
         self.assertNotRegex(page, r'(src|href)="(https?:)?//(?!alonsovine|github|www\.linkedin)')
-        for image_path in ("/images/app-icon.png", "/images/hero-illustration.png", "/images/grain.png"):
+        for image_path in ("/images/app-icon.png", "/images/grain.png"):
             with urlopen(f"{self.base_url}{image_path}") as response:
                 self.assertEqual(response.headers.get_content_type(), "image/png")
                 self.assertTrue(response.read().startswith(b"\x89PNG\r\n\x1a\n"))
@@ -139,6 +139,8 @@ class LocalServerTests(unittest.TestCase):
         undo = self.post("/api/undo", {"run_id": result["run_id"]})
 
         self.assertEqual(undo["restored_count"], 2)
+        self.assertEqual(undo["failed_count"], 0)
+        self.assertIsNone(undo["run_id"])
         self.assertTrue((self.folder / "a.jpg").exists())
         self.assertTrue((self.folder / "c.jpg").exists())
 
@@ -155,6 +157,38 @@ class LocalServerTests(unittest.TestCase):
         with self.assertRaises(HTTPError) as error:
             self.post("/api/confirm", {"plan_id": preview["plan_id"]})
         self.assertEqual(error.exception.code, 400)
+        error.exception.close()
+
+    def test_thumbnails_are_limited_to_the_analysed_folder(self) -> None:
+        self.write_photo("IMG_001.jpg")
+        (self.folder / "rota.jpg").write_bytes(b"no es un jpeg")
+        self.post("/api/preview", {"folder": str(self.folder)})
+
+        request = Request(
+            f"{self.base_url}/api/thumbnail",
+            data=json.dumps({"path": "IMG_001.jpg", "size": 96}).encode("utf-8"),
+            headers={"Content-Type": "application/json", "Origin": self.base_url,
+                     "X-PhotoDateRenamer-Token": self.token},
+        )
+        with urlopen(request) as response:
+            self.assertEqual(response.headers.get_content_type(), "image/jpeg")
+            self.assertTrue(response.read().startswith(bytes([0xFF, 0xD8])))
+        broken = Request(
+            f"{self.base_url}/api/thumbnail",
+            data=json.dumps({"path": "rota.jpg", "size": 96}).encode("utf-8"),
+            headers={"Content-Type": "application/json", "Origin": self.base_url,
+                     "X-PhotoDateRenamer-Token": self.token},
+        )
+        with urlopen(broken) as response:
+            self.assertEqual(response.status, 204)
+        for path in ("../secreto.jpg", str(self.folder / "IMG_001.jpg"), "notas.txt"):
+            with self.assertRaises(HTTPError) as error:
+                self.post("/api/thumbnail", {"path": path, "size": 96})
+            self.assertEqual(error.exception.code, 400)
+            error.exception.close()
+        with self.assertRaises(HTTPError) as error:
+            self.post("/api/thumbnail", {"path": "IMG_001.jpg", "size": 96}, token="incorrecto")
+        self.assertEqual(error.exception.code, 403)
         error.exception.close()
 
     def test_preview_can_include_subfolders(self) -> None:

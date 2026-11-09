@@ -20,6 +20,7 @@ from PIL import Image
 from photodaterenamer.renamer import (
     apply_plan,
     create_preview,
+    undo_each,
     undo_renames,
 )
 
@@ -264,6 +265,38 @@ class RenameSafetyTests(unittest.TestCase):
 
         undo_renames(list(result.renamed))
 
+        self.assertEqual(snapshot(self.folder), before)
+
+    @unittest.skipUnless(os.name == "nt", "Windows locks open files against renaming")
+    def test_undo_reports_a_locked_file_restores_the_rest_and_can_be_retried(self) -> None:
+        for name in ("a.jpg", "b.jpg", "c.jpg"):
+            self.write(name, jpeg_bytes(color={"a.jpg": "red", "b.jpg": "green"}.get(name, "blue")))
+        before = snapshot(self.folder)
+        result = apply_plan(create_preview(self.folder))
+
+        with open(self.folder / "2024_05_06_b.jpg", "rb"):
+            undo = undo_each(list(result.renamed))
+
+        self.assertEqual(len(undo.restored), 2)
+        self.assertEqual([failure.current.name for failure in undo.failures], ["2024_05_06_b.jpg"])
+        self.assertTrue(undo.failures[0].reason)
+        self.assert_same_contents(before, snapshot(self.folder))
+
+        retry = undo_each([(failure.original, failure.current) for failure in undo.failures])
+
+        self.assertEqual(retry.failures, ())
+        self.assertEqual(snapshot(self.folder), before)
+
+    def test_undo_never_overwrites_a_file_that_took_the_original_name(self) -> None:
+        self.write("a.jpg", jpeg_bytes(color="red"))
+        result = apply_plan(create_preview(self.folder))
+        self.write("a.jpg", b"nuevo archivo con el nombre antiguo")
+        before = snapshot(self.folder)
+
+        undo = undo_each(list(result.renamed))
+
+        self.assertEqual(undo.restored, ())
+        self.assertIn("nombre original", undo.failures[0].reason)
         self.assertEqual(snapshot(self.folder), before)
 
     def test_apply_never_deletes_or_overwrites_any_file(self) -> None:

@@ -14,13 +14,14 @@ from typing import Any
 from urllib.parse import urlparse
 
 from .folder_picker import select_windows_folder
+from .thumbnails import make_thumbnail
 from .renamer import (
     RenameExecutionError,
     RenamePlan,
     RenamePlanError,
     apply_plan,
     create_preview,
-    undo_renames,
+    undo_each,
 )
 
 
@@ -28,7 +29,6 @@ WEB_ROOT = Path(__file__).with_name("web")
 MAX_REQUEST_SIZE = 64 * 1024
 STATIC_IMAGES = {
     "/images/app-icon.png": "image/png",
-    "/images/hero-illustration.png": "image/png",
     "/images/grain.png": "image/png",
     "/images/hero-print.webp": "image/webp",
     "/fonts/fraunces.woff2": "font/woff2",
@@ -51,6 +51,7 @@ class AppServer(ThreadingHTTPServer):
             "runs": {},
             "scan": None,
             "apply": None,
+            "gallery": {"root": None, "paths": set()},
         }
         super().__init__(("127.0.0.1", port), AppRequestHandler)
 
@@ -99,7 +100,7 @@ class AppRequestHandler(BaseHTTPRequestHandler):
                 "Content-Security-Policy",
                 "default-src 'none'; "
                 f"script-src 'self' 'nonce-{csp_nonce}'; "
-                "style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; "
+                "style-src 'self'; img-src 'self' blob:; font-src 'self'; connect-src 'self'; "
                 "form-action 'self'; base-uri 'none'; frame-ancestors 'none'; object-src 'none'",
             )
         self.end_headers()
@@ -145,7 +146,7 @@ class AppRequestHandler(BaseHTTPRequestHandler):
                 csp_nonce=self.server.state["token"],
             )
             return
-        if path in {"/app.js", "/styles.css"}:
+        if path in {"/app.js", "/helpers.js", "/styles.css"}:
             content_type = "text/javascript; charset=utf-8" if path.endswith(".js") else "text/css; charset=utf-8"
             self._send_text(200, (WEB_ROOT / path.lstrip("/")).read_text(encoding="utf-8"), content_type)
             return
@@ -172,6 +173,8 @@ class AppRequestHandler(BaseHTTPRequestHandler):
             path = urlparse(self.path).path
             if path == "/api/select-folder":
                 self._send_json(200, self._select_folder())
+            elif path == "/api/thumbnail":
+                self._thumbnail(payload)
             elif path == "/api/check-folder":
                 self._check_folder(payload)
             elif path == "/api/preview":
@@ -216,6 +219,30 @@ class AppRequestHandler(BaseHTTPRequestHandler):
             detail = result.stderr.strip() or "el selector terminó con un error."
             raise ValueError(f"No se pudo abrir el selector de carpetas: {detail}")
         return {"folder": result.stdout.strip()}
+
+    def _thumbnail(self, payload: dict[str, Any]) -> None:
+        relative = payload.get("path")
+        size = payload.get("size", 96)
+        if not isinstance(relative, str) or not isinstance(size, int):
+            raise ValueError("La petición de miniatura no es válida.")
+        with self.server.state_lock:
+            gallery = self.server.state["gallery"]
+            root = gallery["root"]
+            allowed = root is not None and relative in gallery["paths"]
+        if not allowed:
+            raise ValueError("Esa imagen no forma parte de la carpeta analizada.")
+        data = make_thumbnail(root / Path(relative), size)
+        if data is None:
+            self.send_response(204)
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            return
+        self.send_response(200)
+        self.send_header("Content-Type", "image/jpeg")
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(data)
 
     def _check_folder(self, payload: dict[str, Any]) -> None:
         folder = payload.get("folder")
@@ -301,6 +328,11 @@ class AppRequestHandler(BaseHTTPRequestHandler):
 
         self.server.state["plans"].clear()
         self.server.state["plans"][plan.plan_id] = plan
+        with self.server.state_lock:
+            self.server.state["gallery"] = {
+                "root": plan.directory,
+                "paths": {item.original_name for item in plan.items},
+            }
         self._send_json(
             200,
             {
@@ -388,6 +420,12 @@ class AppRequestHandler(BaseHTTPRequestHandler):
             with self.server.state_lock:
                 self.server.state["apply"]["completed"] = True
         renamed = list(result.renamed)
+        with self.server.state_lock:
+            gallery = self.server.state["gallery"]
+            if gallery["root"] == plan.directory:
+                gallery["paths"].update(
+                    new.relative_to(plan.directory).as_posix() for _, new in renamed
+                )
         self.server.state["runs"].clear()
         if renamed:
             self.server.state["runs"][plan_id] = renamed
@@ -432,6 +470,35 @@ class AppRequestHandler(BaseHTTPRequestHandler):
         renamed = self.server.state["runs"].get(run_id)
         if renamed is None:
             raise ValueError("No hay un renombrado disponible para deshacer.")
-        undo_renames(renamed)
-        self.server.state["runs"].pop(run_id, None)
-        self._send_json(200, {"restored_count": len(renamed)})
+        root = self.server.state.get("gallery", {}).get("root")
+        result = undo_each(renamed)
+        pending = [(failure.original, failure.current) for failure in result.failures]
+        if pending:
+            self.server.state["runs"][run_id] = pending
+        else:
+            self.server.state["runs"].pop(run_id, None)
+
+        def relative(path: Path) -> str:
+            if root is not None:
+                try:
+                    return path.relative_to(root).as_posix()
+                except ValueError:
+                    pass
+            return path.name
+
+        self._send_json(
+            200,
+            {
+                "run_id": run_id if pending else None,
+                "restored_count": len(result.restored),
+                "failed_count": len(result.failures),
+                "failures": [
+                    {
+                        "original_name": relative(failure.original),
+                        "current_name": relative(failure.current),
+                        "reason": failure.reason,
+                    }
+                    for failure in result.failures
+                ],
+            },
+        )

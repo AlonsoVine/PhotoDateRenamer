@@ -11,6 +11,7 @@
   <link rel="preload" href="/fonts/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
   <script nonce="__APP_TOKEN__">window.PDR_TOKEN = "__APP_TOKEN__";</script>
+  <script src="/helpers.js" defer></script>
   <script src="/app.js" defer></script>
 </head>
 <body data-mode="idle" data-view="idle">
@@ -23,7 +24,7 @@
       <span class="wordmark-stamp" aria-hidden="true">'26</span>
       <span class="wordmark-name">Photo<i>Date</i>Renamer<span class="sr-only">, inicio</span></span>
     </a>
-    <p class="local-badge"><span class="dot" aria-hidden="true"></span> Todo ocurre en este equipo</p>
+    <p class="local-badge"><span class="dot" aria-hidden="true"></span> <span class="badge-long">Todo ocurre en este equipo</span><span class="badge-short" aria-hidden="true">Solo en tu equipo</span></p>
   </header>
 
   <main id="main" tabindex="-1">
@@ -35,14 +36,14 @@
         <p class="hero-lede">Renombra las imágenes de una carpeta con el día en que se tomaron. Verás cada nombre nuevo antes de aplicar nada y podrás deshacerlo.</p>
 
         <form id="hero-form" class="hero-form" novalidate>
-          <button id="hero-browse" class="btn btn-stamp btn-xl" type="button">
+          <button id="hero-browse" class="btn btn-stamp btn-xl" type="button" aria-keyshortcuts="Alt+O">
             <span>Elegir carpeta</span>
-            <kbd aria-hidden="true">O</kbd>
+            <span class="kbd-combo" aria-hidden="true"><kbd>Alt</kbd><kbd>O</kbd></span>
           </button>
           <div class="path-field">
             <label for="hero-path">o pega la ruta de una carpeta</label>
             <div class="path-row">
-              <input id="hero-path" type="text" inputmode="text" spellcheck="false" autocomplete="off" placeholder="C:\Users\tú\Imágenes\Viaje">
+              <input id="hero-path" type="text" spellcheck="false" autocomplete="off" placeholder="C:\Users\tú\Imágenes\Viaje">
               <button class="btn btn-ghost" type="submit">Revisar</button>
             </div>
           </div>
@@ -64,21 +65,21 @@
       <figure class="tray" aria-hidden="true">
         <div class="print">
           <img src="/images/hero-print.webp" alt="" width="880" height="587" fetchpriority="high">
-          <span id="hero-stamp" class="print-stamp">'26 11 09</span>
+          <span id="hero-stamp" class="print-stamp">'24 08 14</span>
         </div>
-        <figcaption class="tray-caption"><span>Fecha de captura</span><span>EXIF · DateTimeOriginal</span></figcaption>
+        <figcaption class="tray-caption"><span class="tray-old">IMG_0412.jpg</span><span class="tray-new"><mark class="stamp">2024_08_14</mark>_IMG_0412.jpg</span></figcaption>
       </figure>
     </section>
 
     <!-- ============ WORKBENCH ============ -->
     <div id="workbench" class="workbench" hidden>
       <aside class="controls" aria-label="Ajustes del renombrado">
-        <section class="panel folder-panel" aria-labelledby="folder-title">
+        <section class="sleeve folder-panel" aria-labelledby="folder-title">
           <p class="panel-label"><span class="kicker-num">01</span> Carpeta</p>
           <h2 id="folder-title" class="folder-name">—</h2>
           <p id="folder-path-display" class="folder-path mono"></p>
           <div class="folder-actions">
-            <button id="change-folder" class="btn btn-ghost btn-sm" type="button">Cambiar carpeta</button>
+            <button id="change-folder" class="btn btn-ghost btn-sm" type="button" aria-keyshortcuts="Alt+O">Cambiar carpeta</button>
             <label class="check check-sm">
               <input id="bench-recursive" type="checkbox" data-recursive>
               <span class="check-box" aria-hidden="true"></span>
@@ -87,52 +88,59 @@
           </div>
         </section>
 
-        <section class="panel format-panel" aria-labelledby="format-title">
-          <p class="panel-label"><span class="kicker-num">02</span> Formato del nombre</p>
-          <h2 id="format-title" class="sr-only">Formato del nombre</h2>
-          <div class="presets" role="group" aria-label="Recetas de nombre">
-            <button class="preset" data-preset="date_original" type="button" aria-pressed="true">Fecha + nombre</button>
-            <button class="preset" data-preset="date_stem" type="button" aria-pressed="false">Fecha + título</button>
-            <button class="preset" data-preset="original_date" type="button" aria-pressed="false">Nombre + fecha</button>
-            <button class="preset" data-preset="custom" type="button" aria-pressed="false">A medida</button>
+        <details id="format-details" class="sleeve format-panel" open>
+          <summary class="format-summary">
+            <span class="panel-label"><span class="kicker-num">02</span> Formato del nombre</span>
+            <span id="format-summary-value" class="format-summary-value"></span>
+          </summary>
+          <div class="format-body">
+            <p id="format-lock" class="format-lock" hidden>Pulsa <b>Volver a analizar</b> para cambiar el formato.</p>
+            <div class="example" aria-live="polite">
+              <span class="sr-only">Ejemplo:</span>
+              <span id="example-old" class="mono example-old"></span>
+              <span id="example-new" class="mono example-new"></span>
+            </div>
+            <fieldset class="presets">
+              <legend class="field-label">Receta</legend>
+              <div class="seg-group">
+                <button class="preset" data-preset="date_original" type="button" aria-pressed="true">Fecha + nombre</button>
+                <button class="preset" data-preset="date_stem" type="button" aria-pressed="false">Fecha + título</button>
+                <button class="preset" data-preset="original_date" type="button" aria-pressed="false">Nombre + fecha</button>
+                <button class="preset" data-preset="custom" type="button" aria-pressed="false">A medida</button>
+              </div>
+            </fieldset>
+            <div class="field-label" id="tokens-label">Piezas, en orden</div>
+            <ol id="tokens" class="tokens" aria-labelledby="tokens-label"></ol>
+            <div class="add-pieces" role="group" aria-label="Añadir pieza al final">
+              <button type="button" class="add-piece" data-piece="date">+ Fecha</button>
+              <button type="button" class="add-piece" data-piece="original_name">+ Nombre</button>
+              <button type="button" class="add-piece" data-piece="original_stem">+ Sin extensión</button>
+              <button type="button" class="add-piece" data-piece="extension">+ Extensión</button>
+              <button type="button" class="add-piece" data-piece="text">+ Texto…</button>
+            </div>
+            <fieldset class="date-formats">
+              <legend class="field-label">Formato de fecha</legend>
+              <div class="seg-group seg-dates">
+                <label class="seg-option"><input type="radio" name="date-format" value="yyyy_mm_dd" checked><span>2025_04_12</span></label>
+                <label class="seg-option"><input type="radio" name="date-format" value="yyyy-mm-dd"><span>2025-04-12</span></label>
+                <label class="seg-option"><input type="radio" name="date-format" value="yyyymmdd"><span>20250412</span></label>
+              </div>
+            </fieldset>
           </div>
-          <ol id="tokens" class="tokens" aria-label="Piezas del nombre, en orden"></ol>
-          <div class="format-row">
-            <label class="field">
-              <span>Añadir pieza</span>
-              <select id="add-element">
-                <option value="" selected>Elige…</option>
-                <option value="date">Fecha de captura</option>
-                <option value="original_name">Nombre original con extensión</option>
-                <option value="original_stem">Nombre original sin extensión</option>
-                <option value="extension">Extensión</option>
-                <option value="text">Texto fijo…</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Fecha</span>
-              <select id="date-format">
-                <option value="yyyy_mm_dd">2025_04_12</option>
-                <option value="yyyy-mm-dd">2025-04-12</option>
-                <option value="yyyymmdd">20250412</option>
-              </select>
-            </label>
-          </div>
-          <p class="example" aria-live="polite"><span class="example-label">Ejemplo</span> <span id="example-old" class="mono example-old"></span> <span aria-hidden="true" class="arrow">→</span><span class="sr-only">se llamará</span> <span id="example-new" class="mono example-new"></span></p>
-        </section>
+        </details>
       </aside>
 
-      <section class="sheet" aria-labelledby="sheet-title">
+      <section id="sheet" class="sheet" aria-labelledby="sheet-title">
         <header class="sheet-head">
-          <div>
+          <div class="sheet-heading">
             <p id="sheet-kicker" class="kicker">Hoja de contactos</p>
             <h1 id="sheet-title" class="sheet-title" tabindex="-1">Vista previa</h1>
           </div>
           <div id="sheet-tools" class="sheet-tools" hidden>
             <label class="search">
               <span class="sr-only">Buscar por nombre</span>
-              <input id="search" type="search" placeholder="Buscar nombre" autocomplete="off" spellcheck="false">
-              <kbd aria-hidden="true">/</kbd>
+              <input id="search" type="search" placeholder="Buscar nombre" autocomplete="off" spellcheck="false" aria-keyshortcuts="Alt+B">
+              <span class="kbd-combo" aria-hidden="true"><kbd>Alt</kbd><kbd>B</kbd></span>
             </label>
           </div>
         </header>
@@ -141,8 +149,10 @@
 
         <!-- scanning / applying -->
         <div id="progress-view" class="state progress-view" hidden>
-          <p class="counter" aria-hidden="true"><span id="progress-count" class="seg">0</span><span class="counter-of"> / </span><span id="progress-total" class="seg seg-dim">—</span></p>
-          <div class="film-progress" aria-hidden="true"><div id="progress-bar" class="film-progress-bar"></div></div>
+          <div class="scene scene-progress" aria-hidden="true">
+            <div class="film-progress"><div id="progress-bar" class="film-progress-bar"></div></div>
+          </div>
+          <p class="counter" aria-hidden="true"><span id="progress-count" class="seg" data-ghost="8">0</span><span class="counter-of">de</span><span id="progress-total" class="seg seg-dim" data-ghost="8">0</span></p>
           <p id="progress-label" class="state-text" role="status" aria-live="polite">Preparando el análisis…</p>
           <button id="cancel-scan" class="btn btn-ghost" type="button">Cancelar análisis</button>
           <p id="apply-warning" class="state-note" hidden>No cierres la aplicación hasta que termine.</p>
@@ -150,9 +160,7 @@
 
         <!-- empty / no photos / cancelled / generic error / restored -->
         <div id="message-view" class="state message-view" hidden>
-          <div id="message-art" class="frame-art" aria-hidden="true"></div>
-          <p id="message-kicker" class="state-kicker"></p>
-          <h2 id="message-title" class="state-title"></h2>
+          <div id="message-art" class="scene" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
           <p id="message-text" class="state-text"></p>
           <div class="state-actions">
             <button id="message-primary" class="btn btn-stamp" type="button"></button>
@@ -160,34 +168,33 @@
           </div>
         </div>
 
-        <!-- results summary (success / partial / total) -->
+        <!-- results summary (success / partial / total / undo-partial) -->
         <div id="result-view" class="result-view" hidden>
           <div class="result-head">
-            <p class="counter counter-lg" aria-hidden="true"><span id="result-count" class="seg">0</span><span id="result-of" class="result-of"><span class="counter-of"> / </span><span id="result-total" class="seg seg-dim">0</span></span></p>
-            <div>
-              <p id="result-kicker" class="state-kicker"></p>
-              <h2 id="result-title" class="state-title"></h2>
-              <p id="result-text" class="state-text"></p>
-            </div>
+            <p class="counter counter-lg" aria-hidden="true"><span id="result-count" class="seg" data-ghost="8">0</span><span id="result-of" class="result-of"><span class="counter-of">de</span><span id="result-total" class="seg seg-dim" data-ghost="8">0</span></span></p>
+            <p id="result-text" class="state-text"></p>
           </div>
           <div class="state-actions">
-            <button id="undo-button" class="btn btn-stamp" type="button" hidden>Deshacer este lote</button>
+            <button id="result-primary" class="btn btn-stamp" type="button"></button>
+            <button id="undo-button" class="btn btn-ghost" type="button" hidden>Deshacer este lote</button>
             <button id="result-back" class="btn btn-ghost" type="button">Volver a analizar</button>
-            <button id="result-new" class="btn btn-ghost" type="button">Otra carpeta</button>
           </div>
         </div>
 
         <!-- contact sheet (virtualised) -->
         <div id="list-view" class="list-view" hidden>
           <div class="strip">
-            <div id="list-scroller" class="list-scroller" role="listbox" tabindex="0" aria-label="Archivos de la vista previa" aria-describedby="list-help"></div>
+            <div id="list-scroller" class="list-scroller" role="listbox" tabindex="0" aria-label="Archivos" aria-describedby="list-help"></div>
             <p id="list-help" class="sr-only">Usa las flechas para recorrer los archivos e Intro para ver el detalle.</p>
             <p id="list-empty" class="list-empty" hidden>Ningún archivo coincide con el filtro.</p>
           </div>
           <div class="bench-foot">
             <div id="loupe" class="loupe">
-              <p class="loupe-label" aria-hidden="true">Lupa</p>
-              <div id="loupe-body" class="loupe-body"></div>
+              <div class="loupe-frame" aria-hidden="true">
+                <img id="loupe-image" class="loupe-image" alt="" hidden>
+                <span id="loupe-stamp" class="loupe-stamp"></span>
+              </div>
+              <div id="loupe-body" class="loupe-body" aria-live="polite"></div>
             </div>
             <section id="apply-box" class="apply-box" aria-labelledby="apply-title" hidden>
               <h2 id="apply-title" class="panel-label"><span class="kicker-num">03</span> Aplicar</h2>
@@ -201,7 +208,7 @@
   </main>
 
   <footer class="footer">
-    <p class="shortcuts" aria-label="Atajos de teclado"><span><kbd>O</kbd> elegir carpeta</span><span><kbd>/</kbd> buscar</span><span><kbd>↑</kbd><kbd>↓</kbd> recorrer la hoja</span></p>
+    <p class="shortcuts"><span class="sr-only">Atajos de teclado:</span><span><span class="kbd-combo"><kbd>Alt</kbd><kbd>O</kbd></span> elegir carpeta</span><span><span class="kbd-combo"><kbd>Alt</kbd><kbd>B</kbd></span> buscar</span><span><span class="kbd-combo"><kbd>↑</kbd><kbd>↓</kbd></span> recorrer la hoja</span><span><span class="kbd-combo"><kbd>Intro</kbd></span> detalle</span></p>
     <p class="credits"><a href="https://alonsovine.github.io/portfolioR/" target="_blank" rel="noopener noreferrer">Creado por Alonso Viñé</a>
       <span class="footer-links"><a href="https://github.com/AlonsoVine" target="_blank" rel="noopener noreferrer">GitHub</a> <a href="https://www.linkedin.com/in/alonso-vi%C3%B1%C3%A9-barrancos/" target="_blank" rel="noopener noreferrer">LinkedIn</a></span>
       <span class="version">v0.6</span></p>
@@ -214,8 +221,8 @@
     <form method="dialog">
       <p class="kicker">Pieza a medida</p>
       <h2 id="text-dialog-title" class="dialog-title">Añade un texto</h2>
-      <label class="field field-block" for="literal-text"><span>Texto que formará parte del nombre</span></label>
-      <input id="literal-text" maxlength="64" placeholder="por ejemplo, vacaciones" autocomplete="off">
+      <label class="field-label field-block" for="literal-text">Texto que formará parte del nombre</label>
+      <input id="literal-text" maxlength="64" placeholder="por ejemplo, vacaciones" autocomplete="off" aria-describedby="literal-error">
       <p id="literal-error" class="field-error" hidden></p>
       <div class="dialog-actions">
         <button class="btn btn-ghost" value="cancel" type="submit" formnovalidate>Cancelar</button>
@@ -228,6 +235,10 @@
     <form method="dialog">
       <p class="kicker">Lupa</p>
       <h2 id="detail-title" class="dialog-title">Detalle del archivo</h2>
+      <div class="loupe-frame loupe-frame-lg" aria-hidden="true">
+        <img id="detail-image" class="loupe-image" alt="" hidden>
+        <span id="detail-stamp" class="loupe-stamp"></span>
+      </div>
       <div id="detail-body" class="loupe-body detail-body"></div>
       <div class="dialog-actions">
         <button class="btn btn-ghost" value="close" type="submit" autofocus>Cerrar</button>
@@ -237,9 +248,13 @@
 
   <dialog id="confirm-dialog" class="dialog dialog-confirm" aria-labelledby="confirm-title" aria-describedby="confirm-text">
     <form method="dialog">
-      <p class="kicker">Último paso</p>
+      <div class="confirm-strip" aria-hidden="true"></div>
+      <p class="kicker">Último paso · fijar</p>
       <h2 id="confirm-title" class="dialog-title">¿Renombrar?</h2>
+      <p class="counter counter-confirm" aria-hidden="true"><span id="confirm-count" class="seg" data-ghost="8">0</span></p>
       <p id="confirm-text" class="dialog-text"></p>
+      <p id="confirm-example" class="confirm-example mono"></p>
+      <p id="confirm-dated" class="confirm-dated" hidden></p>
       <ul class="promise">
         <li>Ningún archivo se sobrescribe ni se borra.</li>
         <li>Si alguno falla, el resto continúa y verás el motivo.</li>

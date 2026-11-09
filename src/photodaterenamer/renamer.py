@@ -547,3 +547,44 @@ def undo_renames(renamed: list[tuple[Path, Path]]) -> None:
         if rollback_errors:
             detail += " No se pudieron restaurar todos los nombres: " + "; ".join(rollback_errors)
         raise RenameExecutionError(detail) from error
+
+
+@dataclass(frozen=True)
+class UndoFailure:
+    original: Path
+    current: Path
+    reason: str
+
+
+@dataclass(frozen=True)
+class UndoResult:
+    restored: tuple[tuple[Path, Path], ...]
+    failures: tuple[UndoFailure, ...]
+
+
+def undo_each(renamed: list[tuple[Path, Path]]) -> UndoResult:
+    """Restore each renamed file independently, never overwriting an existing name.
+
+    A file that cannot be restored keeps its new name and is reported, so the user can
+    close the program holding it and try again.
+    """
+    restored: list[tuple[Path, Path]] = []
+    failures: list[UndoFailure] = []
+    for original, current in reversed(renamed):
+        reason: str | None = None
+        if not current.is_file():
+            reason = "El archivo renombrado ya no existe con ese nombre."
+        elif original.exists():
+            reason = "Ya existe otro archivo con el nombre original."
+        else:
+            try:
+                _move_without_overwrite(current, original)
+            except FileExistsError:
+                reason = "Ya existe otro archivo con el nombre original."
+            except OSError as error:
+                reason = _describe_os_error(error)
+            else:
+                restored.append((original, current))
+        if reason is not None:
+            failures.append(UndoFailure(original, current, reason))
+    return UndoResult(tuple(restored), tuple(failures))

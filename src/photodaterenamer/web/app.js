@@ -1,9 +1,10 @@
 "use strict";
 
-/* PhotoDateRenamer — interface controller.
-   Views: idle · scanning · empty · nophotos · cancelled · error · preview ·
-          applying · success · partial · total · restored */
+/* PhotoDateRenamer — «Revelado» interface controller.
+   Views: idle · scanning · empty · nophotos · cancelled · error · unknown · preview ·
+          applying · success · partial · total · restored · undo-partial */
 
+const H = window.PDRHelpers;
 const FIELD_LABELS = {
   date: "Fecha",
   original_name: "Nombre original",
@@ -28,25 +29,37 @@ const PRESETS = {
     { kind: "field", value: "extension" }
   ]
 };
+const PRESET_LABELS = {
+  date_original: "Fecha + nombre",
+  date_stem: "Fecha + título",
+  original_date: "Nombre + fecha",
+  custom: "A medida"
+};
 const STATUS_LABELS = {
   ready: "Se renombra",
   conflict: "Conflicto",
   skipped: "Omitida",
   unchanged: "Sin cambio",
   renamed: "Hecho",
-  failed: "Falló"
+  failed: "Falló",
+  pending: "Sin restaurar"
 };
 const FILTER_LABELS = {
   all: "Todas",
   ready: "Se renombran",
+  dated: "Ya fechadas",
   conflict: "Conflictos",
   skipped: "Omitidas",
   unchanged: "Sin cambio",
   renamed: "Renombradas",
-  failed: "Fallaron"
+  failed: "Fallaron",
+  pending: "Sin restaurar"
 };
+const SAMPLE = { name: "IMG_0412.jpg", date: new Date(2024, 7, 14) };
 const INVALID_NAME_TEXT = /[<>:"/\\|?*\u0000-\u001f]/;
+const RESULT_VIEWS = ["success", "partial", "total", "undo-partial"];
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const narrowScreen = window.matchMedia("(max-width: 960px)");
 const numberFormat = new Intl.NumberFormat("es-ES", { useGrouping: "always" });
 const $ = (selector) => document.querySelector(selector);
 
@@ -57,21 +70,21 @@ const ui = {
   heroPath: $("#hero-path"),
   heroBrowse: $("#hero-browse"),
   heroMessage: $("#hero-message"),
-  heroStamp: $("#hero-stamp"),
   workbench: $("#workbench"),
   folderTitle: $("#folder-title"),
   folderPath: $("#folder-path-display"),
   changeFolder: $("#change-folder"),
   recursiveInputs: [...document.querySelectorAll("[data-recursive]")],
+  formatDetails: $("#format-details"),
+  formatSummaryValue: $("#format-summary-value"),
+  formatLock: $("#format-lock"),
   presets: [...document.querySelectorAll(".preset")],
+  addPieces: [...document.querySelectorAll(".add-piece")],
+  dateRadios: [...document.querySelectorAll('input[name="date-format"]')],
   tokens: $("#tokens"),
-  addElement: $("#add-element"),
-  dateFormat: $("#date-format"),
   exampleOld: $("#example-old"),
   exampleNew: $("#example-new"),
-  applyBox: $("#apply-box"),
-  applyHint: $("#apply-hint"),
-  applyButton: $("#apply-button"),
+  sheet: $("#sheet"),
   sheetKicker: $("#sheet-kicker"),
   sheetTitle: $("#sheet-title"),
   sheetTools: $("#sheet-tools"),
@@ -86,8 +99,6 @@ const ui = {
   applyWarning: $("#apply-warning"),
   messageView: $("#message-view"),
   messageArt: $("#message-art"),
-  messageKicker: $("#message-kicker"),
-  messageTitle: $("#message-title"),
   messageText: $("#message-text"),
   messagePrimary: $("#message-primary"),
   messageSecondary: $("#message-secondary"),
@@ -95,27 +106,35 @@ const ui = {
   resultCount: $("#result-count"),
   resultOf: $("#result-of"),
   resultTotal: $("#result-total"),
-  resultKicker: $("#result-kicker"),
-  resultTitle: $("#result-title"),
   resultText: $("#result-text"),
+  resultPrimary: $("#result-primary"),
   undoButton: $("#undo-button"),
   resultBack: $("#result-back"),
-  resultNew: $("#result-new"),
   listView: $("#list-view"),
   listScroller: $("#list-scroller"),
   listEmpty: $("#list-empty"),
   loupe: $("#loupe"),
   loupeBody: $("#loupe-body"),
-  detailDialog: $("#detail-dialog"),
-  detailBody: $("#detail-body"),
+  loupeImage: $("#loupe-image"),
+  loupeStamp: $("#loupe-stamp"),
+  applyBox: $("#apply-box"),
+  applyHint: $("#apply-hint"),
+  applyButton: $("#apply-button"),
   announcer: $("#announcer"),
   toast: $("#toast"),
   textDialog: $("#text-dialog"),
   literalText: $("#literal-text"),
   literalError: $("#literal-error"),
+  detailDialog: $("#detail-dialog"),
+  detailBody: $("#detail-body"),
+  detailImage: $("#detail-image"),
+  detailStamp: $("#detail-stamp"),
   confirmDialog: $("#confirm-dialog"),
   confirmTitle: $("#confirm-title"),
+  confirmCount: $("#confirm-count"),
   confirmText: $("#confirm-text"),
+  confirmExample: $("#confirm-example"),
+  confirmDated: $("#confirm-dated"),
   confirmApply: $("#confirm-apply"),
   wordmark: $(".wordmark")
 };
@@ -146,7 +165,6 @@ function h(tag, attributes = {}, ...children) {
   for (const [name, value] of Object.entries(attributes)) {
     if (value === null || value === undefined || value === false) continue;
     if (name === "class") element.className = value;
-    else if (name === "text") element.textContent = value;
     else element.setAttribute(name, value === true ? "" : String(value));
   }
   for (const child of children.flat()) {
@@ -156,22 +174,30 @@ function h(tag, attributes = {}, ...children) {
   return element;
 }
 
-/** Render "texto *énfasis* texto" into nodes, with *…* as <em>. */
+/** "texto *énfasis*" → nodes with <em>. */
 function rich(text) {
   return text.split(/(\*[^*]+\*)/).filter(Boolean).map((part) =>
     part.startsWith("*") ? h("em", {}, part.slice(1, -1)) : document.createTextNode(part)
   );
 }
 
-/** Render "texto **negrita** texto" into nodes, with **…** as <b>. */
+/** "texto **negrita**" and "*énfasis*" → nodes with <b> / <em>. */
 function strong(text) {
-  return text.split(/(\*\*[^*]+\*\*)/).filter(Boolean).map((part) =>
-    part.startsWith("**") ? h("b", {}, part.slice(2, -2)) : document.createTextNode(part)
-  );
+  return text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/).filter(Boolean).map((part) => {
+    if (part.startsWith("**")) return h("b", {}, part.slice(2, -2));
+    if (part.startsWith("*") && part.length > 2) return h("em", {}, part.slice(1, -1));
+    return document.createTextNode(part);
+  });
 }
 
 const count = (value) => numberFormat.format(value);
 const plural = (value, one, many) => `${count(value)} ${value === 1 ? one : many}`;
+
+function setSeg(element, value) {
+  const text = H.segmentDigits(value);
+  element.textContent = text;
+  element.dataset.ghost = H.segmentGhost(text);
+}
 
 function announce(message) {
   ui.announcer.textContent = "";
@@ -182,7 +208,7 @@ function showToast(message) {
   window.clearTimeout(toastTimer);
   ui.toast.textContent = message;
   ui.toast.hidden = false;
-  toastTimer = window.setTimeout(() => { ui.toast.hidden = true; }, 4200);
+  toastTimer = window.setTimeout(() => { ui.toast.hidden = true; }, 6000);
 }
 
 function wait(milliseconds) {
@@ -196,11 +222,11 @@ class RequestError extends Error {
   }
 }
 
-async function request(path, data = {}) {
-  let response;
+async function post(path, data = {}, signal = undefined) {
   try {
-    response = await fetch(path, {
+    return await fetch(path, {
       method: "POST",
+      signal,
       headers: {
         "Content-Type": "application/json",
         "X-PhotoDateRenamer-Token": window.PDR_TOKEN
@@ -208,8 +234,13 @@ async function request(path, data = {}) {
       body: JSON.stringify(data)
     });
   } catch (error) {
+    if (error.name === "AbortError") throw error;
     throw new RequestError("No hay conexión con la aplicación. ¿Se cerró la ventana del programa?", 0);
   }
+}
+
+async function request(path, data = {}) {
+  const response = await post(path, data);
   let result = {};
   try {
     result = await response.json();
@@ -242,6 +273,10 @@ function formatDate(date, format) {
   return `${year}_${month}_${day}`;
 }
 
+function dateFormat() {
+  return ui.dateRadios.find((radio) => radio.checked)?.value || "yyyy_mm_dd";
+}
+
 function sameSettings(left, right) {
   return Boolean(left && right) && JSON.stringify(left) === JSON.stringify(right);
 }
@@ -250,9 +285,133 @@ function currentSettings() {
   return {
     folder: state.folder,
     components: state.components.map((part) => ({ ...part })),
-    date_format: ui.dateFormat.value,
+    date_format: dateFormat(),
     recursive: state.recursive
   };
+}
+
+/* --------------------------------------------------------------- thumbnails */
+
+class ThumbnailCache {
+  constructor() {
+    this.cache = new Map();
+    this.pending = new Map();
+    this.queue = [];
+    this.active = 0;
+    this.controller = new AbortController();
+  }
+
+  key(path, size) {
+    return `${size}|${path}`;
+  }
+
+  peek(path, size) {
+    return this.cache.get(this.key(path, size));
+  }
+
+  get(path, size, stillWanted = () => true) {
+    const key = this.key(path, size);
+    if (this.cache.has(key)) return Promise.resolve(this.cache.get(key));
+    const waiting = this.pending.get(key);
+    if (waiting) {
+      // A second requester (e.g. a redrawn row) keeps the queued job alive.
+      const previous = waiting.job.stillWanted;
+      waiting.job.stillWanted = () => previous() || stillWanted();
+      return waiting.promise;
+    }
+    const job = { key, path, size, stillWanted, resolve: null };
+    const promise = new Promise((resolve) => { job.resolve = resolve; })
+      .finally(() => this.pending.delete(key));
+    this.pending.set(key, { job, promise });
+    this.queue.push(job);
+    this.pump();
+    return promise;
+  }
+
+  pump() {
+    while (this.active < 4 && this.queue.length) {
+      const job = this.queue.pop();
+      if (!job.stillWanted()) {
+        this.pending.delete(job.key);
+        job.resolve(undefined);
+        continue;
+      }
+      this.active += 1;
+      this.fetch(job).finally(() => {
+        this.active -= 1;
+        this.pump();
+      });
+    }
+  }
+
+  async fetch(job) {
+    let url = null;
+    try {
+      const { signal } = this.controller;
+      const response = await post("/api/thumbnail", { path: job.path, size: job.size }, signal);
+      if (response.status === 200) url = URL.createObjectURL(await response.blob());
+      if (signal.aborted) {
+        if (url) URL.revokeObjectURL(url);
+        job.resolve(undefined);
+        return;
+      }
+    } catch (error) {
+      url = null;
+      if (error.name === "AbortError") {
+        job.resolve(undefined);
+        return;
+      }
+    }
+    this.store(job.key, url);
+    job.resolve(url);
+  }
+
+  store(key, url) {
+    this.cache.set(key, url);
+    if (this.cache.size > 500) {
+      const [oldestKey, oldestUrl] = this.cache.entries().next().value;
+      this.cache.delete(oldestKey);
+      if (oldestUrl) URL.revokeObjectURL(oldestUrl);
+    }
+  }
+
+  /** Forget every preview: called when a new folder or format is analysed. */
+  clear() {
+    this.controller.abort();
+    this.controller = new AbortController();
+    for (const url of this.cache.values()) if (url) URL.revokeObjectURL(url);
+    this.cache.clear();
+    for (const job of this.queue) job.resolve(undefined);
+    this.queue = [];
+    this.pending.clear();
+  }
+}
+
+const thumbnails = new ThumbnailCache();
+
+/** Path where a sheet item currently lives on disk, for its thumbnail. */
+function currentPathOf(item) {
+  return item.status === "renamed" ? item.new_name : item.original_name;
+}
+
+function canShowThumbnail(item) {
+  return Boolean(item) && item.status !== "skipped";
+}
+
+function fillFrame(image, stamp, item, size) {
+  stamp.textContent = item ? H.stampFromDateText(item.date_text) : "";
+  image.hidden = true;
+  image.removeAttribute("src");
+  delete image.dataset.path;
+  if (!canShowThumbnail(item)) return;
+  const path = currentPathOf(item);
+  image.dataset.path = path;
+  thumbnails.get(path, size).then((url) => {
+    if (url && image.dataset.path === path) {
+      image.src = url;
+      image.hidden = false;
+    }
+  });
 }
 
 /* ------------------------------------------------------------ mode & view */
@@ -267,8 +426,8 @@ function transition(update) {
 
 function setMode(mode) {
   if (state.mode === mode) return;
+  state.mode = mode;
   transition(() => {
-    state.mode = mode;
     ui.body.dataset.mode = mode;
     ui.hero.hidden = mode !== "idle";
     ui.workbench.hidden = mode === "idle";
@@ -282,11 +441,13 @@ const VIEW_PANELS = {
   nophotos: "message",
   cancelled: "message",
   error: "message",
+  unknown: "message",
   restored: "message",
   preview: "list",
   success: "result",
   partial: "result",
-  total: "result"
+  total: "result",
+  "undo-partial": "result"
 };
 
 function setView(view) {
@@ -310,18 +471,30 @@ function setSheetHeading(kicker, title) {
   ui.sheetTitle.replaceChildren(...rich(title));
 }
 
+/** Move focus to the state heading and, on small screens, bring it into view. */
 function focusHeading() {
-  ui.sheetTitle.focus({ preventScroll: false });
+  window.requestAnimationFrame(() => {
+    ui.sheetTitle.focus({ preventScroll: true });
+    const box = ui.sheetTitle.getBoundingClientRect();
+    if (box.top < 0 || box.bottom > window.innerHeight) {
+      ui.sheet.scrollIntoView({ block: "start", behavior: reduceMotion.matches ? "auto" : "smooth" });
+    }
+  });
 }
 
 function updateControlsLock() {
-  const locked = state.view === "applying";
-  for (const element of [
-    ui.changeFolder, ui.addElement, ui.dateFormat, ...ui.recursiveInputs, ...ui.presets,
+  const resultView = RESULT_VIEWS.includes(state.view);
+  const locked = state.view === "applying" || resultView;
+  ui.formatLock.hidden = !resultView;
+  const controls = [
+    ...ui.presets, ...ui.addPieces, ...ui.dateRadios, ...ui.recursiveInputs,
     ...ui.tokens.querySelectorAll("button")
-  ]) {
-    if (locked) {
-      element.dataset.lockedDisabled = element.disabled ? "1" : "";
+  ];
+  const lockable = [...controls, ui.changeFolder];
+  for (const element of lockable) {
+    const shouldLock = element === ui.changeFolder ? state.view === "applying" : locked;
+    if (shouldLock) {
+      if (!("lockedDisabled" in element.dataset)) element.dataset.lockedDisabled = element.disabled ? "1" : "";
       element.disabled = true;
     } else if ("lockedDisabled" in element.dataset) {
       element.disabled = element.dataset.lockedDisabled === "1";
@@ -334,7 +507,6 @@ function updateControlsLock() {
 
 function renderFolder() {
   ui.folderTitle.textContent = folderNameOf(state.folder) || "—";
-  ui.folderTitle.title = state.folder;
   ui.folderPath.replaceChildren(h("bdi", {}, state.folder));
   ui.folderPath.title = state.folder;
   for (const input of ui.recursiveInputs) input.checked = state.recursive;
@@ -372,6 +544,7 @@ async function pickFolder() {
 
 function chooseFolder(folder) {
   state.folder = folder;
+  state.lastRunId = null;
   ui.heroPath.value = folder;
   ui.heroMessage.hidden = true;
   renderFolder();
@@ -391,9 +564,10 @@ function renderTokens() {
       button.addEventListener("click", () => {
         const [part] = state.components.splice(index, 1);
         state.components.splice(index + direction, 0, part);
-        formatChanged("custom", `${spoken} movida.`);
-        const again = ui.tokens.children[index + direction]?.querySelectorAll("button")[direction < 0 ? 0 : 1];
-        (again && !again.disabled ? again : ui.tokens.children[index + direction]?.querySelector("button:not(:disabled)"))?.focus();
+        formatChanged("custom", `${spoken} movida a la posición ${index + direction + 1}.`);
+        const moved = ui.tokens.children[index + direction];
+        const same = moved?.querySelectorAll("button")[direction < 0 ? 0 : 1];
+        (same && !same.disabled ? same : moved?.querySelector("button:not(:disabled)"))?.focus();
       });
       return button;
     };
@@ -402,56 +576,50 @@ function renderTokens() {
       state.components.splice(index, 1);
       formatChanged("custom", `${spoken} quitada.`);
       const next = ui.tokens.children[Math.min(index, ui.tokens.children.length - 1)];
-      (next?.querySelector("button:last-child") || ui.addElement).focus();
+      (next?.querySelector("button:last-child") || ui.addPieces[0]).focus();
     });
-    return h(
-      "li",
-      { class: `token ${isText ? "token-text" : ""} ${component.value === "date" && !isText ? "token-date" : ""}` },
-      h("span", { class: "token-label" }, label),
-      move(-1, "←", "Mover a la izquierda"),
-      move(1, "→", "Mover a la derecha"),
-      remove
-    );
+    const kind = isText ? "token-text" : component.value === "date" ? "token-date" : "";
+    return h("li", { class: `token ${kind}` }, h("span", { class: "token-label" }, label),
+      move(-1, "←", "Mover a la izquierda"), move(1, "→", "Mover a la derecha"), remove);
   });
   if (!nodes.length) nodes.push(h("li", { class: "tokens-empty" }, "Añade al menos una pieza para formar el nombre."));
   ui.tokens.replaceChildren(...nodes);
   for (const button of ui.presets) {
     button.setAttribute("aria-pressed", String(button.dataset.preset === state.preset));
   }
+  ui.formatSummaryValue.textContent = `${PRESET_LABELS[state.preset]} · ${formatDate(SAMPLE.date, dateFormat())}`;
   renderExample();
+  updateControlsLock();
 }
 
 function sampleForExample() {
   const items = state.plan?.items || [];
-  const item =
-    items.find((entry) => entry.status === "ready" && !entry.original_name.includes(entry.date_text)) ||
-    items.find((entry) => entry.date_text && entry.status !== "skipped");
+  const fresh = state.plan && sameSettings(state.planSettings, currentSettings());
+  const item = fresh && (
+    items.find((entry) => entry.status === "ready" && !entry.dated) ||
+    items.find((entry) => entry.status === "ready")
+  );
   if (item) return { name: splitPath(item.original_name)[1], date: item.date_text };
-  return { name: "IMG_0412.jpg", date: formatDate(new Date(), ui.dateFormat.value) };
+  return { name: SAMPLE.name, date: formatDate(SAMPLE.date, dateFormat()) };
 }
 
 function renderExample() {
   const sample = sampleForExample();
-  const sampleDate = state.plan && sameSettings(state.planSettings, currentSettings())
-    ? sample.date
-    : formatDate(dateFromText(sample.date), ui.dateFormat.value);
   const dot = sample.name.lastIndexOf(".");
   const extension = dot > 0 ? sample.name.slice(dot) : "";
   const stem = extension ? sample.name.slice(0, -extension.length) : sample.name;
   const values = { original_name: sample.name, original_stem: stem, extension };
   const nodes = state.components.map((part) => {
     if (part.kind === "text") return document.createTextNode(part.value);
-    if (part.value === "date") return h("mark", { class: "stamp" }, sampleDate);
+    if (part.value === "date") return h("mark", { class: "stamp" }, sample.date);
     return document.createTextNode(values[part.value]);
   });
   ui.exampleOld.textContent = sample.name;
-  ui.exampleNew.replaceChildren(...(nodes.length ? nodes : [document.createTextNode("—")]));
-}
-
-function dateFromText(text) {
-  const digits = (text || "").replace(/\D/g, "");
-  if (digits.length !== 8) return new Date();
-  return new Date(Number(digits.slice(0, 4)), Number(digits.slice(4, 6)) - 1, Number(digits.slice(6, 8)));
+  ui.exampleNew.replaceChildren(
+    h("span", { class: "arrow", "aria-hidden": "true" }, "→ "),
+    h("span", { class: "sr-only" }, "se llamará "),
+    ...(nodes.length ? nodes : [document.createTextNode("—")])
+  );
 }
 
 function formatChanged(preset, message) {
@@ -462,7 +630,8 @@ function formatChanged(preset, message) {
 }
 
 function scheduleRefresh() {
-  if (state.mode === "idle" || !state.folder || state.view === "applying") return;
+  updateApplyPanel();
+  if (state.mode === "idle" || !state.folder || state.view === "applying" || RESULT_VIEWS.includes(state.view)) return;
   window.clearTimeout(refreshTimer);
   if (!state.components.length) {
     cancelActiveScan();
@@ -474,12 +643,10 @@ function scheduleRefresh() {
 
 function showEmptyFormat() {
   state.plan = null;
-  setSheetHeading("Formato vacío", "Sin piezas no hay *nombre*");
+  setSheetHeading("Falta el formato", "Añade al menos *una pieza*");
   showMessage({
     view: "error",
     art: "nophotos",
-    kicker: "Falta el formato",
-    title: "Añade al menos *una pieza*",
     text: "Elige una receta o añade la fecha, el nombre original o un texto. La vista previa se actualizará sola.",
     primary: { label: "Usar «Fecha + nombre»", action: () => applyPreset("date_original") }
   });
@@ -487,7 +654,7 @@ function showEmptyFormat() {
 
 function applyPreset(preset) {
   if (preset !== "custom") state.components = PRESETS[preset].map((part) => ({ ...part }));
-  formatChanged(preset, preset === "custom" ? "Formato a medida: añade o mueve piezas." : null);
+  formatChanged(preset, preset === "custom" ? "Formato a medida: añade o mueve piezas." : `Receta ${PRESET_LABELS[preset]}.`);
 }
 
 /* --------------------------------------------------------------- scanning */
@@ -501,7 +668,7 @@ async function cancelActiveScan() {
   } catch (error) {
     /* the scan already finished; nothing to cancel */
   }
-  await scan.done.catch(() => {});
+  await scan.done;
 }
 
 function updateScanProgress(progress) {
@@ -509,16 +676,13 @@ function updateScanProgress(progress) {
   const indeterminate = progress.phase !== "scanning" || progress.total === null;
   ui.progressBar.parentElement.classList.toggle("is-indeterminate", indeterminate);
   if (progress.phase === "indexing") {
-    ui.progressCount.textContent = String(progress.scanned);
-    ui.progressTotal.textContent = "—";
+    setSeg(ui.progressCount, progress.scanned);
     ui.progressLabel.textContent = `Contando archivos… ${count(progress.scanned)} por ahora.`;
   } else if (!indeterminate) {
-    ui.progressCount.textContent = String(progress.scanned);
-    ui.progressTotal.textContent = String(progress.total);
+    setSeg(ui.progressCount, progress.scanned);
+    setSeg(ui.progressTotal, progress.total);
     ui.progressBar.style.transform = `scaleX(${progress.total ? progress.scanned / progress.total : 1})`;
     ui.progressLabel.textContent = `Leyendo la fecha de la foto ${count(progress.scanned)} de ${count(progress.total)}.`;
-  } else {
-    ui.progressLabel.textContent = "Preparando el análisis…";
   }
 }
 
@@ -536,11 +700,15 @@ async function monitorScan(scan) {
   }
 }
 
+function resetProgress(total) {
+  setSeg(ui.progressCount, 0);
+  setSeg(ui.progressTotal, total);
+  ui.progressBar.style.transform = "scaleX(0)";
+}
+
 function showScanning() {
   setSheetHeading("Revelando", `Leyendo *${folderNameOf(state.folder)}*`);
-  ui.progressCount.textContent = "0";
-  ui.progressTotal.textContent = "—";
-  ui.progressBar.style.transform = "scaleX(0)";
+  resetProgress(0);
   ui.progressBar.parentElement.classList.add("is-indeterminate");
   ui.progressLabel.textContent = "Preparando el análisis…";
   ui.cancelScan.hidden = false;
@@ -578,7 +746,7 @@ async function startPreview({ origin }) {
       showHeroMessage(check.error, true);
       ui.heroPath.focus();
     } else {
-      showError("No encuentro esa carpeta", check.error, () => startPreview({ origin: "retry" }));
+      showError("No encuentro *esa carpeta*", check.error, () => startPreview({ origin: "retry" }));
     }
     return;
   }
@@ -590,9 +758,12 @@ async function startPreview({ origin }) {
   activeScan = scan;
   state.plan = null;
   state.planSettings = null;
+  state.result = null;
   state.filter = "all";
   state.query = "";
   ui.search.value = "";
+  thumbnails.clear();
+  list.setItems([]);
 
   let revealTimer = null;
   if (fromIdle) {
@@ -602,11 +773,13 @@ async function startPreview({ origin }) {
         renderFolder();
         setMode("workbench");
         showScanning();
+        focusHeading();
       }
     }, 260);
   } else {
     renderFolder();
     showScanning();
+    if (origin !== "format") focusHeading();
   }
 
   const preview = request("/api/preview", { ...settings, scan_id: scan.id });
@@ -628,14 +801,13 @@ async function startPreview({ origin }) {
     }
     state.plan = result;
     state.planSettings = settings;
-    ui.body.dataset.planFolder = result.folder;
     renderFolder();
     setMode("workbench");
     showPlan(result, origin);
   } catch (error) {
     if (generation !== scanGeneration) return;
     setMode("workbench");
-    showError("No se pudo leer la carpeta", error.message, () => startPreview({ origin: "retry" }));
+    showError("No se pudo leer *la carpeta*", error.message, () => startPreview({ origin: "retry" }));
   } finally {
     window.clearTimeout(revealTimer);
     ui.heroBrowse.removeAttribute("aria-busy");
@@ -649,33 +821,29 @@ function showCancelled() {
   showMessage({
     view: "cancelled",
     art: "cancelled",
-    kicker: "Cancelado",
-    title: "Has detenido el *análisis*",
-    text: "No se ha modificado ningún archivo. Puedes volver a analizar la carpeta cuando quieras.",
+    text: "Has detenido el análisis. **No se ha modificado ningún archivo**; puedes volver a analizar cuando quieras.",
     primary: { label: "Volver a analizar", action: () => startPreview({ origin: "retry" }) },
     secondary: { label: "Elegir otra carpeta", action: pickFolder }
   });
   announce("Análisis cancelado. No se modificó ningún archivo.");
+  focusHeading();
 }
 
 function showError(title, message, retry) {
-  setSheetHeading("Algo no salió bien", "Película *velada*");
+  setSheetHeading("Algo no salió bien", title);
   showMessage({
     view: "error",
     art: "fogged",
-    kicker: "Error",
-    title,
     text: message,
     primary: { label: "Reintentar", action: retry },
     secondary: { label: "Elegir otra carpeta", action: pickFolder }
   });
-  announce(`${title}. ${message}`);
+  announce(`${title.replace(/\*/g, "")}. ${message}`);
+  focusHeading();
 }
 
-function showMessage({ view, art, kicker, title, text, primary, secondary }) {
+function showMessage({ view, art, text, primary, secondary }) {
   ui.messageArt.dataset.art = art;
-  ui.messageKicker.textContent = kicker;
-  ui.messageTitle.replaceChildren(...rich(title));
   ui.messageText.replaceChildren(...strong(text));
   ui.messagePrimary.textContent = primary.label;
   ui.messagePrimary.onclick = primary.action;
@@ -692,6 +860,7 @@ function showMessage({ view, art, kicker, title, text, primary, secondary }) {
 function countsOf(items) {
   return items.reduce((summary, item) => {
     summary[item.status] = (summary[item.status] || 0) + 1;
+    if (item.dated) summary.dated = (summary.dated || 0) + 1;
     return summary;
   }, {});
 }
@@ -701,27 +870,22 @@ function showPlan(plan, origin) {
   if (!plan.items.length) {
     state.plan = null;
     if (plan.entry_count === 0) {
-      setSheetHeading("Carrete vacío", `*${folderName}* está vacía`);
+      setSheetHeading("Carrete vacío", `*${folderName}* no tiene archivos`);
       showMessage({
         view: "empty",
         art: "empty",
-        kicker: "Carpeta vacía",
-        title: "Aquí no hay *nada* que revelar",
-        text: "La carpeta no contiene ningún archivo. Elige otra carpeta con fotografías.",
+        text: "Esta carpeta está vacía: no hay nada que revelar. Elige otra carpeta con fotografías.",
         primary: { label: "Elegir otra carpeta", action: pickFolder }
       });
       announce("La carpeta está vacía.");
     } else {
-      const suggestion = state.recursive
-        ? ""
-        : " Si tus fotos están dentro de subcarpetas, activa **Subcarpetas**.";
-      setSheetHeading("Sin fotografías", `Ninguna foto en *${folderName}*`);
+      const found = plan.entry_count === 1 ? "**1 elemento**" : `**${count(plan.entry_count)} elementos**`;
+      setSheetHeading("Sin fotografías", "Hay archivos, pero *ninguna foto*");
       showMessage({
         view: "nophotos",
         art: "nophotos",
-        kicker: "Sin imágenes compatibles",
-        title: "Hay archivos, pero *ninguna foto*",
-        text: `Encontré ${plan.entry_count === 1 ? "**1 elemento**" : `**${count(plan.entry_count)} elementos**`}, pero ninguno es JPG, PNG o TIFF.${suggestion}`,
+        text: `En *${folderName}* hay ${found}, pero ninguno es JPG, PNG o TIFF.` +
+          (state.recursive ? "" : " Si tus fotos están dentro de subcarpetas, inclúyelas."),
         primary: state.recursive
           ? { label: "Elegir otra carpeta", action: pickFolder }
           : { label: "Incluir subcarpetas", action: () => setRecursive(true) },
@@ -734,29 +898,31 @@ function showPlan(plan, origin) {
     return;
   }
 
+  for (const item of plan.items) item.dated = item.status === "ready" && H.looksDated(item.original_name);
   const counts = countsOf(plan.items);
-  setSheetHeading("Hoja de contactos", `*${count(plan.items.length)}* ${plan.items.length === 1 ? "foto revisada" : "fotos revisadas"}`);
-  renderFilters(counts, ["all", "ready", "conflict", "skipped", "unchanged"]);
+  setSheetHeading(`Hoja de contactos · ${folderName}`, `*${count(plan.items.length)}* ${plan.items.length === 1 ? "foto revisada" : "fotos revisadas"}`);
   setView("preview");
+  renderFilters(counts, ["all", "ready", "dated", "conflict", "skipped", "unchanged"]);
   list.setItems(filteredItems(), { develop: origin !== "format" });
   renderExample();
   const ready = counts.ready || 0;
   announce(
     `Vista previa lista: ${plural(ready, "foto se renombrará", "fotos se renombrarán")}` +
     `${counts.conflict ? `, ${plural(counts.conflict, "conflicto", "conflictos")}` : ""}` +
-    `${counts.skipped ? `, ${plural(counts.skipped, "omitida", "omitidas")}` : ""}.`
+    `${counts.skipped ? `, ${plural(counts.skipped, "omitida", "omitidas")}` : ""}` +
+    `${counts.dated ? `, ${plural(counts.dated, "ya parece fechada", "ya parecen fechadas")}` : ""}.`
   );
   if (origin !== "format") focusHeading();
 }
 
 function renderFilters(counts, keys) {
-  const total = Object.values(counts).reduce((sum, value) => sum + value, 0);
+  const total = sourceItems().length;
   const buttons = keys
     .filter((key) => key === "all" || counts[key])
     .map((key) => {
       const button = h(
         "button",
-        { type: "button", class: "filter", "data-filter": key, "aria-pressed": String(state.filter === key) },
+        { type: "button", class: `filter filter-${key}`, "data-filter": key, "aria-pressed": String(state.filter === key) },
         key === "all" ? null : h("span", { class: "filter-dot", "aria-hidden": "true" }),
         FILTER_LABELS[key],
         h("span", { class: "filter-count" }, count(key === "all" ? total : counts[key]))
@@ -781,7 +947,7 @@ function sourceItems() {
 function filteredItems() {
   const query = state.query.trim().toLocaleLowerCase("es");
   return sourceItems().filter((item) => {
-    if (state.filter !== "all" && item.status !== state.filter) return false;
+    if (state.filter === "dated" ? !item.dated : state.filter !== "all" && item.status !== state.filter) return false;
     if (!query) return true;
     return (
       item.original_name.toLocaleLowerCase("es").includes(query) ||
@@ -790,66 +956,121 @@ function filteredItems() {
   });
 }
 
-/** Highlight the date inside a destination file name. */
-function nameWithStamp(path, dateText) {
-  const [directory, base] = splitPath(path);
+function shorten(path, maxChars) {
+  const [directory, fullBase] = splitPath(path);
+  if (!Number.isFinite(maxChars)) return [directory, fullBase];
+  const room = Math.max(10, maxChars - directory.length);
+  const shortDirectory = directory.length > maxChars * 0.4 ? H.middleEllipsis(directory, Math.max(6, Math.floor(maxChars * 0.4))) : directory;
+  return [shortDirectory, H.middleEllipsis(fullBase, Math.max(10, maxChars - shortDirectory.length, room > 10 ? 10 : room))];
+}
+
+/** Destination name with the date highlighted; optionally shortened in the middle. */
+function nameWithStamp(path, dateText, maxChars = Infinity) {
+  const [directory, base] = shorten(path, maxChars);
   const nodes = [];
   if (directory) nodes.push(h("span", { class: "dir" }, directory));
   const at = dateText ? base.indexOf(dateText) : -1;
-  if (at === -1) {
-    nodes.push(base);
-  } else {
-    nodes.push(base.slice(0, at), h("mark", { class: "stamp" }, dateText), base.slice(at + dateText.length));
-  }
+  if (at === -1) nodes.push(base);
+  else nodes.push(base.slice(0, at), h("mark", { class: "stamp" }, dateText), base.slice(at + dateText.length));
   return nodes;
 }
 
-function pathNodes(path) {
-  const [directory, base] = splitPath(path);
+function pathNodes(path, maxChars = Infinity) {
+  const [directory, base] = shorten(path, maxChars);
   return [directory ? h("span", { class: "dir" }, directory) : null, base];
 }
 
-function shortSource(source) {
-  if (!source) return "—";
-  if (source.startsWith("EXIF")) return "EXIF";
-  if (source.startsWith("XMP")) return "XMP";
-  return "ARCHIVO";
+function shortReason(item) {
+  if (item.status === "unchanged") return "Ya tiene ese nombre.";
+  if (item.status === "conflict" && item.new_name) return "ese nombre ya existe o se repite";
+  return item.reason || "—";
 }
 
-function renderRow(item, index) {
-  const showsName = item.status === "ready" || item.status === "renamed";
-  const second = showsName
-    ? h("span", { class: "row-new" }, h("span", { class: "arrow", "aria-hidden": "true" }, "→"), h("span", { class: "sr-only" }, item.status === "renamed" ? " ahora se llama " : " pasará a llamarse "), ...nameWithStamp(item.new_name, item.date_text))
-    : h("span", { class: "row-new row-reason" }, item.reason || (item.status === "unchanged" ? "Ya tiene ese nombre." : "—"));
+function renderRow(item, index, chars) {
+  const thumb = h("span", { class: "row-thumb", "aria-hidden": "true" },
+    h("img", { alt: "", hidden: true, decoding: "async" }),
+    h("span", { class: "row-frame" }, String(index + 1).padStart(4, "0")));
+  let second;
+  if (item.status === "ready" || item.status === "renamed") {
+    second = h("span", { class: "row-new" },
+      h("span", { class: "arrow", "aria-hidden": "true" }, "→ "),
+      h("span", { class: "sr-only" }, item.status === "renamed" ? "ahora se llama " : "pasará a llamarse "),
+      ...nameWithStamp(item.new_name, item.date_text, chars - 2));
+  } else if (item.status === "conflict" && item.new_name) {
+    second = h("span", { class: "row-new row-clash" },
+      h("span", { class: "arrow", "aria-hidden": "true" }, "⨯ "),
+      h("span", { class: "sr-only" }, "chocaría con "),
+      ...pathNodes(item.new_name, Math.max(12, chars - 34)),
+      h("span", { class: "row-why" }, ` · ${shortReason(item)}`));
+  } else if (item.status === "pending") {
+    second = h("span", { class: "row-new row-reason" },
+      h("span", { class: "arrow", "aria-hidden": "true" }, "↺ "),
+      h("span", { class: "sr-only" }, "debía volver a "),
+      ...pathNodes(item.new_name, Math.max(12, chars - 2)));
+  } else if (item.status === "failed") {
+    second = h("span", { class: "row-new row-reason" }, item.reason || "—");
+  } else {
+    second = h("span", { class: "row-new row-reason" }, shortReason(item));
+  }
+  const tags = [h("span", { class: `badge badge-${item.status}` },
+    h("span", { class: "sr-only" }, ". "),
+    h("span", { class: "badge-text" }, STATUS_LABELS[item.status]))];
+  if (item.dated) {
+    tags.push(h("span", { class: "badge badge-dated" },
+      h("span", { class: "sr-only" }, ", "),
+      h("span", { class: "badge-text" }, "ya fechada")));
+  }
   return [
-    h("span", { class: "row-frame", "aria-hidden": "true" }, String(index + 1).padStart(4, "0"), h("small", {}, shortSource(item.date_source))),
-    h("span", { class: "row-names" }, h("span", { class: "row-old" }, ...pathNodes(item.original_name)), second),
-    h("span", { class: `badge badge-${item.status}` }, h("span", { class: "sr-only" }, ". "), STATUS_LABELS[item.status])
+    thumb,
+    h("span", { class: "row-names" }, h("span", { class: "row-old" }, ...pathNodes(item.original_name, chars)), second),
+    h("span", { class: "row-tags" }, ...tags)
   ];
 }
 
 function loupeContent(item) {
-  const rows = [["Ahora", h("span", { class: "mono" }, item.original_name)]];
-  if (item.new_name && item.status !== "unchanged") {
-    rows.push([item.status === "renamed" ? "Ahora se llama" : "Será", h("span", { class: "mono" }, ...nameWithStamp(item.new_name, item.date_text))]);
+  const mono = (...children) => h("span", { class: "mono" }, ...children);
+  const rows = [];
+  if (item.status === "renamed") {
+    rows.push(["Antes", mono(item.original_name)]);
+    rows.push(["Ahora se llama", mono(...nameWithStamp(item.new_name, item.date_text))]);
+  } else if (item.status === "pending") {
+    rows.push(["Ahora", mono(item.original_name)]);
+    rows.push(["Debía volver a", mono(item.new_name)]);
+  } else {
+    rows.push(["Ahora", mono(item.original_name)]);
+    if (item.status === "ready") {
+      rows.push(["Pasará a", mono(...nameWithStamp(item.new_name, item.date_text))]);
+    } else if (item.status === "failed") {
+      rows.push(["Destino previsto", h("span", { class: "mono loupe-strike" }, item.new_name, h("span", { class: "sr-only" }, " (no aplicado)"))]);
+    } else if (item.status === "conflict" && item.new_name) {
+      rows.push(["Chocaría con", mono(item.new_name)]);
+    }
   }
-  if (item.date_source) rows.push(["Fecha de", item.date_source]);
+  if (item.date_source) rows.push(["Origen de la fecha", item.date_source]);
   if (item.reason) rows.push(["Motivo", h("span", { class: "loupe-reason" }, item.reason)]);
+  if (item.dated) rows.push(["Aviso", "El nombre ya empieza por una fecha; recibirá otra delante."]);
   rows.push(["Estado", STATUS_LABELS[item.status]]);
   return h("dl", {}, ...rows.flatMap(([term, value]) => [h("dt", {}, term), h("dd", {}, value)]));
 }
 
 function renderLoupe(item) {
+  fillFrame(ui.loupeImage, ui.loupeStamp, item, 360);
+  ui.loupe.dataset.status = item ? item.status : "";
   if (!item) {
-    ui.loupeBody.replaceChildren(h("span", {}, "Pasa el cursor o usa ↑ ↓ en la hoja para ver un archivo completo."));
+    ui.loupeBody.replaceChildren(h("p", { class: "loupe-empty" }, "Pasa el cursor o usa ↑ ↓ en la hoja para ver un archivo completo."));
     return;
   }
   ui.loupeBody.replaceChildren(loupeContent(item));
 }
 
+function loupeVisible() {
+  return getComputedStyle(ui.loupe).display !== "none" && !ui.listView.hidden;
+}
+
 function openDetail(item) {
-  if (!item || getComputedStyle(ui.loupe).display !== "none") return;
+  if (!item || loupeVisible()) return;
   ui.detailBody.replaceChildren(loupeContent(item));
+  fillFrame(ui.detailImage, ui.detailStamp, item, 360);
   ui.detailDialog.showModal();
 }
 
@@ -864,15 +1085,19 @@ class VirtualList {
     this.items = [];
     this.rows = new Map();
     this.active = -1;
-    this.rowHeight = 62;
+    this.hover = -1;
+    this.rowHeight = 64;
     this.viewport = 400;
+    this.chars = 60;
+    this.charWidth = 0;
     this.frame = 0;
     this.scroller.addEventListener("scroll", () => this.schedule(), { passive: true });
     this.scroller.addEventListener("keydown", (event) => this.onKey(event));
-    this.scroller.addEventListener("pointermove", (event) => {
+    this.scroller.addEventListener("pointerover", (event) => {
       const row = event.target.closest(".row");
-      if (row) this.setActive(Number(row.dataset.index), false);
+      if (row) this.setHover(Number(row.dataset.index));
     });
+    this.scroller.addEventListener("pointerleave", () => this.setHover(-1));
     this.scroller.addEventListener("click", (event) => {
       const row = event.target.closest(".row");
       if (!row) return;
@@ -883,22 +1108,43 @@ class VirtualList {
   }
 
   measure() {
-    const value = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--row-h"));
-    if (value) this.rowHeight = value;
+    const value = parseFloat(getComputedStyle(this.scroller).getPropertyValue("--row-h"));
+    if (value && value !== this.rowHeight) {
+      this.rowHeight = value;
+      this.spacer.style.height = `${this.items.length * this.rowHeight}px`;
+      this.redraw();
+    }
     this.viewport = this.scroller.clientHeight || 400;
+    if (!this.charWidth) {
+      const context = document.createElement("canvas").getContext("2d");
+      context.font = "13px 'JetBrains Mono', monospace";
+      this.charWidth = context.measureText("0000000000").width / 10 || 7.8;
+    }
+    const sample = this.spacer.querySelector(".row-names");
+    const chars = sample ? Math.max(14, Math.floor(sample.clientWidth / this.charWidth)) : this.chars;
+    if (chars !== this.chars) {
+      this.chars = chars;
+      this.redraw();
+    }
     this.schedule();
+  }
+
+  redraw() {
+    for (const row of this.rows.values()) row.remove();
+    this.rows.clear();
+    this.render();
   }
 
   setItems(items, { develop = false } = {}) {
     this.items = items;
-    for (const row of this.rows.values()) row.remove();
-    this.rows.clear();
     this.spacer.style.height = `${items.length * this.rowHeight}px`;
     this.scroller.scrollTop = 0;
     this.emptyNote.hidden = items.length > 0;
     this.active = -1;
+    this.hover = -1;
     this.scroller.removeAttribute("aria-activedescendant");
-    this.render();
+    this.redraw();
+    this.measure();
     this.setActive(items.length ? 0 : -1, false);
     if (develop) this.develop();
   }
@@ -927,7 +1173,7 @@ class VirtualList {
       const row = h(
         "div",
         {
-          class: `row is-${item.status}${index === this.active ? " is-active" : ""}`,
+          class: `row is-${item.status}${item.dated ? " is-dated" : ""}${index === this.active ? " is-active" : ""}${index === this.hover ? " is-hover" : ""}`,
           role: "option",
           id: `frame-${index}`,
           "data-index": index,
@@ -935,16 +1181,43 @@ class VirtualList {
           "aria-posinset": index + 1,
           "aria-selected": String(index === this.active)
         },
-        ...renderRow(item, index)
+        ...renderRow(item, index, this.chars)
       );
       row.style.transform = `translateY(${index * this.rowHeight}px)`;
       this.spacer.append(row);
       this.rows.set(index, row);
+      this.loadThumb(row, item, index);
     }
   }
 
+  loadThumb(row, item, index) {
+    if (!canShowThumbnail(item)) return;
+    const image = row.querySelector(".row-thumb img");
+    const path = currentPathOf(item);
+    const show = (url) => {
+      if (url && this.rows.get(index) === row) {
+        image.src = url;
+        image.hidden = false;
+        row.classList.add("has-thumb");
+      }
+    };
+    const cached = thumbnails.peek(path, 96);
+    if (cached !== undefined) {
+      show(cached);
+      return;
+    }
+    thumbnails.get(path, 96, () => this.rows.get(index) === row).then(show);
+  }
+
+  setHover(index) {
+    if (index === this.hover) return;
+    this.rows.get(this.hover)?.classList.remove("is-hover");
+    this.hover = index;
+    this.rows.get(index)?.classList.add("is-hover");
+    renderLoupe(this.items[index >= 0 ? index : this.active]);
+  }
+
   setActive(index, scroll) {
-    if (index === this.active) return;
     const previous = this.rows.get(this.active);
     if (previous) {
       previous.classList.remove("is-active");
@@ -969,7 +1242,7 @@ class VirtualList {
       row.setAttribute("aria-selected", "true");
     }
     this.scroller.setAttribute("aria-activedescendant", `frame-${index}`);
-    renderLoupe(this.items[index]);
+    if (this.hover < 0) renderLoupe(this.items[index]);
   }
 
   onKey(event) {
@@ -980,12 +1253,10 @@ class VirtualList {
       return;
     }
     const page = Math.max(1, Math.floor(this.viewport / this.rowHeight) - 1);
-    const moves = {
-      ArrowDown: 1, ArrowUp: -1, PageDown: page, PageUp: -page,
-      Home: -Infinity, End: Infinity
-    };
+    const moves = { ArrowDown: 1, ArrowUp: -1, PageDown: page, PageUp: -page, Home: -Infinity, End: Infinity };
     if (!(event.key in moves)) return;
     event.preventDefault();
+    this.setHover(-1);
     const target = Math.min(this.items.length - 1, Math.max(0, (this.active < 0 ? 0 : this.active) + moves[event.key]));
     this.setActive(target, true);
   }
@@ -996,10 +1267,10 @@ class VirtualList {
     visible.forEach(([, row], order) => {
       row.animate(
         [
-          { opacity: 0, filter: "brightness(2.2) sepia(1) blur(3px)" },
-          { opacity: 1, filter: "none" }
+          { opacity: 0, transform: `${row.style.transform} translateX(-6px)` },
+          { opacity: 1, transform: row.style.transform }
         ],
-        { duration: 700, delay: order * 35, easing: "cubic-bezier(.16,1,.3,1)", fill: "backwards" }
+        { duration: 520, delay: order * 30, easing: "cubic-bezier(.16,1,.3,1)", fill: "backwards" }
       );
     });
   }
@@ -1010,24 +1281,22 @@ const list = new VirtualList(ui.listScroller, ui.listEmpty);
 /* ------------------------------------------------------------ apply panel */
 
 function updateApplyPanel() {
+  ui.applyBox.hidden = state.view !== "preview";
   const plan = state.plan;
   const counts = plan ? countsOf(plan.items) : {};
   const ready = counts.ready || 0;
   const fresh = plan && sameSettings(state.planSettings, currentSettings());
   let hint;
-  if (state.view === "scanning") hint = "Analizando la carpeta…";
-  else if (state.view === "applying") hint = "Aplicando los cambios…";
-  else if (["success", "partial", "total"].includes(state.view)) hint = "Lote aplicado. Revisa el resumen a la derecha.";
-  else if (!plan) hint = "Cuando haya una vista previa, aquí podrás aplicarla.";
+  if (!plan) hint = "Cuando haya una vista previa, aquí podrás aplicarla.";
   else if (!fresh) hint = "El formato cambió: actualizando la vista previa…";
   else if (!ready) hint = "Ninguna foto puede renombrarse con este formato. Revisa los conflictos o prueba otra receta.";
   else {
     const rest = plan.items.length - ready;
     hint = `**${plural(ready, "foto", "fotos")}** ${ready === 1 ? "cambiará" : "cambiarán"} de nombre.` +
-      (rest ? ` ${plural(rest, "se queda", "se quedan")} como ${rest === 1 ? "está" : "están"}.` : "");
+      (rest ? ` ${plural(rest, "se queda", "se quedan")} como ${rest === 1 ? "está" : "están"}.` : "") +
+      (counts.dated ? ` ${plural(counts.dated, "ya parece fechada", "ya parecen fechadas")}.` : "");
   }
   ui.applyHint.replaceChildren(...strong(hint));
-  ui.applyBox.hidden = state.view !== "preview";
   const enabled = state.view === "preview" && fresh && ready > 0;
   ui.applyButton.disabled = !enabled;
   ui.applyButton.textContent = enabled ? `Renombrar ${plural(ready, "foto", "fotos")}` : "Renombrar";
@@ -1038,12 +1307,27 @@ function openConfirm() {
   const counts = countsOf(state.plan.items);
   const ready = counts.ready || 0;
   const rest = state.plan.items.length - ready;
-  ui.confirmTitle.replaceChildren("¿Renombrar ", h("span", { class: "seg" }, String(ready)), ready === 1 ? " foto?" : " fotos?");
+  setSeg(ui.confirmCount, ready);
+  ui.confirmTitle.textContent = ready === 1 ? "¿Renombrar esta foto?" : "¿Renombrar estas fotos?";
   ui.confirmText.replaceChildren(...strong(
     `Se cambiará el nombre de **${plural(ready, "archivo", "archivos")}** en **${folderNameOf(state.plan.folder)}**` +
     `${state.recursive ? " y sus subcarpetas" : ""}.` +
-    (rest ? ` ${plural(rest, "archivo con conflicto u omitido se queda", "archivos con conflicto u omitidos se quedan")} como ${rest === 1 ? "está" : "están"}.` : "")
+    (rest ? ` ${plural(rest, "archivo se queda", "archivos se quedan")} como ${rest === 1 ? "está" : "están"}.` : "")
   ));
+  const sample = state.plan.items.find((item) => item.status === "ready" && !item.dated) ||
+    state.plan.items.find((item) => item.status === "ready");
+  ui.confirmExample.replaceChildren(
+    h("span", { class: "example-old" }, splitPath(sample.original_name)[1]),
+    h("span", { class: "arrow", "aria-hidden": "true" }, " → "),
+    h("span", { class: "sr-only" }, " pasará a llamarse "),
+    h("span", { class: "example-new" }, ...nameWithStamp(splitPath(sample.new_name)[1], sample.date_text))
+  );
+  ui.confirmDated.hidden = !counts.dated;
+  if (counts.dated) {
+    ui.confirmDated.replaceChildren(...strong(
+      `Atención: **${plural(counts.dated, "foto ya empieza", "fotos ya empiezan")}** por una fecha y ${counts.dated === 1 ? "recibirá" : "recibirán"} otra. Cancela y usa el filtro «Ya fechadas» para revisarlas.`
+    ));
+  }
   ui.confirmApply.textContent = `Renombrar ${count(ready)}`;
   ui.confirmDialog.returnValue = "";
   ui.confirmDialog.showModal();
@@ -1054,9 +1338,7 @@ async function applyPlan() {
   if (!plan || !sameSettings(state.planSettings, currentSettings())) return;
   const total = plan.rename_count;
   setSheetHeading("Fijando", `Renombrando *${folderNameOf(plan.folder)}*`);
-  ui.progressCount.textContent = "0";
-  ui.progressTotal.textContent = String(total);
-  ui.progressBar.style.transform = "scaleX(0)";
+  resetProgress(total);
   ui.progressBar.parentElement.classList.remove("is-indeterminate");
   ui.progressLabel.textContent = `Renombrando 0 de ${count(total)}…`;
   ui.cancelScan.hidden = true;
@@ -1065,14 +1347,15 @@ async function applyPlan() {
   focusHeading();
 
   let settled = false;
-  const confirm = request("/api/confirm", { plan_id: plan.plan_id }).finally(() => { settled = true; });
+  const confirm = request("/api/confirm", { plan_id: plan.plan_id });
+  confirm.then(() => { settled = true; }, () => { settled = true; });
   (async () => {
     while (!settled) {
       try {
         const progress = await request("/api/apply-progress", { plan_id: plan.plan_id });
         if (settled || state.view !== "applying") return;
         if (progress.total) {
-          ui.progressCount.textContent = String(progress.done);
+          setSeg(ui.progressCount, progress.done);
           ui.progressBar.style.transform = `scaleX(${progress.done / progress.total})`;
           ui.progressLabel.textContent = `Renombrando ${count(progress.done)} de ${count(progress.total)}…`;
         }
@@ -1090,8 +1373,22 @@ async function applyPlan() {
     showResult(plan, result);
   } catch (error) {
     state.plan = null;
-    showError("No se aplicó ningún cambio", error.message, () => startPreview({ origin: "retry" }));
+    state.planSettings = null;
+    showUnknown(error.message);
   }
+}
+
+/** The apply request failed: some files may have been renamed. Never claim otherwise. */
+function showUnknown(message) {
+  setSheetHeading("Resultado desconocido", "No sé si se *renombró* todo");
+  showMessage({
+    view: "unknown",
+    art: "fogged",
+    text: `La aplicación no pudo confirmar el resultado (${message}) Algunos archivos pueden haber cambiado de nombre. **Vuelve a analizar la carpeta** para ver su estado real antes de seguir.`,
+    primary: { label: "Volver a analizar", action: () => startPreview({ origin: "retry" }) }
+  });
+  announce("Resultado desconocido. Vuelve a analizar la carpeta para comprobar su estado.");
+  focusHeading();
 }
 
 function showResult(plan, result) {
@@ -1111,43 +1408,37 @@ function showResult(plan, result) {
     date_text: byOriginal.get(entry.old_name)?.date_text,
     date_source: byOriginal.get(entry.old_name)?.date_source
   }));
-  state.result = { runId: result.run_id, items: [...failures, ...renamed] };
+  state.result = { items: [...failures, ...renamed] };
   state.lastRunId = result.run_id || null;
-  state.filter = "all";
-  state.query = "";
-  ui.search.value = "";
   const renamedCount = result.renamed_count;
   const failedCount = result.failed_count;
   let view;
   if (!failedCount) {
     view = "success";
-    setSheetHeading("Revelado completo", "Todo *en su sitio*");
-    ui.resultKicker.textContent = "Hecho";
-    ui.resultTitle.replaceChildren(...rich(`${renamedCount === 1 ? "*1 foto* renombrada" : `*${count(renamedCount)} fotos* renombradas`}`));
-    ui.resultText.replaceChildren(...strong("Ningún archivo se ha sobrescrito. Si algo no te convence, puedes **deshacer el lote** mientras la aplicación siga abierta."));
+    setSheetHeading("Revelado completo", renamedCount === 1 ? "*1 foto*, en su sitio" : `*${count(renamedCount)} fotos*, en su sitio`);
+    ui.resultText.replaceChildren(...strong("Todos los nombres se aplicaron y **ningún archivo se ha sobrescrito**. Si algo no te convence, puedes deshacer el lote mientras la aplicación siga abierta."));
   } else if (renamedCount) {
     view = "partial";
-    setSheetHeading("Revelado con velos", "Casi *todo* listo");
-    ui.resultKicker.textContent = "Error parcial";
-    ui.resultTitle.replaceChildren(...rich(`*${count(renamedCount)}* renombradas, *${count(failedCount)}* sin cambiar`));
-    ui.resultText.replaceChildren(...strong(`${failedCount === 1 ? "**1 archivo** no se pudo renombrar" : `**${count(failedCount)} archivos** no se pudieron renombrar`} y ${failedCount === 1 ? "conserva" : "conservan"} su nombre original. Abajo verás el motivo de cada uno; el resto se aplicó correctamente.`));
+    setSheetHeading("Revelado con velos", `*${count(renamedCount)}* renombradas · *${count(failedCount)}* sin cambiar`);
+    ui.resultText.replaceChildren(...strong(`${failedCount === 1 ? "**1 archivo** no se pudo renombrar y conserva" : `**${count(failedCount)} archivos** no se pudieron renombrar y conservan`} su nombre original; el motivo está en la lista. El resto se aplicó correctamente.`));
   } else {
     view = "total";
-    setSheetHeading("Película velada", "No se pudo *renombrar*");
-    ui.resultKicker.textContent = "Error";
-    ui.resultTitle.replaceChildren(...rich("Ningún archivo ha *cambiado*"));
-    ui.resultText.replaceChildren(...strong(`${failedCount === 1 ? "El único archivo falló" : `Los **${count(failedCount)} archivos** fallaron`}; todos conservan su nombre original. Revisa los motivos abajo — a menudo es un archivo abierto en otro programa — y vuelve a intentarlo.`));
+    setSheetHeading("Película velada", "Ningún archivo ha *cambiado*");
+    ui.resultText.replaceChildren(...strong(`${failedCount === 1 ? "El archivo falló y conserva" : `Los **${count(failedCount)} archivos** fallaron y conservan`} su nombre original. Suele deberse a un archivo abierto en otro programa o de solo lectura: ciérralo y vuelve a analizar.`));
   }
-  ui.resultCount.textContent = String(renamedCount);
+  setSeg(ui.resultCount, renamedCount);
   ui.resultOf.hidden = view === "success";
-  ui.resultTotal.textContent = String(renamedCount + failedCount);
+  setSeg(ui.resultTotal, renamedCount + failedCount);
   ui.undoButton.hidden = !state.lastRunId;
   ui.undoButton.textContent = renamedCount === 1 ? "Deshacer este cambio" : `Deshacer ${count(renamedCount)} cambios`;
-  renderFilters(
-    { renamed: renamedCount, failed: failedCount },
-    ["all", "failed", "renamed"]
-  );
+  configureResultPrimary(view === "success"
+    ? { label: "Elegir otra carpeta", action: pickFolder, back: true }
+    : { label: "Volver a analizar", action: () => startPreview({ origin: "retry" }), back: false });
+  state.filter = "all";
+  state.query = "";
+  ui.search.value = "";
   setView(view);
+  renderFilters({ renamed: renamedCount, failed: failedCount }, ["all", "failed", "renamed"]);
   list.setItems(filteredItems(), { develop: true });
   focusHeading();
   announce(
@@ -1157,32 +1448,72 @@ function showResult(plan, result) {
   );
 }
 
+function configureResultPrimary({ label, action, back }) {
+  ui.resultPrimary.textContent = label;
+  ui.resultPrimary.onclick = action;
+  ui.resultBack.hidden = !back;
+}
+
 async function undoLastRun() {
   const runId = state.lastRunId;
   if (!runId) return;
   ui.undoButton.disabled = true;
+  ui.resultPrimary.disabled = true;
   try {
     const result = await request("/api/undo", { run_id: runId });
-    state.lastRunId = null;
-    state.result = null;
-    setSheetHeading("Restaurado", "Como *estaba*");
-    showMessage({
-      view: "restored",
-      art: "restored",
-      kicker: "Deshecho",
-      title: `${result.restored_count === 1 ? "*1 archivo* ha" : `*${count(result.restored_count)} archivos* han`} recuperado su nombre`,
-      text: "La carpeta vuelve a estar como antes de renombrar. Puedes preparar otra vista previa.",
-      primary: { label: "Volver a analizar", action: () => startPreview({ origin: "retry" }) },
-      secondary: { label: "Elegir otra carpeta", action: pickFolder }
-    });
-    announce("Lote deshecho. Los archivos han recuperado su nombre original.");
+    state.lastRunId = result.run_id || null;
+    if (!result.failed_count) {
+      state.result = null;
+      thumbnails.clear();
+      setSheetHeading("Restaurado", result.restored_count === 1 ? "*1 archivo* vuelve a su nombre" : `*${count(result.restored_count)} archivos* vuelven a su nombre`);
+      showMessage({
+        view: "restored",
+        art: "restored",
+        text: "La carpeta está como antes de renombrar. Puedes preparar otra vista previa o elegir otra carpeta.",
+        primary: { label: "Volver a analizar", action: () => startPreview({ origin: "retry" }) },
+        secondary: { label: "Elegir otra carpeta", action: pickFolder }
+      });
+      announce("Lote deshecho. Los archivos han recuperado su nombre original.");
+    } else {
+      showUndoPartial(result);
+    }
     focusHeading();
   } catch (error) {
     showToast(`No se pudo deshacer: ${error.message}`);
     announce(`No se pudo deshacer: ${error.message}`);
   } finally {
     ui.undoButton.disabled = false;
+    ui.resultPrimary.disabled = false;
   }
+}
+
+function showUndoPartial(result) {
+  state.result = {
+    items: result.failures.map((failure) => ({
+      original_name: failure.current_name,
+      new_name: failure.original_name,
+      status: "pending",
+      reason: failure.reason
+    }))
+  };
+  setSheetHeading("Deshacer incompleto", `*${count(result.failed_count)}* sin restaurar`);
+  ui.resultText.replaceChildren(...strong(
+    `Se restauraron **${plural(result.restored_count, "archivo", "archivos")}**, pero ${result.failed_count === 1 ? "**1** sigue" : `**${count(result.failed_count)}** siguen`} con el nombre nuevo. El motivo está en la lista: cierra el programa que lo use y vuelve a intentarlo. No se ha sobrescrito nada.`
+  ));
+  setSeg(ui.resultCount, result.restored_count);
+  ui.resultOf.hidden = false;
+  setSeg(ui.resultTotal, result.restored_count + result.failed_count);
+  ui.undoButton.hidden = true;
+  configureResultPrimary(state.lastRunId
+    ? { label: "Reintentar deshacer", action: undoLastRun, back: true }
+    : { label: "Volver a analizar", action: () => startPreview({ origin: "retry" }), back: false });
+  state.filter = "all";
+  state.query = "";
+  ui.search.value = "";
+  setView("undo-partial");
+  renderFilters({ pending: result.failed_count }, ["all", "pending"]);
+  list.setItems(filteredItems());
+  announce(`${plural(result.failed_count, "archivo no se pudo", "archivos no se pudieron")} restaurar.`);
 }
 
 function setRecursive(value) {
@@ -1206,30 +1537,29 @@ ui.heroForm.addEventListener("submit", (event) => {
   chooseFolder(folder);
 });
 ui.heroPath.addEventListener("input", () => { ui.heroMessage.hidden = true; });
-for (const input of ui.recursiveInputs) {
-  input.addEventListener("change", () => setRecursive(input.checked));
+for (const input of ui.recursiveInputs) input.addEventListener("change", () => setRecursive(input.checked));
+for (const button of ui.presets) button.addEventListener("click", () => applyPreset(button.dataset.preset));
+for (const radio of ui.dateRadios) {
+  radio.addEventListener("change", () => {
+    renderTokens();
+    announce(`Formato de fecha ${radio.closest("label")?.textContent.trim() || radio.value}.`);
+    scheduleRefresh();
+  });
 }
-for (const button of ui.presets) {
-  button.addEventListener("click", () => applyPreset(button.dataset.preset));
+for (const button of ui.addPieces) {
+  button.addEventListener("click", () => {
+    const value = button.dataset.piece;
+    if (value === "text") {
+      ui.literalText.value = "";
+      ui.literalError.hidden = true;
+      ui.textDialog.returnValue = "";
+      ui.textDialog.showModal();
+      return;
+    }
+    state.components.push({ kind: "field", value });
+    formatChanged("custom", `${FIELD_LABELS[value]} añadida al final.`);
+  });
 }
-ui.dateFormat.addEventListener("change", () => {
-  renderExample();
-  scheduleRefresh();
-});
-ui.addElement.addEventListener("change", () => {
-  const value = ui.addElement.value;
-  ui.addElement.value = "";
-  if (!value) return;
-  if (value === "text") {
-    ui.literalText.value = "";
-    ui.literalError.hidden = true;
-    ui.textDialog.returnValue = "";
-    ui.textDialog.showModal();
-    return;
-  }
-  state.components.push({ kind: "field", value });
-  formatChanged("custom", `${FIELD_LABELS[value]} añadida al final.`);
-});
 ui.textDialog.addEventListener("submit", (event) => {
   if (event.submitter?.value !== "add") return;
   const value = ui.literalText.value;
@@ -1246,7 +1576,10 @@ ui.textDialog.addEventListener("submit", (event) => {
   state.components.push({ kind: "text", value });
   formatChanged("custom", `Texto «${value}» añadido al final.`);
 });
-ui.textDialog.addEventListener("close", () => ui.addElement.focus());
+ui.textDialog.addEventListener("close", () => {
+  const textButton = ui.addPieces.find((button) => button.dataset.piece === "text");
+  (textButton || ui.addPieces[0]).focus();
+});
 ui.detailDialog.addEventListener("close", () => ui.listScroller.focus());
 
 ui.applyButton.addEventListener("click", openConfirm);
@@ -1261,7 +1594,6 @@ ui.cancelScan.addEventListener("click", async () => {
 });
 ui.undoButton.addEventListener("click", undoLastRun);
 ui.resultBack.addEventListener("click", () => startPreview({ origin: "retry" }));
-ui.resultNew.addEventListener("click", pickFolder);
 
 let searchTimer = null;
 ui.search.addEventListener("input", () => {
@@ -1278,51 +1610,33 @@ ui.wordmark.addEventListener("click", (event) => {
   if (state.view === "applying") return;
   window.clearTimeout(refreshTimer);
   if (activeScan) cancelActiveScan();
+  scanGeneration += 1;
   setMode("idle");
   ui.heroMessage.hidden = true;
   ui.heroBrowse.focus();
 });
 
+/* Shortcuts use Alt so they never fire while typing or reading (WCAG 2.1.4). */
 document.addEventListener("keydown", (event) => {
-  if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return;
-  const target = event.target;
-  if (target.closest("input, select, textarea, dialog[open]") || document.querySelector("dialog[open]")) return;
-  if (event.key === "o" || event.key === "O") {
+  if (!event.altKey || event.ctrlKey || event.metaKey || document.querySelector("dialog[open]")) return;
+  if (event.code === "KeyO") {
     event.preventDefault();
     pickFolder();
-  } else if (event.key === "/" && !ui.sheetTools.hidden && state.mode !== "idle") {
+  } else if (event.code === "KeyB" && !ui.sheetTools.hidden && state.mode !== "idle") {
     event.preventDefault();
     ui.search.focus();
   }
 });
 
-/* ------------------------------------------------------------ atmosphere */
-
-function stampToday() {
-  const today = new Date();
-  const pad = (value) => String(value).padStart(2, "0");
-  ui.heroStamp.textContent = `'${pad(today.getFullYear() % 100)} ${pad(today.getMonth() + 1)} ${pad(today.getDate())}`;
+function syncFormatDisclosure() {
+  ui.formatDetails.open = !narrowScreen.matches;
 }
+narrowScreen.addEventListener("change", syncFormatDisclosure);
+ui.formatDetails.addEventListener("toggle", () => {
+  if (!narrowScreen.matches && !ui.formatDetails.open) ui.formatDetails.open = true;
+});
 
-function followPointer() {
-  let frame = 0;
-  let x = 0;
-  let y = 0;
-  window.addEventListener("pointermove", (event) => {
-    if (reduceMotion.matches || event.pointerType !== "mouse") return;
-    x = event.clientX;
-    y = event.clientY;
-    if (frame) return;
-    frame = window.requestAnimationFrame(() => {
-      frame = 0;
-      document.documentElement.style.setProperty("--pointer-x", `${(x / window.innerWidth) * 100}%`);
-      document.documentElement.style.setProperty("--pointer-y", `${(y / window.innerHeight) * 100}%`);
-    });
-  }, { passive: true });
-}
-
-stampToday();
-followPointer();
+syncFormatDisclosure();
 renderTokens();
 renderLoupe(null);
 updateApplyPanel();
