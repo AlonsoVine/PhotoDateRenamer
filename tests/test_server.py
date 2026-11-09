@@ -47,6 +47,13 @@ class LocalServerTests(unittest.TestCase):
         with urlopen(request) as response:
             return json.loads(response.read())
 
+    def test_an_unexpected_server_error_answers_500_instead_of_dropping_the_connection(self) -> None:
+        with patch("photodaterenamer.server.AppRequestHandler._last_run", side_effect=RuntimeError("boom")):
+            with self.assertRaises(HTTPError) as caught:
+                self.post("/api/last-run", {})
+        self.assertEqual(caught.exception.code, 500)
+        self.assertIn("boom", json.loads(caught.exception.read())["error"])
+
     def test_serves_browser_assets_and_limits_api_to_authorized_origin(self) -> None:
         with urlopen(f"{self.base_url}/styles.css") as response:
             stylesheet = response.read().decode("utf-8")

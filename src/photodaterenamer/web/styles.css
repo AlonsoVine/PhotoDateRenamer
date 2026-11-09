@@ -639,7 +639,7 @@ body[data-mode="idle"] .shortcuts > span:nth-child(n+3) { display: none; }
 .detail-body { margin-top: 4px; }
 @media (max-width: 1279px) {
   .list-scroller { --row-h: 84px; --name-lines: 2; }
-  .row-new { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal; overflow-wrap: anywhere; }
+  .row-new { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal; word-break: break-all; }
   .row-origin { display: none; }
   .bench-foot, .bench-foot:has(.apply-box[hidden]) { grid-template-columns: minmax(0, 1fr); }
   .loupe { display: none; }
@@ -650,12 +650,14 @@ body[data-mode="idle"] .shortcuts > span:nth-child(n+3) { display: none; }
 }
 @media (max-height: 640px) and (min-width: 961px) {
   .workbench { height: auto; }
+  .list-view { grid-template-rows: auto auto; }
   .strip { height: min(60vh, var(--content-h, 60vh)); }
 }
 @media (max-width: 960px) {
   .workbench { grid-template-columns: minmax(0, 1fr); height: auto; min-height: 0; }
   .sheet { order: -1; min-height: 0; }
   .controls { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; overflow: visible; }
+  .list-view { grid-template-rows: auto auto; }
   .strip { height: min(clamp(300px, 56vh, 720px), var(--content-h, 100vh)); }
   .state { padding: 20px 0 8px; justify-content: flex-start; }
   .bench-foot { position: sticky; bottom: 0; z-index: 5; grid-template-columns: minmax(0, 1fr); padding: 10px 0 12px; background: linear-gradient(transparent, var(--ink) 18px); }

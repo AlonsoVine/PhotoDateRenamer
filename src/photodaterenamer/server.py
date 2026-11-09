@@ -201,6 +201,8 @@ class AppRequestHandler(BaseHTTPRequestHandler):
             self._send_json(400, {"error": str(error)})
         except RenameExecutionError as error:
             self._send_json(500, {"error": str(error)})
+        except Exception as error:  # noqa: BLE001 - an explicit answer beats a dropped connection
+            self._send_json(500, {"error": f"Error interno de la aplicación: {error}"})
 
     def _select_folder(self) -> dict[str, str]:
         if platform.system() == "Windows":

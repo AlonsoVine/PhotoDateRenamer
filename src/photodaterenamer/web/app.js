@@ -29,6 +29,7 @@ const PRESETS = {
     { kind: "field", value: "extension" }
   ]
 };
+const PHOTO_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".tif", ".tiff"]);
 const PRESET_LABELS = {
   date_original: "Fecha + nombre",
   date_stem: "Fecha, sin extensión",
@@ -1072,6 +1073,16 @@ function shorten(path, maxChars) {
 }
 
 /** Destination name with the date highlighted; optionally shortened in the middle. */
+/** True when a proposed name drops the photo extension (e.g. the «sin extensión» recipe). */
+function losesExtension(item) {
+  const extension = (name) => {
+    const base = H.baseName(name || "");
+    const dot = base.lastIndexOf(".");
+    return dot > 0 ? base.slice(dot).toLowerCase() : "";
+  };
+  return Boolean(item.new_name) && PHOTO_EXTENSIONS.has(extension(item.original_name)) && !PHOTO_EXTENSIONS.has(extension(item.new_name));
+}
+
 function nameWithStamp(path, dateText, maxChars = Infinity) {
   const [directory, base] = shorten(path, maxChars);
   const nodes = [];
@@ -1485,6 +1496,10 @@ function openConfirm() {
   if (readyFileDates) {
     warnings.push(`**${plural(readyFileDates, "foto usa", "fotos usan")}** la fecha del archivo porque no guarda la de captura (filtro «Fecha del archivo»).`);
   }
+  const extensionless = state.plan.items.filter((item) => item.status === "ready" && losesExtension(item)).length;
+  if (extensionless) {
+    warnings.push(`**${plural(extensionless, "foto quedará", "fotos quedarán")} sin extensión** (.jpg, .png…) y el sistema podría no abrir${extensionless === 1 ? "la" : "las"} con doble clic.`);
+  }
   if (state.lastRun) {
     warnings.push(`El lote anterior (**${plural(state.lastRun.count, "foto", "fotos")}** en ${quoted(state.lastRun.folder_name)}) dejará de poder deshacerse en cuanto este renombre una foto.`);
   }
@@ -1553,7 +1568,7 @@ function showUnknown(message) {
   showMessage({
     view: "unknown",
     art: "fogged",
-    text: `La aplicación no pudo confirmar el resultado: ${message.replace(/[.?!]?$/, ".")} Algunos archivos pueden haber cambiado de nombre. **Vuelve a analizar la carpeta** para ver su estado real; si se renombró alguno, podrás deshacerlo desde «Último lote».`,
+    text: `La aplicación no pudo confirmar el resultado: ${message.replace(/[.?!]?$/, ".")} Algunos archivos pueden haber cambiado de nombre. **Vuelve a analizar la carpeta** para ver su estado real; si se renombró alguno y la aplicación sigue abierta, podrás deshacerlo desde «Último lote». Si la aplicación se cerró, ese deshacer se ha perdido y habría que devolver los nombres a mano.`,
     primary: { label: "Volver a analizar", action: () => startPreview({ origin: "retry" }) }
   });
   announce("Resultado desconocido. Vuelve a analizar la carpeta para comprobar su estado.");
