@@ -14,7 +14,7 @@ Every change to the name format re-read the metadata of every photo, which takes
   - Proposed names are identical with and without the cache.
   - The loopback adapter keeps one cache per analysed folder, capped at 200,000 entries.
 - `apply_plan` accepts `on_renamed`, called after each successful move. The adapter records each move as it happens, so an interrupted batch can still be undone.
-- The adapter keeps the run's root folder with the run, and exposes `POST /api/last-run`. The interface shows a «Último lote» bar in every view until another batch is applied.
+- The adapter keeps the run's root folder with the run, and exposes `POST /api/last-run`. The interface shows a «Último lote» bar in every view until another batch renames its first file. A batch that renames nothing leaves the previous one undoable.
 
 ## Consequences
 

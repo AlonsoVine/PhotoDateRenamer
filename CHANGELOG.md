@@ -38,6 +38,10 @@ Notable changes to PhotoDateRenamer are documented here.
 - Changing the format updates the preview in place, keeps the filter, search and selection, and reuses dates already read instead of reading every photo again.
 - The loupe follows the selected row, not the pointer. On narrow windows, statuses use short text labels instead of colour alone.
 - The «Fecha + título» recipe is now called «Fecha, sin extensión»; it produces the same names.
+- Applying a batch that renames nothing keeps the previous batch undoable. The confirmation warns when the previous batch will stop being undoable.
+- Below 1280 px the new name wraps onto two lines instead of being cut in the middle.
+- Result views show the summary before the filters. Counters are green for what succeeded and red only when nothing changed.
+- Conflicts name the frame they clash with. Wide screens show where each date comes from (EXIF, XMP or Archivo).
 
 ### Fixed
 - Destination names longer than 255 characters are flagged as conflicts in the preview instead of failing during the rename.

@@ -103,6 +103,10 @@ El arte no estorba:
 26. **Estado nunca solo por color** (vuelta 3). En pantallas estrechas las etiquetas se abrevian con texto (Cambia, Choque, Omitida…) en lugar de quedarse en un punto de color (WCAG 1.4.1).
 27. **Receta «Fecha, sin extensión»** (vuelta 3). Sustituye a «Fecha + título», que no decía qué hacía. Es la misma receta: los nombres no cambian.
 28. **Errores de deshacer y aplicar, sin afirmaciones falsas** (vuelta 3). Un rechazo del servidor (4xx) ocurre antes de tocar archivos, y la interfaz lo dice. Un fallo de red o de servidor lleva a «Resultado desconocido», con el lote recuperable. Mientras se deshace, una vista «Deshaciendo» bloquea las acciones que podrían cruzarse.
+29. **Un lote que no renombra nada no sustituye al anterior** (vuelta 4). El servidor cambia de «último lote» al renombrar el primer archivo del nuevo, y la confirmación avisa de la sustitución.
+30. **Nombre nuevo en dos líneas por debajo de 1280 px** (vuelta 4). Allí no hay lupa, y el nombre nuevo es lo que el usuario revisa. Las filas pasan a 84 px fijos, así que la virtualización no cambia.
+31. **Rótulo literal y titular metafórico** (vuelta 4). El rótulo pequeño dice lo que pasa, para quien no conoce el cuarto oscuro; el titular conserva la metáfora. La carpeta se escribe entre comillas angulares.
+32. **De negativo a positivo** (vuelta 4). Al terminar de renombrar, las miniaturas de las fotos renombradas se «fijan»: pasan de negativo a positivo en 1,1 s, escalonadas. Con movimiento reducido no hay animación.
 
 ## 4. Dependencias
 

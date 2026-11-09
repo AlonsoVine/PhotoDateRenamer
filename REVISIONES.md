@@ -8,6 +8,7 @@ Ponderada = 0,4·Diseño + 0,3·Usabilidad + 0,2·Creatividad + 0,1·Contenido. 
 | --- | --- | --- | --- | --- | --- |
 | 1 | 7,5 | 6,5 | 7,5 | 7,5 | 7,2 |
 | 2 | 8,3 | 7,6 | 8,5 | 7,9 | 8,09 |
+| 3 | 8,3 | 7,8 | 8,4 | 7,8 | 8,12 |
 
 ---
 
@@ -143,3 +144,45 @@ Ponderada = 0,4·Diseño + 0,3·Usabilidad + 0,2·Creatividad + 0,1·Contenido. 
   - 100 capturas, con 0 errores de consola, 0 desbordamientos, 0 violaciones de axe en 88 estados auditados y todos los titulares dentro de la primera vista;
   - 60 fps al desplazar 3.000 filas y durante el revelado.
 - Lighthouse: 99/100/100 en móvil y en escritorio.
+
+### Defectos señalados por el revisor
+
+No señaló bloqueantes. La mejora frente a la vuelta 2 fue de 0,03, por debajo de 0,2. Es la primera vuelta con una mejora tan pequeña, así que la regla de parada (dos seguidas) aún no se cumple y queda una vuelta más, la 4, que es el máximo.
+
+| Prioridad | Defecto | Resolución (vuelta 4) |
+| --- | --- | --- |
+| Mayor | Aplicar un lote nuevo borraba el deshacer del anterior aunque el nuevo no renombrase nada. | Corregido: el lote anterior solo se sustituye cuando el nuevo renombra su primer archivo. El diálogo de confirmación avisa de que el lote anterior dejará de poder deshacerse. Test `test_a_batch_that_renames_nothing_keeps_the_previous_batch_undoable`. |
+| Mayor | En 1024 y 360 px el nombre nuevo se cortaba por el centro. | Corregido: por debajo de 1280 px las filas miden 84 px y el nombre nuevo usa dos líneas. En 360 px las etiquetas pasan bajo la miniatura y el nombre ocupa todo el ancho. |
+| Mayor | Tras deshacer desde la barra, el panel mostraba otra carpeta. | Corregido: deshacer fija la carpeta del lote. |
+| Mayor | Quitar la última pieza durante un análisis mostraba «Análisis cancelado». | Corregido: se invalida la generación del análisis antes de cancelarlo. |
+| Mayor | Filtros encima del resumen de resultados; contador en rojo para lo que salió bien. | Corregido: resumen, después filtros y después lista. El contador es verde para lo hecho y rojo solo si no cambió nada. |
+| Menor | El error total culpaba a archivos «de solo lectura», que sí se renombran. | Corregido: «abierto en otro programa o carpeta sin permiso de escritura». |
+| Menor | «Todos los nombres se aplicaron» con archivos sin tocar. | Corregido: «Todos los cambios previstos», más el número de archivos que siguen igual. |
+| Menor | El nombre de carpeta en el titular se leía como palabra («La carpeta vacia está vacía»). | Corregido: la carpeta va entre comillas angulares, «vacia». |
+| Menor | Al volver al inicio no aparecía la barra del último lote. | Corregido: `setMode` también la pinta. |
+| Menor | El conflicto repetía el nombre («como X» igual al destino). | Corregido: «ya existe (fotograma 0001)» o «también lo pide el 0008». El número de fotograma es fijo por foto, aunque haya filtros. |
+| Menor | El diálogo de confirmar no cabía en 360×720. | Corregido: versión compacta en ventanas de menos de 760 px de alto y desplazamiento al inicio. |
+| Menor | Muestras 2025 frente a 2024, la versión «v0.6» inventada y etiquetas distintas para el mismo estado. | Corregido: la muestra es 2024_08_14 en todas partes, se retira la versión y las etiquetas cortas son «Renombra» y «Conflicto». |
+| Menor | El origen de la fecha no se veía de un vistazo. | Corregido: desde 1280 px cada fila indica EXIF, XMP o Archivo. |
+| Menor | La salida de `checks.txt` aparecía mezclada con el registro del servidor. | Corregido: los tests se ejecutan con `-b`. |
+
+### Ideas del revisor
+
+| Idea | Decisión | Motivo |
+| --- | --- | --- |
+| Nombre nuevo legible siempre | Adoptada | Dos líneas por debajo de 1280 px; la lista virtual sigue con altura fija (84 px). |
+| Revelado real: de negativo a positivo al aplicar | Adoptada | Las miniaturas renombradas pasan de negativo a positivo, escalonadas. Con movimiento reducido el resultado es estático. |
+| Deshacer a prueba de lotes | Adoptada | Corrige M1, M3 y m4. |
+| Semántica de color y orden en los resultados | Adoptada | Corrige M5. |
+| Revisión de textos: rótulo literal y titular en metáfora | Adoptada | Rótulos como «Analizando la carpeta», «Renombrando», «Resultado: 2 fallos», «Ningún archivo cambió» y «Resultado sin confirmar», sin primera persona. |
+| Conflicto que salta a la fila con la que choca | Adoptada en parte | Se nombra el fotograma. El salto por enlace se descarta: un control dentro de una opción de `listbox` no es accesible. |
+| Grafismo propio por estado | Descartada en esta vuelta | Prioridad menor que los defectos mayores; las tiras actuales ya distinguen los estados por forma y color. |
+
+## Vuelta 4: verificación propia antes de la revisión
+
+- **360 px:** en la primera captura de la vuelta 4, las etiquetas de estado desbordaban su columna de 66 px y tapaban la segunda línea del nombre nuevo. Ahora van bajo los nombres, en una sola línea, y el nombre usa todo el ancho.
+- **Desde 1280 px:** con la tira ajustada a sus filas quedaba un hueco negro entre la tira y la lupa. La fila de la rejilla también se ajusta (`minmax(0, var(--content-h))`), y la lupa va justo después de la tira.
+- **Fluidez:** la primera medición en 1680 px dio 38 fps. Para descartar una regresión, se compararon el código de la vuelta 3 y el de la vuelta 4 en el mismo equipo, alternándolos:
+  - el código de la vuelta 4 dio 49–60 fps, sin tareas largas;
+  - el perfil de CPU atribuye a JavaScript menos del 5 % del tiempo;
+  - los 38 fps se debían a carga del equipo durante la captura, no al código.
